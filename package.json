@@ -1,0 +1,36 @@
+{
+	"name": "@spmeesseman/test-utils",
+	"version": "0.0.1",
+	"displayName": "Unit Test Utility",
+	"description": "Unit Testing utilities including best and slowest time tracking",
+	"license": "MIT",
+	"homepage": "https://github.com/spmeesseman/test-utils/blob/master/README.md",
+	"author": {
+		"name": "Scott Meesseman",
+		"email": "spmeesseman@gmail.com"
+	},
+	"bugs": {
+		"url": "https://github.com/spmeesseman/test-utils/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/spmeesseman/test-utils.git"
+	},
+	"categories": [
+		"Testing"
+	],
+	"keywords": [
+		"test",
+		"tests",
+		"unit test",
+		"mocha",
+		"nyc"
+	],
+	"scripts": {},
+	"devDependencies": {
+		"@types/node": "^16.18.34"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

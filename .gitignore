@@ -1,0 +1,10 @@
+node_modules
+dist
+*.buildinfo
+*.tsbuildinfo
+coverage
+.coverage
+.nyc_output
+types/lib
+tsconfig.tsbuildinfo
+.dccache
