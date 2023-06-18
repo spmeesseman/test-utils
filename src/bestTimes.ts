@@ -1,69 +1,38 @@
 import { figures } from "./figures";
 import { ITestUtilsOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
+import TestUtilsUtilities from "./utils";
 
 
 export class TestUtilsBestTimes
 {
+    private readonly _utils: TestUtilsUtilities;
     private readonly _options: ITestUtilsOptions;
     private readonly _results: ITestUtilsResults;
     private readonly _timeSep = "----------------------------------------------------------------------------------------------------";
-
 
     private _storage = {
         async updateStoreValue(...args: any[]) {},
         getStoreValue<T>(...args: any[]) { return 0 as T; }
     };
 
-    constructor(options: Partial<ITestUtilsOptions>)
-    {
-        this._options = Object.assign({
-            clearAllBestTimes: false,
-            clearBestTime: false,
-            clearBestTimesOnTestCountChange: false,
-            isConsoleLogEnabled: false,
-            isFileLogEnabled: false,
-            isLogEnabled: false,
-            isMultiRootWorkspace: false,
-            isOutputWindowLogEnabled: false
-        }, options);
 
-        this._results = {
-            numSuites: 0,
-            numSuitesFail: 0,
-            numSuitesSuccess: 0,
-            numTests: 0,
-            numTestsFail: 0,
-            numTestsSuccess: 0,
-            suiteResults: <ITestUtilsSuiteResults>{},
-        };
+    constructor(options: ITestUtilsOptions, utils: TestUtilsUtilities, results: ITestUtilsResults)
+    {
+        this._utils = utils;
+        this._options = options;
+        this._results = results;
+
     }
 
 
-    private properCase = (name: string | undefined, removeSpaces?: boolean) =>
-    {
-        if (!name) {
-        return "";
-        }
-        return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(/[ ]+/g, !removeSpaces ? " " : "");
-    };
+    get results(): ITestUtilsResults {
+        return this._results;
+    }
 
 
-    private lowerCaseFirstChar = (s: string, removeSpaces: boolean) =>
-    {
-        let fs = "";
-        if (s)
-        {
-            fs = s[0].toString().toLowerCase();
-            if (s.length > 1) {
-                fs += s.substring(1);
-            }
-            if (removeSpaces) {
-                fs = fs.replace(/ /g, "");
-            }
-        }
-        return fs;
-    };
-
+    suiteResults(suiteName: string): ITestUtilsSuiteResults {
+        return this._results.suiteResults[suiteName];
+    }
 
 
     private clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
@@ -94,15 +63,6 @@ export class TestUtilsBestTimes
 
 
     getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
-
-
-    getSuiteKey = (suiteName: string, preKey = "") =>
-    {
-        if (preKey) {
-            return preKey + this.properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
-        }
-        return this.lowerCaseFirstChar(this.properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
-    };
 
 
     private getTimeElapsedFmt = (timeElapsed: number) =>
@@ -251,7 +211,7 @@ export class TestUtilsBestTimes
         for (const suiteResult of suiteResults)
         {
             const typeKey = this._results.numSuites === 1 ? "Single" : "",
-                storageKey = this.getSuiteKey(suiteResult.suiteName, this.getStorageKey("bestTimeElapsedSuite" + typeKey));
+                storageKey = this._utils.getSuiteKey(suiteResult.suiteName, this.getStorageKey("bestTimeElapsedSuite" + typeKey));
             if (this._options.clearAllBestTimes) {
                 await this.clearProcessTimeStorage(storageKey, this._results.numTests);
                 await this.clearProcessTimeStorage(`${storageKey}Slow`, this._results.numTests);

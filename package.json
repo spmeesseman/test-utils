@@ -28,6 +28,8 @@
 	],
 	"scripts": {},
 	"devDependencies": {
+		"@types/chai": "^4.3.4",
+		"@types/mocha": "^9.1.0",
 		"@types/node": "^16.18.34"
 	},
 	"publishConfig": {

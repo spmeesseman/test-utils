@@ -1,14 +1,15 @@
 
 export interface ITestUtilsOptions
 {
-    clearAllBestTimes: boolean,
+    clearAllBestTimes: boolean;
     clearBestTime: boolean,
-    clearBestTimesOnTestCountChange: boolean,
-    isConsoleLogEnabled: boolean,
-    isFileLogEnabled: boolean,
-    isLogEnabled: boolean,
-    isMultiRootWorkspace: boolean,
-    isOutputWindowLogEnabled: boolean
+    clearBestTimesOnTestCountChange: boolean;
+    isConsoleLogEnabled: boolean;
+    isFileLogEnabled: boolean;
+    isLogEnabled: boolean;
+    isMultiRootWorkspace: boolean;
+    isOutputWindowLogEnabled: boolean;
+    printSuiteRuntimes: boolean;
 }
 
 export interface ITestUtilsSuiteResults extends Record<string, any>
@@ -24,11 +25,11 @@ export interface ITestUtilsSuiteResults extends Record<string, any>
 
 export interface ITestUtilsResults
 {
-    numSuites: number,
-    numSuitesFail: number,
-    numSuitesSuccess: number,
-    numTests: number,
+    numSuites: number;
+    numSuitesFail: number;
+    numSuitesSuccess: number;
+    numTests: number;
     numTestsFail: number,
-    numTestsSuccess: number,
-    readonly suiteResults: ITestUtilsSuiteResults
+    numTestsSuccess: number;
+    readonly suiteResults: Record<string, ITestUtilsSuiteResults>;
 }
