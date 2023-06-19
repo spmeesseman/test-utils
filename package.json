@@ -19,6 +19,9 @@
 	"categories": [
 		"Testing"
 	],
+	"engines": {
+		"node": ">=12.0.0"
+	},
 	"keywords": [
 		"test",
 		"tests",
