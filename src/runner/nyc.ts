@@ -14,7 +14,7 @@ export default async(nycConfig: any) =>
 	// Check the modules already loaded and warn in case of race condition
 	// (ideally, at this point the require cache should only contain one file - this module)
 	//
-	const myFilesRegex = /vscode-extjs\/dist/,
+	const myFilesRegex = /vscode-taskexplorer\/dist/,
 			filterFn = myFilesRegex.test.bind(myFilesRegex);
 	if (Object.keys(require.cache).filter(filterFn).length > 1)
 	{
@@ -40,7 +40,7 @@ export default async(nycConfig: any) =>
 
 	const env: any = {
 		NYC_CONFIG: JSON.stringify(nycConfig),
-		NYC_CWD: nycConfig.cwd // process.cwd()
+		NYC_CWD: nycConfig.cwd
 	};
 
 	if (nycConfig.babelCache === false)
@@ -53,6 +53,7 @@ export default async(nycConfig: any) =>
 
 	if (!nycConfig.useSpawnWrap)
 	{
+		nyc.wrap();
 		const requireModules = [
 			require.resolve("../../../node_modules/nyc/lib/register-env.js"),
 			...nyc.require.map((mod: any) => resolveFrom.silent(nyc.cwd, mod) || mod)
@@ -61,7 +62,7 @@ export default async(nycConfig: any) =>
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			require.resolve("./wrap.js")
+			require.resolve("../../../node_modules/nyc/lib/wrap.js")
 		);
 		Object.assign(process.env, env);
 		requireModules.forEach(mod => { require(mod); });
@@ -73,7 +74,9 @@ export default async(nycConfig: any) =>
 	}
 
 	if (nycConfig.useSpawnWrap)
-	{   //
+	{
+		nyc.wrap();
+		//
 		// This is where we are failing now in our efforts to wrap the server spawn for coverage.
 		// The vscode-languageclient module files to launch the server when these final lines are
 		// enabled.  For now, we just use the nyc.wrap() like we always have, so that at least the
@@ -83,9 +86,8 @@ export default async(nycConfig: any) =>
 		//        programatically, and use foreground() in indext.ts to launch it.  THis would pretty
 		//        much replicate how nyc/bin/nyc.js works.
 		//
-		/* TEMP */ nyc.wrap(); /* TEMP */
 		// const sw = require("spawn-wrap"),
-		//       wrapper = require.resolve("./wrap.js");
+		//       wrapper = require.resolve("../../../node_modules/nyc/bin/wrap.js");
 		// sw.runMain();
 		// env.SPAWN_WRAP_SHIM_ROOT = process.env.SPAWN_WRAP_SHIM_ROOT || process.env.XDG_CACHE_HOME || require("os").homedir();
 		// sw([ wrapper ], env);

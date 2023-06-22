@@ -62,7 +62,7 @@ export async function run(): Promise<void>
     if (runCfg.nyc)
     {
         try {
-            await runCfg.nyc.writeCoverageFile();
+            runCfg.nyc.writeCoverageFile();
             //
             // Capture text-summary reporter's output and log it in console
             //
