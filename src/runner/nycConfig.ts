@@ -49,10 +49,8 @@ export default (): NycConfig =>
 		showProcessTree: true,
 		silent: false,
 		tempDir: "./.nyc_output",
-		useSpawnWrap: true,
-		// require: [ "bootstrap-fork"],
-		// reporter: ["text", "html", "lcov", "cobertura", "json" ],
-		reporter: [ "text-summary", "html", "lcov", "cobertura" ],
+		useSpawnWrap: false,
+		reporter: [ "text-summary", "html", "json", "lcov", "cobertura" ],
 		include: !isWebpackBuild ? [ "dist/client/**/*.js", "common/lib/**/*.js", "dist/server/**/*.js" ] :
 								[ "dist/client.js", "dist/server.js" ],
 		exclude: !isWebpackBuild ? [ "dist/**/test/**", "node_modules/**", "dist/vendor.js" ] :

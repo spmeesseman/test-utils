@@ -1,10 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable @typescript-eslint/naming-convention */
 
+import Mocha from "mocha";
 import * as glob from "glob";
 import { basename, resolve } from "path";
-
-const Mocha = require("mocha");
 
 
 export default (testsRoot: string) =>
