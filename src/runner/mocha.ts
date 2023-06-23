@@ -1,17 +1,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import Mocha from "mocha";
+import Mocha, { MochaOptions } from "mocha";
 import * as glob from "glob";
 import { basename, resolve } from "path";
+import { ITestUtilsOptions } from "../types";
 
 
-export default (testsRoot: string) =>
+export default (options: ITestUtilsOptions) =>
 {
     const testArgs = JSON.parse(process.env.testArgs || "[]");
 	//
 	// Create the mocha test
 	//
-	const mocha = new Mocha({
+	const mocha = new Mocha(Object.assign({
 		ui: "tdd", // the TDD UI is being used in extension.test.ts (suite, test, etc.)
 		color: true, // colored output from test results,
 		timeout: 30000, // default timeout: 10 seconds
@@ -29,7 +30,7 @@ export default (testsRoot: string) =>
 		//         suiteTitleSeparatedBy: ": "
 		//     }
 		// }
-	});
+	}, <Partial<MochaOptions>>options.mochaConfig));
 
 	let filesToTest = "**/*.test.js";
 	if (testArgs.length > 0)
@@ -48,9 +49,9 @@ export default (testsRoot: string) =>
 	//
 	// Add all files to the test suite
 	//
-	const files = glob.sync(filesToTest, { cwd: testsRoot });
+	const files = glob.sync(filesToTest, { cwd: options.testsRoot });
 	files.sort((a: string, b: string) => basename(a) < basename(b) ? -1 : 1)
-			.forEach(f => mocha.addFile(resolve(testsRoot, f)));
+			.forEach(f => mocha.addFile(resolve(options.testsRoot, f)));
 
 	return mocha;
 };

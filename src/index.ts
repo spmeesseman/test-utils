@@ -22,7 +22,11 @@ export default class TestUtils
             isLogEnabled: false,
             isMultiRootWorkspace: false,
             isOutputWindowLogEnabled: false,
-            printSuiteRuntimes: false
+            mochaConfig: {},
+            nycConfig: {},
+            printSuiteRuntimes: false,
+            projectRoot: "",
+            testsRoot: ""
         }, options);
 
         this._results = {

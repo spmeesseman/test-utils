@@ -1,50 +1,42 @@
 
+import { join } from "path";
 import { existsSync, readFileSync } from "fs";
-import { join, resolve } from "path";
-
-type NycConfig = Record<string, boolean | string | string[]>;
+import { INycConfig, ITestUtilsOptions } from "../types";
 
 
-export default (): NycConfig =>
+export default (options: ITestUtilsOptions): INycConfig =>
 {
-	const xArgs = JSON.parse(process.env.xArgs || "[]"),
-		projectRoot = resolve(__dirname, "..", "..", "..", ".."),
-		isWebpackBuild = existsSync(join(projectRoot, "dist", "vendor.js")),
-		noClean = xArgs.includes("--nyc-no-clean");
+	const isWebpackBuild = existsSync(join(options.projectRoot, "dist", "vendor.js"));
 
-	// while (!existsSync(join(projectRoot, "package.json"))) {
-	// 	projectRoot = resolve(projectRoot, "..");
-	// }
-	let cfgFile = join(projectRoot, ".nycrc.json");
+	let cfgFile = join(options.projectRoot, ".nycrc.json");
 	if (existsSync(cfgFile)) {
 		try {
-			return <NycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
-	cfgFile = join(projectRoot, ".nycrc");
+	cfgFile = join(options.projectRoot, ".nycrc");
 	if (existsSync(cfgFile)) {
 		try {
-			return <NycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
-	cfgFile = join(projectRoot, "nycrc.json");
+	cfgFile = join(options.projectRoot, "nycrc.json");
 	if (existsSync(cfgFile)) {
 		try {
-			return <NycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
-	return <NycConfig>{
+	return <INycConfig>Object.assign({
 		extends: "@istanbuljs/nyc-config-typescript",
 		all: false,
-		cwd: projectRoot,
+		cwd: options.projectRoot,
 		hookRequire: true,
 		hookRunInContext: true,
 		hookRunInThisContext: true,
 		instrument: true,
-		noClean,
 		reportDir: "./.coverage",
 		showProcessTree: true,
 		silent: false,
@@ -55,5 +47,5 @@ export default (): NycConfig =>
 								   [ "dist/client.js", "dist/server.js" ],
 		exclude: !isWebpackBuild ? [ "dist/**/test/**", "node_modules/**" ] :
 								   [ "dist/**/test/**", "node_modules/**", "dist/vendor.js", "dist/runtime.js" ]
-	};
+	}, options.nycConfig);
 };
