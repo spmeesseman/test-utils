@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import NycConfig from "./nycConfig";
 import resolveFrom from "resolve-from";
 import { ITestUtilsOptions } from "../types";
 
@@ -9,7 +10,7 @@ const NYC = require("nyc");
 
 export default async(options: ITestUtilsOptions) =>
 {
-    const nycConfig = options.nycConfig,
+    const nycConfig = Object.assign({}, NycConfig(options), options.nycConfig),
 		  xArgs = JSON.parse(process.env.xArgs || "[]"),
 		  clean = !xArgs.includes("--nyc-no-clean") || xArgs.includes("--nyc-clean");
 	//
@@ -22,7 +23,7 @@ export default async(options: ITestUtilsOptions) =>
 	// (ideally, at this point the require cache should only contain one file - this module)
 	//
 	const myFilesRegex = /vscode-[a-zA-Z0-9\-_]+[\/\\]dist/,
-			filterFn = myFilesRegex.test.bind(myFilesRegex);
+		  filterFn = myFilesRegex.test.bind(myFilesRegex);
 	if (Object.keys(require.cache).filter(filterFn).length > 1)
 	{
 		console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
