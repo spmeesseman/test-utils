@@ -52,8 +52,8 @@ export default (): NycConfig =>
 		useSpawnWrap: false,
 		reporter: [ "text-summary", "html", "json", "lcov", "cobertura" ],
 		include: !isWebpackBuild ? [ "dist/client/**/*.js", "common/lib/**/*.js", "dist/server/**/*.js" ] :
-								[ "dist/client.js", "dist/server.js" ],
-		exclude: !isWebpackBuild ? [ "dist/**/test/**", "node_modules/**", "dist/vendor.js" ] :
-								[ "dist/**/test/**", "dist/webpack/**", "node_modules/**", "dist/vendor.js", "dist/runtime.js" ]
+								   [ "dist/client.js", "dist/server.js" ],
+		exclude: !isWebpackBuild ? [ "dist/**/test/**", "node_modules/**" ] :
+								   [ "dist/**/test/**", "node_modules/**", "dist/vendor.js", "dist/runtime.js" ]
 	};
 };

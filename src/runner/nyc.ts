@@ -8,7 +8,7 @@ const NYC = require("nyc");
 export default async(nycConfig: any) =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
-          noClean = xArgs.includes("--nyc-no-clean");
+		  clean = !xArgs.includes("--nyc-no-clean") || xArgs.includes("--nyc-clean");
 	//
 	// Inmstantiate an NYC instance and wrap the current running extension host process
 	//
@@ -18,7 +18,7 @@ export default async(nycConfig: any) =>
 	// Check the modules already loaded and warn in case of race condition
 	// (ideally, at this point the require cache should only contain one file - this module)
 	//
-	const myFilesRegex = /vscode-extjs\/dist/,
+	const myFilesRegex = /vscode-[a-zA-Z0-9\-_]+[\/\\]dist/,
 			filterFn = myFilesRegex.test.bind(myFilesRegex);
 	if (Object.keys(require.cache).filter(filterFn).length > 1)
 	{
@@ -28,7 +28,7 @@ export default async(nycConfig: any) =>
 	// Debug which files will be included/excluded
 	// console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
 	//
-	if (noClean)
+	if (!clean)
 	{
 		await nyc.createTempDirectory();
 	}
