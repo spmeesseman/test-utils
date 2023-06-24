@@ -19,24 +19,18 @@
         "target": "es2020",
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": false,
-        "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+        "tsBuildInfoFile": ".vscode/tsconfig.tsbuildinfo"
     },
     "include": [
-        "src/**/*"
+        "src"
     ],
     "exclude": [
         "node_modules",
-        ".vscode-test",
         ".vscode",
-        "test-fixture",
-        "script",
-        "types",
-        "res",
+        "types/**",
         "dist",
         ".nyc_output",
         "coverage",
-        "src/test/**/*",
-        "src/webview/app/**/*",
-        "src/lib/env/browser/**/*"
+        "src/test/**/*"
     ]
 }

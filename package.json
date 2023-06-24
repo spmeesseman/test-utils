@@ -20,7 +20,7 @@
 		"Testing"
 	],
 	"engines": {
-		"node": ">=12.0.0"
+		"node": ">=10.0.0"
 	},
 	"keywords": [
 		"tests",
@@ -32,8 +32,21 @@
 		"unit test",
 		"vscode unit testing"
 	],
+	"dependencies": {
+		"@istanbuljs/nyc-config-typescript": "^1.0.2",
+		"foreground-child": "^3.1.1",
+		"glob": "^10.3.0",
+		"mocha": "^10.2.0",
+		"nyc": "^15.1.0",
+		"resolve-from": "^5.0.0",
+		"source-map-support": "^0.5.21",
+		"spawn-wrap": "^2.0.0"
+	},
 	"scripts": {
-		"build-types": "tsc -p ./types"
+		"build-prod": "webpack --mode production --config ./webpack.config.js",
+		"build-analyze": "webpack --mode production --env analyze=true --config ./webpack.config.js",
+		"build-dev": "webpack --mode development --config ./webpack.config.js",
+		"clean-types": "rimraf .vscode/tsconfig.types.tsbuildinfo && rimraf types/lib"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.22.5",
@@ -72,15 +85,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"dependencies": {
-		"@istanbuljs/nyc-config-typescript": "^1.0.2",
-		"foreground-child": "^3.1.1",
-		"glob": "^10.3.0",
-		"mocha": "^10.2.0",
-		"nyc": "^15.1.0",
-		"resolve-from": "^5.0.0",
-		"source-map-support": "^0.5.21",
-		"spawn-wrap": "^2.0.0"
 	}
 }
