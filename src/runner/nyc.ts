@@ -1,31 +1,33 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import NycConfig from "./nycConfig";
 import resolveFrom from "resolve-from";
-import { ITestUtilsOptions } from "../types";
-import { join, resolve } from "path";
+import { join, relative, resolve } from "path";
+import { ICoverageConfig, ITestUtilsOptions } from "../types";
+import { existsSync, readFileSync } from "fs";
 
 const NYC = require("nyc");
 
 
 export default async(options: ITestUtilsOptions) =>
 {
-    const nycConfig = Object.assign({}, NycConfig(options), options.coverageConfig),
+    const nycConfig = Object.assign({}, defaultConfig(options), options.coverageConfig),
 		  xArgs = JSON.parse(process.env.xArgs || "[]"),
 		  clean = !xArgs.includes("--nyc-no-clean") || xArgs.includes("--nyc-clean");
 	//
-	// Inmstantiate an NYC instance and wrap the current running extension host process
+	// Instantiate an NYC instance and wrap the current running extension host process. This
+	// differs a bit from the way nyc is normally used on the command line.
 	//
 	const nyc = new NYC(nycConfig);
 	nyc.wrap();
 	//
 	// Check the modules already loaded and warn in case of race condition
-	// (ideally, at this point the require cache should only contain one file - this module)
+	// (ideally, at this point the require cache should only contain one file - this module (& helper imports)
 	//
-	const myFilesRegex = /vscode-[a-zA-Z0-9\-_]+[\/\\]dist/,
-		  filterFn = myFilesRegex.test.bind(myFilesRegex);
-	if (Object.keys(require.cache).filter(filterFn).length > 1)
+	const myFilesRegex = /vscode\-[a-zA-Z0-9\-_]+[\/\\]dist/,
+		filterFn = myFilesRegex.test.bind(myFilesRegex),
+		moduleCountShouldBe = 5;
+	if (Object.keys(require.cache).filter(filterFn).length > moduleCountShouldBe)
 	{
 		console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
 	}
@@ -53,8 +55,8 @@ export default async(options: ITestUtilsOptions) =>
 		NYC_CWD: nycConfig.cwd
 	};
    	//
-	// babel's cache interferes with some configurations, so is
-	// disabled by default. opt in by setting babel-cache=true.
+	// Babel's cache interferes with some configurations, so is disabled by default, it can be
+	// re-enabled with the configuration babelCache=`false`
 	//
 	if (nycConfig.babelCache === false)
 	{
@@ -65,16 +67,16 @@ export default async(options: ITestUtilsOptions) =>
 	//
 	if (!nycConfig.useSpawnWrap)
 	{
-		const nycLibPath = resolve(nyc.cwd, "node_modules", "nyc", "lib");
+		const nycLibPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
 		const requireModules = [
-			require.resolve(join(nycLibPath, "register-env.js")),
+			require.resolve(`${nycLibPath}/register-env.js`),
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
 		// eslint-disable-next-line import/no-extraneous-dependencies
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			require.resolve(join(nycLibPath, "wrap.js"))
+			require.resolve(`${nycLibPath}/wrap.js`)
 		);
 		Object.assign(process.env, env);
 		requireModules.forEach(mod => { require(mod); });
@@ -100,16 +102,59 @@ export default async(options: ITestUtilsOptions) =>
 		//        programatically, and use foreground() in indext.ts to launch it.  THis would pretty
 		//        much replicate how nyc/bin/nyc.js works.
 		//
-		// UPDATE 6/22/23 - Have language server srapped FINALLY without using useSpawnWrap.  Key was
+		// UPDATE 6/22/23 - Have language server srapped FINALLY "without" using useSpawnWrap.  Key was
 		//                  to use a node runtime to directly spawn the server, as opposed to the
 		//                  default fork.
 		//
-		// const sw = require("spawn-wrap"),
-		//       wrapper = require.resolve("../../../node_modules/nyc/bin/wrap.js");
-		// sw.runMain();
-		// env.SPAWN_WRAP_SHIM_ROOT = process.env.SPAWN_WRAP_SHIM_ROOT || process.env.XDG_CACHE_HOME || require("os").homedir();
-		// sw([ wrapper ], env);
+		const sw = require("spawn-wrap"),
+			  nycBinPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "bin")).replace(/\\/g, "/"),
+		      wrapper = require.resolve(`${nycBinPath}/wrap.js`);
+		sw.runMain();
+		env.SPAWN_WRAP_SHIM_ROOT = process.env.SPAWN_WRAP_SHIM_ROOT || process.env.XDG_CACHE_HOME || require("os").homedir();
+		sw([ wrapper ], env);
 	}
 
 	return nyc;
 };
+
+
+const defaultConfig = (options: ITestUtilsOptions): Partial<ICoverageConfig> =>
+{
+	const isWebpackBuild = existsSync(join(options.projectRoot, "dist", "vendor.js"));
+
+	let cfgFile = join(options.projectRoot, ".nycrc.json");
+	if (existsSync(cfgFile)) {
+		try {
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+		} catch {}
+	}
+
+	cfgFile = join(options.projectRoot, ".nycrc");
+	if (existsSync(cfgFile)) {
+		try {
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+		} catch {}
+	}
+
+	cfgFile = join(options.projectRoot, "nycrc.json");
+	if (existsSync(cfgFile)) {
+		try {
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+		} catch {}
+	}
+
+	return {
+		extends: "@istanbuljs/nyc-config-typescript",
+		cwd: options.projectRoot,
+		hookRequire: true,
+		hookRunInContext: true,
+		hookRunInThisContext: true,
+		instrument: true,
+		reportDir: "./.coverage",
+		silent: false,
+		reporter: [ "text-summary", "html" ],
+		include: [ "dist/**/*.js" ],
+		exclude: [ "dist/**/test/**", "node_modules/**" ]
+	};
+};
+
