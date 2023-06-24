@@ -4,13 +4,14 @@
 import NycConfig from "./nycConfig";
 import resolveFrom from "resolve-from";
 import { ITestUtilsOptions } from "../types";
+import { join, resolve } from "path";
 
 const NYC = require("nyc");
 
 
 export default async(options: ITestUtilsOptions) =>
 {
-    const nycConfig = Object.assign({}, NycConfig(options), options.nycConfig),
+    const nycConfig = Object.assign({}, NycConfig(options), options.coverageConfig),
 		  xArgs = JSON.parse(process.env.xArgs || "[]"),
 		  clean = !xArgs.includes("--nyc-no-clean") || xArgs.includes("--nyc-clean");
 	//
@@ -64,15 +65,16 @@ export default async(options: ITestUtilsOptions) =>
 	//
 	if (!nycConfig.useSpawnWrap)
 	{
+		const nycLibPath = resolve(nyc.cwd, "node_modules", "nyc", "lib");
 		const requireModules = [
-			require.resolve("../../../../node_modules/nyc/lib/register-env.js"),
+			require.resolve(join(nycLibPath, "register-env.js")),
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
 		// eslint-disable-next-line import/no-extraneous-dependencies
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			require.resolve("../../../../node_modules/nyc/lib/wrap.js")
+			require.resolve(join(nycLibPath, "wrap.js"))
 		);
 		Object.assign(process.env, env);
 		requireModules.forEach(mod => { require(mod); });

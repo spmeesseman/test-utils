@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import Mocha, { MochaOptions } from "mocha";
 import * as glob from "glob";
+import Mocha, { MochaOptions } from "mocha";
 import { basename, resolve } from "path";
 import { ITestUtilsOptions } from "../types";
 
@@ -30,9 +30,9 @@ export default (options: ITestUtilsOptions) =>
 		//         suiteTitleSeparatedBy: ": "
 		//     }
 		// }
-	}, <Partial<MochaOptions>>options.mochaConfig));
+	}, <Partial<MochaOptions>>options.testsConfig));
 
-	let filesToTest = "**/*.test.js";
+	let filesToTest = "**/*.{spec,test}.js";
 	if (testArgs.length > 0)
 	{
 		filesToTest = (testArgs.length > 1 ? "{" : "");
@@ -41,7 +41,7 @@ export default (options: ITestUtilsOptions) =>
 			if (filesToTest.length > 1) {
 				filesToTest += ",";
 			}
-			filesToTest += `**/${a}.test.js`;
+			filesToTest += `**/${a}.{spec,test}.js`;
 		});
 		filesToTest += (testArgs.length > 1 ? "}" : "");
 	}

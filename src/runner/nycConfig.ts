@@ -1,35 +1,35 @@
 
 import { join } from "path";
 import { existsSync, readFileSync } from "fs";
-import { INycConfig, ITestUtilsOptions } from "../types";
+import { ICoverageConfig, ITestUtilsOptions } from "../types";
 
 
-export default (options: ITestUtilsOptions): INycConfig =>
+export default (options: ITestUtilsOptions): ICoverageConfig =>
 {
 	const isWebpackBuild = existsSync(join(options.projectRoot, "dist", "vendor.js"));
 
 	let cfgFile = join(options.projectRoot, ".nycrc.json");
 	if (existsSync(cfgFile)) {
 		try {
-			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
 	cfgFile = join(options.projectRoot, ".nycrc");
 	if (existsSync(cfgFile)) {
 		try {
-			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
 	cfgFile = join(options.projectRoot, "nycrc.json");
 	if (existsSync(cfgFile)) {
 		try {
-			return <INycConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
+			return <ICoverageConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
 		} catch {}
 	}
 
-	return <INycConfig>Object.assign({
+	return <ICoverageConfig>Object.assign({
 		extends: "@istanbuljs/nyc-config-typescript",
 		all: false,
 		cwd: options.projectRoot,
@@ -47,5 +47,5 @@ export default (options: ITestUtilsOptions): INycConfig =>
 								   [ "dist/client.js", "dist/server.js" ],
 		exclude: !isWebpackBuild ? [ "dist/**/test/**", "node_modules/**" ] :
 								   [ "dist/**/test/**", "node_modules/**", "dist/vendor.js", "dist/runtime.js" ]
-	}, options.nycConfig);
+	}, options.coverageConfig);
 };
