@@ -5,21 +5,30 @@ type TestsTool = "mocha" | undefined;
 
 type PrimitiveType = boolean | number | string;
 
+
+export interface ITestUtilsRegisterModules
+{
+    sourceMapSupport: boolean;
+    tsNode: boolean;
+}
+
 export interface ITestUtilsOptions
 {
     clearAllBestTimes: boolean;
     clearBestTime: boolean,
     clearBestTimesOnTestCountChange: boolean;
-    coverageConfig: ICoverageConfig;
+    coverageConfig: Partial<ICoverageConfig>;
     coverageTool: CoverageTool;
     isConsoleLogEnabled: boolean;
     isFileLogEnabled: boolean;
     isLogEnabled: boolean;
     isMultiRootWorkspace: boolean;
     isOutputWindowLogEnabled: boolean;
+    isTypescript: boolean;
     printSuiteRuntimes: boolean;
     projectRoot: string;
-    testsConfig: ITestsConfig;
+    register: Partial<ITestUtilsRegisterModules>;
+    testsConfig: Readonly<ITestsConfig>;
     testsRoot: string;
     testsTool: TestsTool;
     verbose: boolean;

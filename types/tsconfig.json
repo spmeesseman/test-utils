@@ -2,14 +2,14 @@
 	"compilerOptions": {
         "declaration": true,
         "declarationMap": true,
-		"emitDeclarationOnly": false,
+		"emitDeclarationOnly": true,
 		"incremental": true,
 		"module": "commonjs",
 		"outDir": "lib",
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "es2020",
-		"tsBuildInfoFile": "../.vscode/tsconfig.types.tsbuildinfo",
+		"tsBuildInfoFile": "./tsconfig.types.tsbuildinfo",
 		"lib": [
 			"es2020"
 		],

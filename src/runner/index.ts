@@ -4,17 +4,13 @@
 // Recommended modules, loading them here to speed up NYC init
 // and minimize risk of race condition
 //
-import "ts-node/register";
-import "source-map-support/register";
-
-import { resolve } from "path";
 import runConfig from "./config";
-// import foreground from "foreground-child";
 
 
 export async function run(): Promise<void>
 {
-    const runCfg = await runConfig(resolve(__dirname, ".."));
+    const runCfg = await runConfig(JSON.parse(process.env.testUtilOptions || "{}"));
+
     preparePlatform();
 
     let mochaError: Error | undefined,

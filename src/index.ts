@@ -13,21 +13,33 @@ export default class TestUtils
 
     constructor(options: Partial<ITestUtilsOptions>)
     {
-        this._options = Object.assign({
+        this._options = {
             clearAllBestTimes: false,
             clearBestTime: false,
             clearBestTimesOnTestCountChange: false,
+            coverageTool: undefined,
             isConsoleLogEnabled: false,
             isFileLogEnabled: false,
             isLogEnabled: false,
             isMultiRootWorkspace: false,
             isOutputWindowLogEnabled: false,
-            mochaConfig: {},
-            nycConfig: {},
+            isTypescript: false,
+            coverageConfig: {},
             printSuiteRuntimes: false,
             projectRoot: "",
-            testsRoot: ""
-        }, options);
+            register: {
+                sourceMapSupport: true,
+                tsNode: false
+            },
+            testsConfig: {},
+            testsRoot: "",
+            testsTool: undefined,
+            verbose: false
+        };
+
+        if (options) {
+            this._options = Object.assign(this._options, options);
+        }
 
         this._results = {
             numSuites: 0,
