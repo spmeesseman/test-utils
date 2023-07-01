@@ -73,8 +73,9 @@ export class TestUtilsUtilities
         }
 
         const suiteResults = this._results.suiteResults[suiteKey],
-              testIdx = !isSetup && !isTeardown ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
-                                                  (isSetup ? -1 : (suiteResults.successCount === -1 ? -1 : suite.tests.length));
+              testIdx = !isSetup && !isTeardown ?
+                        suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
+                        (isSetup ? -1 : suite.tests.length);
         try
         {
             if (suiteResults.successCount !== testIdx) {
