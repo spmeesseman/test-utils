@@ -25,7 +25,7 @@ export class TestUtilsBestTimes
             printSuiteRuntimes: false,
             store: {
                 async updateStoreValue(..._args: any[]) {},
-                getStoreValue<T>(..._args: any[]) { return 0 as T; }
+                async getStoreValue<T>(..._args: any[]) { return 0 as T; }
             }
         };
 

@@ -1,5 +1,5 @@
 
-type CoverageTool = "nyc" | undefined;
+type CoverageTool = "nyc" | "karma" | undefined;
 type TestsTool = "mocha" | undefined;
 
 
@@ -8,8 +8,8 @@ type PrimitiveType = boolean | number | string;
 export interface ITestUtilsStore
 {
     updateStoreValue(key: string, value: any): PromiseLike<void>;
-    getStoreValue<T>(key: string): T | undefined;
-    getStoreValue<T>(key: string, defaultValue?: T): T;
+    getStoreValue<T>(key: string): PromiseLike<T | undefined>;
+    getStoreValue<T>(key: string, defaultValue?: T): PromiseLike<T>;
 }
 
 export interface ITestUtilsRegisterModules

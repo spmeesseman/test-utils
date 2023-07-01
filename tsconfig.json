@@ -18,6 +18,7 @@
 		// "resolveJsonModule": true,
 		"rootDir": "src",
         "sourceMap": false,
+        "inlineSourceMap": true,
         "strict": true,
         "target": "es2020",
 		"useDefineForClassFields": true,
