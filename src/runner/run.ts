@@ -2,10 +2,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import runConfig from "./config";
-import { ITestUtilsRunOptions } from "../interface";
+import { ITestRunOptions } from "../interface";
 
 
-export async function run(options: ITestUtilsRunOptions): Promise<void>
+export async function run(options: ITestRunOptions): Promise<void>
 {
     const runCfg = await runConfig(options); // JSON.parse(process.env.testUtilOptions || "{}"));
 

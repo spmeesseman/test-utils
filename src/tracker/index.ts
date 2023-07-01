@@ -1,16 +1,17 @@
 import { figures } from "../utils/figures";
 import { TestUtilsUtilities } from "./utils";
-import { ITestUtilsBestTimesOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "../interface";
+import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface";
 
 
-export class TestUtilsBestTimes
+export class TestTracker
 {
     private readonly _utils: TestUtilsUtilities;
-    private readonly _options: ITestUtilsBestTimesOptions;
-    private readonly _results: ITestUtilsResults;
+    private readonly _options: ITestTrackerOptions;
+    private readonly _results: ITestResults;
     private readonly _timeSep = "----------------------------------------------------------------------------------------------------";
 
-    constructor(options?: Partial<ITestUtilsBestTimesOptions>)
+
+    constructor(options?: Partial<ITestTrackerOptions>)
     {
         this._options = {
             clearAllBestTimes: false,
@@ -47,26 +48,15 @@ export class TestUtilsBestTimes
     }
 
 
-    get options(): ITestUtilsBestTimesOptions {
-        return this._options;
-    }
+    get options(): ITestTrackerOptions { return this._options; }
+    set options(options: Partial<ITestTrackerOptions>) { Object.assign(this._options, options); }
 
-    set options(options: Partial<ITestUtilsBestTimesOptions>) {
-        Object.assign(this._options, options);
-    }
+    get results(): ITestResults { return this._results; }
 
-    get results(): ITestUtilsResults {
-        return this._results;
-    }
-
-    get utils(): TestUtilsUtilities {
-        return this._utils;
-    }
+    get utils(): TestUtilsUtilities { return this._utils; }
 
 
-    suiteResults(suiteName: string): ITestUtilsSuiteResults {
-        return this._results.suiteResults[suiteName];
-    }
+    suiteResults = (suiteName: string): ITestSuiteResults => this._results.suiteResults[suiteName];
 
 
     private clearProcessTimeStorage = async (storageKey: string, numTests: number) =>

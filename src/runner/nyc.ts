@@ -4,12 +4,12 @@
 import resolveFrom from "resolve-from";
 import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
-import { ICoverageToolConfig, ITestUtilsRunOptions } from "../interface";
+import { ITestCoverageToolConfig, ITestRunOptions } from "../interface";
 
 const NYC = require("nyc");
 
 
-export default async(options: ITestUtilsRunOptions) =>
+export default async(options: ITestRunOptions) =>
 {
     const nycConfig = Object.assign({}, defaultConfig(options), options.coverage.config);
 	//
@@ -116,27 +116,21 @@ export default async(options: ITestUtilsRunOptions) =>
 };
 
 
-const defaultConfig = (options: ITestUtilsRunOptions): Partial<ICoverageToolConfig> =>
+const defaultConfig = (options: ITestRunOptions): Partial<ITestCoverageToolConfig> =>
 {
 	let cfgFile = join(options.projectRoot, ".nycrc.json");
 	if (existsSync(cfgFile)) {
-		try {
-			return <ICoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
-		} catch {}
+		try { return <ITestCoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8")); } catch {}
 	}
 
 	cfgFile = join(options.projectRoot, ".nycrc");
 	if (existsSync(cfgFile)) {
-		try {
-			return <ICoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
-		} catch {}
+		try { return <ITestCoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8")); } catch {}
 	}
 
 	cfgFile = join(options.projectRoot, "nycrc.json");
 	if (existsSync(cfgFile)) {
-		try {
-			return <ICoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8"));
-		} catch {}
+		try { return <ITestCoverageToolConfig>JSON.parse(readFileSync(cfgFile, "utf8")); } catch {}
 	}
 
 	return {

@@ -1,9 +1,9 @@
 
 import Nyc from "./nyc";
 import Mocha from "./mocha";
-import { ITestUtilsRunOptions } from "../interface";
+import { ITestRunOptions } from "../interface";
 
-export default async(options: ITestUtilsRunOptions) =>
+export default async(options: ITestRunOptions) =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
           cover = !xArgs.includes("--no-coverage");

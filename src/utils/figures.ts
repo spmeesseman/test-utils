@@ -38,15 +38,11 @@ class LogColors implements ILogColors
 
 export const colors = new LogColors();
 
-export const withColor = (msg: string, color: LogColor) =>
-{
-    return "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
-};
+export const withColor = (msg: string, color: LogColor) => "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
 
 export const figures = {
     colors,
     withColor,
-
     success: "✔",
     info: "ℹ",
 	warning: "⚠",
@@ -61,7 +57,6 @@ export const figures = {
 	pointerSmall: "›",
 	bullet: "●",
     up: "△",
-
     color:
     {
         success: withColor("✔", colors.green),
@@ -76,42 +71,6 @@ export const figures = {
         end: withColor("◀", colors.green),
         pointer: withColor("❯", colors.grey),
         up: withColor("△", colors.green),
-    },
-
-
-    // mocha:
-    // {
-    //     success: "✅",
-    //     warning: "⚠️",
-    //     error: "❌️"
-    // },
-
-    // emoji:
-    // {
-    //     cross: "✖️",
-    //     love: "😍",
-    //     happy: "😀",
-    //     heart: "💓",
-    //     success: "✔️",
-    //     red: "🟠",
-    //     yellow: "🟡",
-    //     green: "🟢",
-    //     purple: "🟣"
-    // },
-
-    old:
-    {
-        tick: "√",
-        info: "i",
-        warning: "‼",
-        cross: "×",
-        pointer: ">",
-        star: "✶",
-        play: "►",
-        nodejs: "♦",
-        checkboxOn: "[×]",
-        checkboxOff: "[ ]",
-        up: "∆"
     }
 
 };

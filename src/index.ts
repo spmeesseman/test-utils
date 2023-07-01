@@ -1,5 +1,5 @@
 
-export * from "./tracker";
 export * from "./interface";
-export * from "./testUtils";
 export * from "./utils/figures";
+export { TestRunner } from "./runner";
+export { TestTracker } from "./tracker";

@@ -1,15 +1,15 @@
 
-import { run } from "./runner";
-import { ITestUtilsRunOptions } from "./interface";
+import { run } from "./run";
+import { ITestRunOptions } from "../interface";
 
 
-export class TestUtils
+export class TestRunner
 {
-    private readonly _options: ITestUtilsRunOptions;
+    private readonly _options: ITestRunOptions;
 
     run = () => run(this._options);
 
-    constructor(options: Partial<ITestUtilsRunOptions>)
+    constructor(options: Partial<ITestRunOptions>)
     {
         this._options = {
             coverage: {

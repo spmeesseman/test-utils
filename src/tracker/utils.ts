@@ -1,18 +1,18 @@
 
 import { figures } from "../utils/figures";
-import { TestUtilsBestTimes } from "../tracker";
-import { ITestUtilsBestTimesOptions, ITestUtilsResults } from "../interface";
+import { TestTracker } from "../tracker";
+import { ITestTrackerOptions, ITestResults } from "../interface";
 
 
 export class TestUtilsUtilities
 {
     private _testTimer = 0;
     private _hasRollingCountError = false;
-    private readonly _options: ITestUtilsBestTimesOptions;
-    private readonly _results: ITestUtilsResults;
+    private readonly _results: ITestResults;
+    private readonly _options: ITestTrackerOptions;
 
 
-    constructor(bestTimesInst: TestUtilsBestTimes)
+    constructor(bestTimesInst: TestTracker)
     {
         this._options = bestTimesInst.options;
         this._results = bestTimesInst.results;
