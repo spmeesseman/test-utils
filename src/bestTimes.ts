@@ -10,12 +10,6 @@ export class TestUtilsBestTimes
     private readonly _results: ITestUtilsResults;
     private readonly _timeSep = "----------------------------------------------------------------------------------------------------";
 
-    private _storage = {
-        async updateStoreValue(...args: any[]) {},
-        getStoreValue<T>(...args: any[]) { return 0 as T; }
-    };
-
-
     constructor(options?: Partial<ITestUtilsBestTimesOptions>)
     {
         this._options = {
@@ -28,7 +22,11 @@ export class TestUtilsBestTimes
             isMultiRootWorkspace: false,
             isOutputWindowLogEnabled: false,
             isSingleSuiteTest: false,
-            printSuiteRuntimes: false
+            printSuiteRuntimes: false,
+            store: {
+                async updateStoreValue(..._args: any[]) {},
+                getStoreValue<T>(..._args: any[]) { return 0 as T; }
+            }
         };
 
         if (options) {
@@ -74,12 +72,12 @@ export class TestUtilsBestTimes
     private clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
     {
         const _clr = async () => {
-            await this._storage.updateStoreValue(storageKey, undefined);
-            await this._storage.updateStoreValue(storageKey + "Fmt", undefined);
-            await this._storage.updateStoreValue(storageKey + "NumTests", undefined);
-            await this._storage.updateStoreValue(storageKey + "Slow", undefined);
-            await this._storage.updateStoreValue(storageKey + "SlowFmt", undefined);
-            await this._storage.updateStoreValue(storageKey + "SlowNumTests", undefined);
+            await this._options.store.updateStoreValue(storageKey, undefined);
+            await this._options.store.updateStoreValue(storageKey + "Fmt", undefined);
+            await this._options.store.updateStoreValue(storageKey + "NumTests", undefined);
+            await this._options.store.updateStoreValue(storageKey + "Slow", undefined);
+            await this._options.store.updateStoreValue(storageKey + "SlowFmt", undefined);
+            await this._options.store.updateStoreValue(storageKey + "SlowNumTests", undefined);
         };
         if (this._options.clearBestTime || this._options.clearAllBestTimes)
         {
@@ -87,7 +85,7 @@ export class TestUtilsBestTimes
         }
         else if (this._options.clearBestTimesOnTestCountChange)
         {
-            const prevNumTests = await this._storage.getStoreValue<number>(storageKey + "NumTests", 0);
+            const prevNumTests = await this._options.store.getStoreValue<number>(storageKey + "NumTests", 0);
             if (prevNumTests < numTests) {
                 await _clr();
             }
@@ -111,8 +109,8 @@ export class TestUtilsBestTimes
     {
         let msg: string;
         let wsTypeMsg = this._options.isMultiRootWorkspace ? "multi-root" : "single-root";
-        const prevBestTimeElapsedFmt = await this._storage.getStoreValue<string>(storageKey + "Fmt", ""),
-            slowestTImeFmt = await this._storage.getStoreValue<string>(storageKey + "SlowFmt", ""),
+        const prevBestTimeElapsedFmt = await this._options.store.getStoreValue<string>(storageKey + "Fmt", ""),
+            slowestTImeFmt = await this._options.store.getStoreValue<string>(storageKey + "SlowFmt", ""),
             prevMsg = ` The previous fastest time recorded for a ${wsTypeMsg} workspace was ${prevBestTimeElapsedFmt}`,
             slowMsg = ` The slowest time recorded for a ${wsTypeMsg} workspace was ${slowestTImeFmt}`,
             preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
@@ -164,8 +162,8 @@ export class TestUtilsBestTimes
     {
         let msg: string;
         let wsTypeMsg = this._options.isMultiRootWorkspace ? "multi-root" : "single-root";
-        const prevBestTimeElapsedFmt = await this._storage.getStoreValue<string>(storageKey + "Fmt", ""),
-            slowestTimeFmt = await this._storage.getStoreValue<string>(storageKey + "SlowFmt", ""),
+        const prevBestTimeElapsedFmt = await this._options.store.getStoreValue<string>(storageKey + "Fmt", ""),
+            slowestTimeFmt = await this._options.store.getStoreValue<string>(storageKey + "SlowFmt", ""),
             prevMsg = ` The previous slowest time recorded for a ${wsTypeMsg} workspace was ${slowestTimeFmt}`,
             fastMsg = ` The fastest time recorded for a ${wsTypeMsg} workspace was ${prevBestTimeElapsedFmt}`,
             preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.red)}`;
@@ -205,11 +203,11 @@ export class TestUtilsBestTimes
 
         await this.clearProcessTimeStorage(storageKey, numTests);
 
-        let bestTimeElapsed = await this._storage.getStoreValue<number>(storageKey, 0);
+        let bestTimeElapsed = await this._options.store.getStoreValue<number>(storageKey, 0);
         if (bestTimeElapsed === 0) {
             bestTimeElapsed = timeElapsed + 1;
         }
-        const worstTimeElapsedStored = await this._storage.getStoreValue<number>(`${storageKey}Slow`, 0);
+        const worstTimeElapsedStored = await this._options.store.getStoreValue<number>(`${storageKey}Slow`, 0);
         let worstTimeElapsed = worstTimeElapsedStored;
         if (worstTimeElapsed === 0) {
             worstTimeElapsed = timeElapsed + 1;
@@ -231,8 +229,8 @@ export class TestUtilsBestTimes
         }
         else
         {
-            let bestTimeElapsedFmt = await this._storage.getStoreValue<string>(storageKey + "Fmt", ""),
-                worstTimeElapsedFmt = await this._storage.getStoreValue<string>(storageKey + "SlowFmt", "");
+            let bestTimeElapsedFmt = await this._options.store.getStoreValue<string>(storageKey + "Fmt", ""),
+                worstTimeElapsedFmt = await this._options.store.getStoreValue<string>(storageKey + "SlowFmt", "");
             const wsTypeMsg = this._options.isMultiRootWorkspace ? "multi-root" : "single-root",
                 msg1 = `The time elapsed was ${timeElapsedFmt}`,
                 msg2 = timeElapsed > 0 ? `The fastest time recorded for a ${wsTypeMsg} workspace is ${bestTimeElapsedFmt}` :
@@ -343,9 +341,9 @@ export class TestUtilsBestTimes
 
     private saveProcessTimeToStorage = async (key: string, timeElapsed: number, timeElapseFmt: string, numTests: number) =>
     {
-        await this._storage.updateStoreValue(key, timeElapsed);
-        await this._storage.updateStoreValue(key + "Fmt", timeElapseFmt);
-        await this._storage.updateStoreValue(key + "NumTests", numTests);
+        await this._options.store.updateStoreValue(key, timeElapsed);
+        await this._options.store.updateStoreValue(key + "Fmt", timeElapseFmt);
+        await this._options.store.updateStoreValue(key + "NumTests", numTests);
     };
 
 }

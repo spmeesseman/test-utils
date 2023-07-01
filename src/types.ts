@@ -5,6 +5,12 @@ type TestsTool = "mocha" | undefined;
 
 type PrimitiveType = boolean | number | string;
 
+export interface ITestUtilsStore
+{
+    updateStoreValue(key: string, value: any): PromiseLike<void>;
+    getStoreValue<T>(key: string): T | undefined;
+    getStoreValue<T>(key: string, defaultValue?: T): T;
+}
 
 export interface ITestUtilsRegisterModules
 {
@@ -51,6 +57,7 @@ export interface ITestUtilsBestTimesOptions
     isOutputWindowLogEnabled: boolean;
     isSingleSuiteTest: boolean;
     printSuiteRuntimes: boolean;
+    store: ITestUtilsStore;
 }
 
 export interface ITestUtilsSuiteResults extends Record<string, any>
