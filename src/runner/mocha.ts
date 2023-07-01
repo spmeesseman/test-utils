@@ -3,24 +3,21 @@
 import * as glob from "glob";
 import Mocha, { MochaOptions } from "mocha";
 import { basename, resolve } from "path";
-import { ITestUtilsOptions } from "../types";
+import { ITestUtilsRunOptions } from "../types";
 
 
-export default (options: ITestUtilsOptions) =>
+export default (options: ITestUtilsRunOptions) =>
 {
-	//
-	// Create the mocha test
-	//
-	const mocha = new Mocha(Object.assign({
+	const config: MochaOptions = Object.assign({
 		ui: "tdd", // the TDD UI is being used in extension.test.ts (suite, test, etc.)
 		color: true, // colored output from test results,
 		timeout: 30000, // default timeout: 10 seconds
 		retries: 0, // ,
-		slow: 250,
-		require: [
-		    "ts-node/register",
-		    "source-map-support/register"
-		]
+		slow: 250
+		// require: [
+		//     "ts-node/register",
+		//     "source-map-support/register"
+		// ]
 		// reporter: "mocha-multi-reporters",
 		// reporterOptions: {
 		//     reporterEnabled: "spec, mocha-junit-reporter",
@@ -29,7 +26,20 @@ export default (options: ITestUtilsOptions) =>
 		//         suiteTitleSeparatedBy: ": "
 		//     }
 		// }
-	}, <Partial<MochaOptions>>options.tests.config));
+	}, <Readonly<MochaOptions>>options.tests.config);
+
+	const mocha = new Mocha(config);
+
+	// if (options.register.tsNode) {
+	// 	mocha.require = [
+	// 		"ts-node/register"
+	// 	];
+	// }
+	// if (options.register.sourceMapSupport) {
+	// 	mocha.require = [
+	// 		"source-map-support/register"
+	// 	];
+	// }
 
 	let filesToTest = "**/*.{spec,test}.js";
 	if (options.tests.suite && options.tests.suite.length > 0)

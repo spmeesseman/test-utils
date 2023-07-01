@@ -1,12 +1,12 @@
 import { figures } from "./figures";
-import { ITestUtilsOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
-import TestUtilsUtilities from "./utils";
+import { TestUtilsUtilities } from "./utils";
+import { ITestUtilsBestTimesOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
 
 
 export class TestUtilsBestTimes
 {
     private readonly _utils: TestUtilsUtilities;
-    private readonly _options: ITestUtilsOptions;
+    private readonly _options: ITestUtilsBestTimesOptions;
     private readonly _results: ITestUtilsResults;
     private readonly _timeSep = "----------------------------------------------------------------------------------------------------";
 
@@ -16,17 +16,53 @@ export class TestUtilsBestTimes
     };
 
 
-    constructor(options: ITestUtilsOptions, utils: TestUtilsUtilities, results: ITestUtilsResults)
+    constructor(options?: Partial<ITestUtilsBestTimesOptions>)
     {
-        this._utils = utils;
-        this._options = options;
-        this._results = results;
+        this._options = {
+            clearAllBestTimes: false,
+            clearBestTime: false,
+            clearBestTimesOnTestCountChange: false,
+            isConsoleLogEnabled: false,
+            isFileLogEnabled: false,
+            isLogEnabled: false,
+            isMultiRootWorkspace: false,
+            isOutputWindowLogEnabled: false,
+            isSingleSuiteTest: false,
+            printSuiteRuntimes: false
+        };
 
+        if (options) {
+            Object.assign(this._options, options);
+        }
+
+        this._results = {
+            numSuites: 0,
+            numSuitesFail: 0,
+            numSuitesSuccess: 0,
+            numTests: 0,
+            numTestsFail: 0,
+            numTestsSuccess: 0,
+            suiteResults: {}
+        };
+
+        this._utils = new TestUtilsUtilities(this);
     }
 
 
+    get options(): ITestUtilsBestTimesOptions {
+        return this._options;
+    }
+
+    set options(options: Partial<ITestUtilsBestTimesOptions>) {
+        Object.assign(this._options, options);
+    }
+
     get results(): ITestUtilsResults {
         return this._results;
+    }
+
+    get utils(): TestUtilsUtilities {
+        return this._utils;
     }
 
 
@@ -60,9 +96,6 @@ export class TestUtilsBestTimes
 
 
     private getStorageKey = (baseKey: string) => baseKey + (this._options.isMultiRootWorkspace ? "MWS" : "");
-
-
-    getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
 
 
     private getTimeElapsedFmt = (timeElapsed: number) =>
@@ -106,6 +139,24 @@ export class TestUtilsBestTimes
         console.log(preMsg + figures.withColor(prevMsg, figures.colors.grey));
         console.log(preMsg + figures.withColor(slowMsg, figures.colors.grey));
         // console.log(preMsg);
+    };
+
+
+    logErrorsAreFine = () =>
+    {
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.up}  ${figures.withColor("  THESE ERRORS WERE SUPPOSED TO HAPPEN!!!  ", figures.colors.green)}  ` +
+                    `${figures.color.up}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
     };
 
 

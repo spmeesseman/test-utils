@@ -14,6 +14,7 @@ export interface ITestUtilsRegisterModules
 
 export interface ITestUtilsCoverageInfo
 {
+    clean: boolean;
     config: Partial<ICoverageToolConfig>;
     tool: CoverageTool;
 }
@@ -26,25 +27,30 @@ export interface ITestUtilsTestsInfo
     tool: TestsTool;
 }
 
-export interface ITestUtilsOptions
+export interface ITestUtilsRunOptions
+{
+    coverage: ITestUtilsCoverageInfo;
+    isTypescript: boolean;
+    moduleBuildDir: string;
+    moduleName: string;
+    projectRoot: string;
+    register: Partial<ITestUtilsRegisterModules>;
+    tests: Partial<ITestUtilsTestsInfo>;
+    verbose: boolean;
+}
+
+export interface ITestUtilsBestTimesOptions
 {
     clearAllBestTimes: boolean;
     clearBestTime: boolean,
     clearBestTimesOnTestCountChange: boolean;
-    coverage: ITestUtilsCoverageInfo;
     isConsoleLogEnabled: boolean;
     isFileLogEnabled: boolean;
     isLogEnabled: boolean;
     isMultiRootWorkspace: boolean;
     isOutputWindowLogEnabled: boolean;
-    isTypescript: boolean;
-    moduleBuildDir: string;
-    moduleName: string;
+    isSingleSuiteTest: boolean;
     printSuiteRuntimes: boolean;
-    projectRoot: string;
-    register: Partial<ITestUtilsRegisterModules>;
-    tests: Partial<ITestUtilsTestsInfo>;
-    verbose: boolean;
 }
 
 export interface ITestUtilsSuiteResults extends Record<string, any>

@@ -1,20 +1,21 @@
 
+import { TestUtilsBestTimes } from "./bestTimes";
 import { figures } from "./figures";
-import { ITestUtilsOptions, ITestUtilsResults } from "./types";
+import { ITestUtilsBestTimesOptions, ITestUtilsResults } from "./types";
 
 
-export default class TestUtilsUtilities
+export class TestUtilsUtilities
 {
     private _testTimer = 0;
     private _hasRollingCountError = false;
-    private readonly _options: ITestUtilsOptions;
+    private readonly _options: ITestUtilsBestTimesOptions;
     private readonly _results: ITestUtilsResults;
 
 
-    constructor(options: ITestUtilsOptions, results: ITestUtilsResults)
+    constructor(bestTimesInst: TestUtilsBestTimes)
     {
-        this._options = options;
-        this._results = results;
+        this._options = bestTimesInst.options;
+        this._results = bestTimesInst.results;
     }
 
 
@@ -24,11 +25,10 @@ export default class TestUtilsUtilities
 
     getSuccessCount = (instance: Mocha.Context) =>
     {
-    
         const mTest = instance.test || instance.currentTest as Mocha.Runnable,
-                suite = mTest.parent as Mocha.Suite,
-                suiteKey = this.getSuiteKey(suite.title),
-                suiteResults = this._results.suiteResults[suiteKey];
+              suite = mTest.parent as Mocha.Suite,
+              suiteKey = this.getSuiteKey(suite.title),
+              suiteResults = this._results.suiteResults[suiteKey];
         return suiteResults.successCount;
     };
 
@@ -53,16 +53,32 @@ export default class TestUtilsUtilities
     exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isTeardown?: boolean) =>
     {
         const mTest = (!isSetup && !isTeardown ? instance.test : instance.currentTest) as Mocha.Runnable,
-            suite = mTest.parent as Mocha.Suite,
-            suiteKey = this.getSuiteKey(suite.title),
-            suiteResults = this._results.suiteResults[suiteKey],
-            testIdx = !isSetup && !isTeardown ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
-                                                (isSetup ? undefined : (suiteResults ? suite.tests.length : -1));
+              suite = mTest.parent as Mocha.Suite,
+              suiteKey = this.getSuiteKey(suite.title);
+        
+        if (!this._results.suiteResults[suiteKey])
+        {
+            this._results.suiteResults[suiteKey] = {
+                timeStarted: Date.now(),
+                numTests: suite.tests.length,
+                success: false,
+                successCount: -1,
+                suiteName: this.getSuiteFriendlyName(suite.title),
+                timeFinished: 0,
+                numTestsFailed: 0
+            };
+            if (suite.parent) {
+                this._options.isSingleSuiteTest = suite.parent.suites.length <= 2;
+            }
+        }
 
+        const suiteResults = this._results.suiteResults[suiteKey],
+              testIdx = !isSetup && !isTeardown ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
+                                                  (isSetup ? -1 : (suiteResults.successCount === -1 ? -1 : suite.tests.length));
         try
         {
-            if (suiteResults?.successCount !== (testIdx)) {
-                throw new Error(`Expected success count to be ${suiteResults?.successCount}, got ${testIdx}`);
+            if (suiteResults.successCount !== testIdx) {
+                throw new Error(`Expected success count to be ${suiteResults.successCount}, got ${testIdx}`);
             }
         }
         catch (e: any)
@@ -90,6 +106,9 @@ export default class TestUtilsUtilities
         }
         return this.lowerCaseFirstChar(this.properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
     };
+
+
+    getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
 
 
     isRollingCountError = () => this._hasRollingCountError;

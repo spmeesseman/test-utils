@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable import/no-extraneous-dependencies */
-//
-// Recommended modules, loading them here to speed up NYC init
-// and minimize risk of race condition
-//
+
 import runConfig from "./config";
-import { ITestUtilsOptions } from "src/types";
+import { ITestUtilsRunOptions } from "src/types";
 
 
-export async function run(options: ITestUtilsOptions): Promise<void>
+export async function run(options: ITestUtilsRunOptions): Promise<void>
 {
     const runCfg = await runConfig(options); // JSON.parse(process.env.testUtilOptions || "{}"));
 
