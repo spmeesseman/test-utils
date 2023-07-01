@@ -3,8 +3,8 @@
         "allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
         "declaration": true,
-        "declarationMap": false,
-        // "declarationDir": "dist/types",
+        "declarationMap": true,
+        "declarationDir": "dist/types",
         "esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"incremental": true,
@@ -21,6 +21,7 @@
         "inlineSourceMap": true,
         "strict": true,
         "target": "es2020",
+        "typeRoots": [ "./types" ],
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": false,
         "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"

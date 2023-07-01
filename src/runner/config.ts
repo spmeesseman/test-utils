@@ -1,7 +1,7 @@
 
 import Nyc from "./nyc";
 import Mocha from "./mocha";
-import { ITestUtilsRunOptions } from "../types";
+import { ITestUtilsRunOptions } from "../interface";
 
 export default async(options: ITestUtilsRunOptions) =>
 {

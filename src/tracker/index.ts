@@ -1,6 +1,6 @@
-import { figures } from "./figures";
+import { figures } from "../utils/figures";
 import { TestUtilsUtilities } from "./utils";
-import { ITestUtilsBestTimesOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
+import { ITestUtilsBestTimesOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "../interface";
 
 
 export class TestUtilsBestTimes

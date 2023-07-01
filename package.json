@@ -38,7 +38,9 @@
 		"build-prod2": "webpack --mode production --config ./webpack.config.js",
 		"build-analyze2": "webpack --mode production --env analyze=true --config ./webpack.config.js",
 		"build-dev2": "webpack --mode development --config ./webpack.config.js",
-		"clean-types": "rimraf types/tsconfig.types.tsbuildinfo && rimraf types/lib"
+		"clean-all": "npm run clean-build && npm run clean-types",
+		"clean-build": "rimraf dist && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
+		"clean-types": "rimraf node_modules/.cache/tsconfig.types.tsbuildinfo && rimraf types/lib"
 	},
 	"dependencies": {
 		"glob": "^10.3.0",

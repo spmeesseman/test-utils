@@ -1,6 +1,6 @@
 
 import { run } from "./runner";
-import { ITestUtilsRunOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
+import { ITestUtilsRunOptions } from "./interface";
 
 
 export class TestUtils

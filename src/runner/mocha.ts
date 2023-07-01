@@ -3,7 +3,7 @@
 import * as glob from "glob";
 import Mocha, { MochaOptions } from "mocha";
 import { basename, resolve } from "path";
-import { ITestUtilsRunOptions } from "../types";
+import { ITestUtilsRunOptions } from "../interface";
 
 
 export default (options: ITestUtilsRunOptions) =>

@@ -4,7 +4,7 @@
 import resolveFrom from "resolve-from";
 import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
-import { ICoverageToolConfig, ITestUtilsRunOptions } from "../types";
+import { ICoverageToolConfig, ITestUtilsRunOptions } from "../interface";
 
 const NYC = require("nyc");
 
@@ -118,8 +118,6 @@ export default async(options: ITestUtilsRunOptions) =>
 
 const defaultConfig = (options: ITestUtilsRunOptions): Partial<ICoverageToolConfig> =>
 {
-	const isWebpackBuild = existsSync(join(options.projectRoot, "dist", "vendor.js"));
-
 	let cfgFile = join(options.projectRoot, ".nycrc.json");
 	if (existsSync(cfgFile)) {
 		try {

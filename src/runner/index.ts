@@ -2,7 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import runConfig from "./config";
-import { ITestUtilsRunOptions } from "src/types";
+import { ITestUtilsRunOptions } from "../interface";
 
 
 export async function run(options: ITestUtilsRunOptions): Promise<void>

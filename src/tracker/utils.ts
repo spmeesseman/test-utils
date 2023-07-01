@@ -1,7 +1,7 @@
 
-import { TestUtilsBestTimes } from "./bestTimes";
-import { figures } from "./figures";
-import { ITestUtilsBestTimesOptions, ITestUtilsResults } from "./types";
+import { figures } from "../utils/figures";
+import { TestUtilsBestTimes } from "../tracker";
+import { ITestUtilsBestTimesOptions, ITestUtilsResults } from "../interface";
 
 
 export class TestUtilsUtilities
