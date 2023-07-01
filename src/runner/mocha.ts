@@ -8,7 +8,6 @@ import { ITestUtilsOptions } from "../types";
 
 export default (options: ITestUtilsOptions) =>
 {
-    const testArgs = JSON.parse(process.env.testArgs || "[]");
 	//
 	// Create the mocha test
 	//
@@ -30,28 +29,28 @@ export default (options: ITestUtilsOptions) =>
 		//         suiteTitleSeparatedBy: ": "
 		//     }
 		// }
-	}, <Partial<MochaOptions>>options.testsConfig));
+	}, <Partial<MochaOptions>>options.tests.config));
 
 	let filesToTest = "**/*.{spec,test}.js";
-	if (testArgs.length > 0)
+	if (options.tests.suite && options.tests.suite.length > 0)
 	{
-		filesToTest = (testArgs.length > 1 ? "{" : "");
-		testArgs.forEach((a: string) =>
+		filesToTest = (options.tests.suite.length > 1 ? "{" : "");
+		options.tests.suite.forEach((a: string) =>
 		{
 			if (filesToTest.length > 1) {
 				filesToTest += ",";
 			}
 			filesToTest += `**/${a}.{spec,test}.js`;
 		});
-		filesToTest += (testArgs.length > 1 ? "}" : "");
+		filesToTest += (options.tests.suite.length > 1 ? "}" : "");
 	}
 
 	//
 	// Add all files to the test suite
 	//
-	const files = glob.sync(filesToTest, { cwd: options.testsRoot });
+	const files = glob.sync(filesToTest, { cwd: options.tests.root });
 	files.sort((a: string, b: string) => basename(a) < basename(b) ? -1 : 1)
-			.forEach(f => mocha.addFile(resolve(options.testsRoot, f)));
+		 .forEach(f => mocha.addFile(resolve(<string>options.tests.root, f)));
 
 	return mocha;
 };

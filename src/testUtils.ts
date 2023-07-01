@@ -18,14 +18,16 @@ export class TestUtils
             clearAllBestTimes: false,
             clearBestTime: false,
             clearBestTimesOnTestCountChange: false,
-            coverageTool: undefined,
+            coverage: {
+                config: {},
+                tool: undefined,
+            },
             isConsoleLogEnabled: false,
             isFileLogEnabled: false,
             isLogEnabled: false,
             isMultiRootWorkspace: false,
             isOutputWindowLogEnabled: false,
             isTypescript: false,
-            coverageConfig: {},
             moduleBuildDir: "dist",
             moduleName: "",
             printSuiteRuntimes: false,
@@ -34,9 +36,12 @@ export class TestUtils
                 sourceMapSupport: true,
                 tsNode: false
             },
-            testsConfig: {},
-            testsRoot: "",
-            testsTool: undefined,
+            tests: {
+                config: {},
+                root: "",
+                suite: undefined,
+                tool: undefined,
+            },
             verbose: false
         };
 

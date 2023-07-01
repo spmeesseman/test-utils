@@ -12,13 +12,26 @@ export interface ITestUtilsRegisterModules
     tsNode: boolean;
 }
 
+export interface ITestUtilsCoverageInfo
+{
+    config: Partial<ICoverageToolConfig>;
+    tool: CoverageTool;
+}
+
+export interface ITestUtilsTestsInfo
+{
+    config: Readonly<ITestsToolConfig>;
+    root: string;
+    suite: string[];
+    tool: TestsTool;
+}
+
 export interface ITestUtilsOptions
 {
     clearAllBestTimes: boolean;
     clearBestTime: boolean,
     clearBestTimesOnTestCountChange: boolean;
-    coverageConfig: Partial<ICoverageConfig>;
-    coverageTool: CoverageTool;
+    coverage: ITestUtilsCoverageInfo;
     isConsoleLogEnabled: boolean;
     isFileLogEnabled: boolean;
     isLogEnabled: boolean;
@@ -30,9 +43,7 @@ export interface ITestUtilsOptions
     printSuiteRuntimes: boolean;
     projectRoot: string;
     register: Partial<ITestUtilsRegisterModules>;
-    testsConfig: Readonly<ITestsConfig>;
-    testsRoot: string;
-    testsTool: TestsTool;
+    tests: Partial<ITestUtilsTestsInfo>;
     verbose: boolean;
 }
 
@@ -58,7 +69,7 @@ export interface ITestUtilsResults
     readonly suiteResults: Record<string, ITestUtilsSuiteResults>;
 }
 
-export interface ICoverageConfig extends Record<string, PrimitiveType | undefined | PrimitiveType[]>
+export interface ICoverageToolConfig extends Record<string, PrimitiveType | undefined | PrimitiveType[]>
 {
     all?: boolean;
     babelCache?: boolean;           // Disable babel cache, defaults to `true`
@@ -99,7 +110,7 @@ export interface ICoverageConfig extends Record<string, PrimitiveType | undefine
     watermarks?: string[];
 }
 
-export interface ITestsConfig
+export interface ITestsToolConfig
 {
     color?: boolean;
     retries?: number;
