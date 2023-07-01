@@ -3,7 +3,7 @@
 import * as glob from "glob";
 import Mocha, { MochaOptions } from "mocha";
 import { existsSync, readFileSync } from "fs";
-import { basename, join, resolve } from "path";
+import { basename, join, relative, resolve } from "path";
 import { ITestRunOptions, ITestToolConfig } from "../interface";
 
 
@@ -41,9 +41,23 @@ export default (options: ITestRunOptions) =>
 	//
 	// Add all files to the test suite
 	//
-	const files = glob.sync(filesToTest, { cwd: options.tests.root });
-	files.sort((a: string, b: string) => basename(a) < basename(b) ? -1 : 1)
-		 .forEach(f => mocha.addFile(resolve(<string>options.tests.root, f)));
+	const root = <string>options.tests.root,
+		  sortGroup = options.tests.sortGroup,
+		  files = glob.sync(filesToTest, { cwd: options.tests.root });
+	if (!sortGroup)
+	{
+		files.sort((a: string, b: string) => basename(a) < basename(b) ? -1 : 1);
+	}
+	else
+	{
+		files.sort((a: string, b: string) =>
+		{
+			const pA = sortGroup.includes(relative(root, a)) ? relative(root, a) : basename(a),
+				  pB = sortGroup.includes(relative(root, b)) ? relative(root, b) : basename(b);
+			return pA < pB ? -1 : 1;
+		});
+	}
+	files.forEach(f => mocha.addFile(resolve(root, f)));
 
 	return mocha;
 };

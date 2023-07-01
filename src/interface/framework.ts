@@ -5,6 +5,7 @@ export interface ITestToolOptions
 {
     config: Readonly<ITestToolConfig>;
     root: string;
+    sortGroup?: string[];
     suite: string[];
     tool: TestTool;
 }
