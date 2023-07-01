@@ -5,11 +5,12 @@
 // and minimize risk of race condition
 //
 import runConfig from "./config";
+import { ITestUtilsOptions } from "src/types";
 
 
-export async function run(): Promise<void>
+export async function run(options: ITestUtilsOptions): Promise<void>
 {
-    const runCfg = await runConfig(JSON.parse(process.env.testUtilOptions || "{}"));
+    const runCfg = await runConfig(options); // JSON.parse(process.env.testUtilOptions || "{}"));
 
     preparePlatform();
 

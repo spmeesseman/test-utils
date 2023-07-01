@@ -25,6 +25,8 @@ export interface ITestUtilsOptions
     isMultiRootWorkspace: boolean;
     isOutputWindowLogEnabled: boolean;
     isTypescript: boolean;
+    moduleBuildDir: string;
+    moduleName: string;
     printSuiteRuntimes: boolean;
     projectRoot: string;
     register: Partial<ITestUtilsRegisterModules>;
@@ -102,6 +104,7 @@ export interface ITestsConfig
     color?: boolean;
     retries?: number;
     slow?: number;
+    require?: string[];
     timeout?: number;  // Default to 10s for Mocha
     ui?: string;
 }

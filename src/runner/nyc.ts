@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import resolveFrom from "resolve-from";
+import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
 import { ICoverageConfig, ITestUtilsOptions } from "../types";
-import { existsSync, readFileSync } from "fs";
 
 const NYC = require("nyc");
 
@@ -24,9 +24,9 @@ export default async(options: ITestUtilsOptions) =>
 	// Check the modules already loaded and warn in case of race condition
 	// (ideally, at this point the require cache should only contain one file - this module (& helper imports)
 	//
-	const myFilesRegex = /vscode\-[a-zA-Z0-9\-_]+[\/\\]dist/,
-		filterFn = myFilesRegex.test.bind(myFilesRegex),
-		moduleCountShouldBe = 5;
+	const myFilesRegex = new RegExp(`${options.moduleName}[\\/\\\\]${options.moduleBuildDir}[\\/\\\\]`),
+		  filterFn = myFilesRegex.test.bind(myFilesRegex),
+		  moduleCountShouldBe = 5;
 	if (Object.keys(require.cache).filter(filterFn).length > moduleCountShouldBe)
 	{
 		console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));

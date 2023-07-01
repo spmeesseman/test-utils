@@ -1,5 +1,4 @@
 
-import { expect } from "chai";
 import { figures } from "./figures";
 import { ITestUtilsOptions, ITestUtilsResults } from "./types";
 
@@ -62,7 +61,9 @@ export default class TestUtilsUtilities
 
         try
         {
-            expect(suiteResults?.successCount).to.be.equal(testIdx);
+            if (suiteResults?.successCount !== (testIdx)) {
+                throw new Error(`Expected success count to be ${suiteResults?.successCount}, got ${testIdx}`);
+            }
         }
         catch (e: any)
         {

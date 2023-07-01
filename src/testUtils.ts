@@ -1,10 +1,11 @@
 
+import { run } from "./runner";
 import TestUtilsUtilities from "./utils";
 import { TestUtilsBestTimes } from "./bestTimes";
 import { ITestUtilsOptions, ITestUtilsResults, ITestUtilsSuiteResults } from "./types";
 
 
-export default class TestUtils
+export class TestUtils
 {
     private readonly _times: TestUtilsBestTimes;
     private readonly _utils: TestUtilsUtilities;
@@ -25,6 +26,8 @@ export default class TestUtils
             isOutputWindowLogEnabled: false,
             isTypescript: false,
             coverageConfig: {},
+            moduleBuildDir: "dist",
+            moduleName: "",
             printSuiteRuntimes: false,
             projectRoot: "",
             register: {
@@ -55,16 +58,12 @@ export default class TestUtils
         this._times = new TestUtilsBestTimes(this._options, this._utils, this._results);
     }
 
-    get utils() {
-        return this._utils;
-    }
+    get utils() { return this._utils; }
 
-    get results(): ITestUtilsResults {
-        return this._times.results;
-    }
+    get results(): ITestUtilsResults { return this._times.results; }
 
-    suiteResults(suiteName: string): ITestUtilsSuiteResults {
-        return this._times.suiteResults(suiteName);
-    }
+    run = () => run(this._options)
+
+    suiteResults = (suiteName: string): ITestUtilsSuiteResults => this._times.suiteResults(suiteName);
 
 }

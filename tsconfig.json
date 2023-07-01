@@ -2,6 +2,9 @@
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
+        "declaration": true,
+        "declarationMap": false,
+        "declarationDir": "dist/types",
         "esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"incremental": true,
@@ -14,12 +17,12 @@
         "outDir": "dist",
 		// "resolveJsonModule": true,
 		"rootDir": "src",
-        "sourceMap": true,
+        "sourceMap": false,
         "strict": true,
         "target": "es2020",
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": false,
-        "tsBuildInfoFile": ".vscode/tsconfig.tsbuildinfo"
+        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
     },
     "include": [
         "src"
