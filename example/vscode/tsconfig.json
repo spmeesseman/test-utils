@@ -1,36 +1,23 @@
 {
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
-        "esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"incremental": true,
-		"isolatedModules": true,
-		"lib": [ "es2020" ],
-        "module": "commonjs",
-		"moduleResolution": "node",
-		"noImplicitOverride": true,
-        "noUnusedLocals": false,
-        "noEmitOnError": true,
-		"skipLibCheck": true,
         "sourceMap": true,
-        "strict": true,
-        "target": "es2020",
-		"useDefineForClassFields": true,
-		"useUnknownInCatchVariables": false,
-        "noEmit": true,
+        "inlineSourceMap": false,
+        "outDir": "dist",
         "rootDir": "src",
-        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.example.tsbuildinfo",
+        "tsBuildInfoFile": "../../node_modules/.cache/tsconfig.example.tsbuildinfo",
         "paths": {
 			"@spmeesseman/test-utils": [ "../.." ],
-            "@vscode/test-electron": [ "../../../../vscode-taskexplorer/node_modules/@vscode/test-electron" ],
-            "vscode": [ "../../../../vscode-taskexplorer/node_modules/vscode" ]
+            "@vscode/test-electron": [ "${CODE_HOME}/nodejs_16.20.0/node_modules/@vscode/test-electron" ],
+            "vscode": [ "${CODE_HOME}/nodejs_16.20.0/node_modules/vscode" ]
 		}
     },
     "include": [
-        "src"
+        "src/**/*.ts"
     ],
     "exclude": [
-        "src/test"
+        "src/test/**/*.ts"
     ]
 }

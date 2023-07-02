@@ -37,7 +37,6 @@ export const run = (): Promise<void> =>
 				reportDir: "./.coverage",
 				showProcessTree: verbose,
 				silent,
-				skipEmpty: true,
 				reporter: [ "text-summary", "html" ],
 				include: [ "dist/my-extension.js" ],
 				exclude: [ "dist/test", "node_modules", "dist/vendor.js", "dist/runtime.js" ]

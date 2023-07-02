@@ -3,11 +3,11 @@
     "compilerOptions": {
 		"baseUrl": ".",
         "rootDir": "src",
-        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.test.tsbuildinfo",
+        "tsBuildInfoFile": "../../node_modules/.cache/tsconfig.test.tsbuildinfo",
         "paths": {
 			"@spmeesseman/test-utils": [ "../.." ],
-            "@vscode/test-electron": [ "../../../../vscode-taskexplorer/node_modules/@vscode/test-electron" ],
-            "vscode": [ "../../../../vscode-taskexplorer/node_modules/vscode" ]
+            "@vscode/test-electron": [ "${CODE_HOME}/nodejs_16.20.0/node_modules/@vscode/test-electron" ],
+            "vscode": [ "${CODE_HOME}/nodejs_16.20.0/node_modules/vscode" ]
 		}
     },
     "exclude": []
