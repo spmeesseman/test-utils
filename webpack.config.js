@@ -6,7 +6,7 @@ const path = require("path");
 const wpConsole = require("./webpack/console");
 const {
 	context, devtool, entry, externals, ignorewarnings, minification,  mode, plugins, optimization,
-	output, resolve, rules, stats, target
+	output, resolve, rules, stats, target, watch
 } = require("./webpack/exports");
 
 /** @typedef {import("./webpack/types/webpack").WebpackBuild} WebpackBuild */
@@ -85,6 +85,7 @@ const getWebpackConfig = (buildTarget, env, argv) =>
 	resolve(env, wpConfig);              // Resolve config
 	rules(env, wpConfig);                // Loaders & build rules
 	stats(env, wpConfig);                // Stats i.e. console output & verbosity
+	watch(env, wpConfig);				 // Watch-mode options
 	wpConfig.name = `${buildTarget}:${wpConfig.mode}`;
 	wpConfig.node ={ global: false };
 	return wpConfig;
