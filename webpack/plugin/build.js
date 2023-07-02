@@ -162,11 +162,11 @@ const tsc =
 	 */
 	buildTypes: (env) =>
 	{
-		const tscArgs = [  "tsc", "-p", "./" ];
+		const npmArgs = [ "npm", "run", "build-types" ];
 		if (!fs.existsSync(path.join(env.buildPath, "dist", "types"))) {
 			try { fs.unlinkSync(path.join(env.buildPath, "node_modules", ".cache", "tsconfig.tsbuildinfo")); } catch {}
 		}
-		spawnSync("npx", tscArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
+		spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
 	}
 
 };

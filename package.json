@@ -42,29 +42,29 @@
         "example"
     ],
     "scripts": {
-        "build-tsc": "tsc -p ./",
-        "build-types": "tsc -p ./types",
+        "build-types": "tsc -p ./",
         "build-prod": "webpack --mode production --config ./webpack.config.js",
         "build-analyze": "webpack --mode production --env analyze=true --config ./webpack.config.js",
         "build-dev": "webpack --mode development --config ./webpack.config.js",
         "clean-all": "npm run clean-build && npm run clean-types",
-        "clean-build": "rimraf dist && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
-        "clean-types": "rimraf node_modules/.cache/tsconfig.types.tsbuildinfo && rimraf types/lib",
-        "publish-types": "",
-        "rebuild-all": "npm run clean-all && npm run build-types && npm run build-tsc",
-        "rebuild-dev": "npm run clean-build && npm run build-dev",
-        "rebuild-prod": "npm run clean-build && npm run build-prod",
-        "rebuild-tsc": "npm run clean-build && npm run build-tsc",
+        "clean-build": "rimraf dist",
+        "clean-types": "rimraf dist/types && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
+        "rebuild-dev": "npm run clean-all && npm run build-dev",
+        "rebuild-prod": "npm run clean-all && npm run build-prod",
         "rebuild-types": "npm run clean-types &&  && npm run build-types"
+    },
+    "bundleDependencies": [
+        "resolve-from",
+        "source-map-support"
+    ],
+    "optionalDependencies": {
+        "mocha": "^10.2.0",
+        "nyc": "^15.1.0"
     },
     "dependencies": {
         "glob": "^10.3.0",
         "resolve-from": "^5.0.0",
         "source-map-support": "^0.5.21"
-    },
-    "optionalDependencies": {
-        "mocha": "^10.2.0",
-        "nyc": "^15.1.0"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.5",
@@ -109,9 +109,5 @@
         "webpack-cli": "^5.1.4",
         "webpack-node-externals": "^3.0.0",
         "webpack-visualizer-plugin2": "^1.0.0"
-    },
-    "bundleDependencies": [
-        "resolve-from",
-        "source-map-support"
-    ]
+    }
 }

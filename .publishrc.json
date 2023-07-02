@@ -1,7 +1,7 @@
 {
     "projectName":              "test-utils",
     "branch":                   "main",
-    "buildCommand":             "npm run rebuild-tsc",
+    "buildCommand":             "npm run rebuild-prod",
     "changelogFile":            "CHANGELOG.md",
     "distReleasePathSrc":       "dist",
     "githubAssets": [
