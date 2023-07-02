@@ -9,7 +9,6 @@
         "test-utils-$(VERSION).tgz|NPM Tarball"
     ],
     "githubRelease":            "Y",
-    "githubReleasePostCommand": "npx rimraf \"test-utils*.tgz\"",
     "githubUser":               "spmeesseman",
     "npmPackDist":              "Y",
     "npmRegistry":              "https://registry.npmjs.org",
