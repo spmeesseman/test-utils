@@ -17,6 +17,6 @@ export interface ITestRunOptions
     moduleName: string;
     projectRoot: string;
     register: Partial<ITestModules>;
-    tests: Partial<ITestToolOptions>;
+    framework: Partial<ITestToolOptions>;
     verbose: boolean;
 }

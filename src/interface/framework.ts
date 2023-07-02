@@ -1,5 +1,5 @@
 
-type TestTool = "mocha" | undefined;
+export type TestsFramework = "mocha" | undefined;
 
 export interface ITestToolOptions
 {
@@ -7,7 +7,7 @@ export interface ITestToolOptions
     root: string;
     sortGroup?: string[];
     suite: string[];
-    tool: TestTool;
+    type: TestsFramework;
 }
 
 export interface ITestToolConfig

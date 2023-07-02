@@ -1,3 +1,4 @@
+import { TestsFramework } from "./framework";
 
 export interface ITestUtilsStore
 {
@@ -23,7 +24,7 @@ export interface ITestResults
     numSuitesFail: number;
     numSuitesSuccess: number;
     numTests: number;
-    numTestsFail: number,
+    numTestsFail: number;
     numTestsSuccess: number;
     readonly suiteResults: Record<string, ITestSuiteResults>;
 }
@@ -31,7 +32,7 @@ export interface ITestResults
 export interface ITestTrackerOptions
 {
     clearAllBestTimes: boolean;
-    clearBestTime: boolean,
+    clearBestTime: boolean;
     clearBestTimesOnTestCountChange: boolean;
     isConsoleLogEnabled: boolean;
     isFileLogEnabled: boolean;
@@ -39,6 +40,7 @@ export interface ITestTrackerOptions
     isMultiRootWorkspace: boolean;
     isOutputWindowLogEnabled: boolean;
     isSingleSuiteTest: boolean;
+    framework: TestsFramework;
     printSuiteRuntimes: boolean;
     store: ITestUtilsStore;
 }

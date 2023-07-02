@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable import/no-extraneous-dependencies */
 
 import runConfig from "./config";
 import { ITestRunOptions } from "../interface";
 
 
-export async function run(options: ITestRunOptions): Promise<void>
+export const run = async (options: ITestRunOptions): Promise<void> =>
 {
     const runCfg = await runConfig(options); // JSON.parse(process.env.testUtilOptions || "{}"));
 
@@ -42,13 +40,13 @@ export async function run(options: ITestRunOptions): Promise<void>
     {
         throw new Error(!mochaError ? `${failures} tests failed.` : mochaError.message);
     }
-}
+};
 
 
-async function sleep(ms: number) { return new Promise(resolve => setTimeout(resolve, ms)); }
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
-async function captureStdout(fn: any)
+const captureStdout = async (fn: any) =>
 {
     // eslint-disable-next-line prefer-const
     let w = process.stdout.write, buffer = "";
@@ -63,18 +61,18 @@ async function captureStdout(fn: any)
         process.stdout.write = w;
     }
     return buffer;
-}
+};
 
 
-function suppressEPIPE (error: any)
+const suppressEPIPE = async (error: any) =>
 {   //
     // Prevent dumping error when `nyc npm t|head` causes stdout to be closed when reporting runs
     //
     if (error.code !== "EPIPE") { throw error; }
-}
+};
 
 
-function preparePlatform()
+const preparePlatform = async () =>
 {   //
     // Linux: prevent a weird NPE when mocha on Linux requires the window size from the TTY
     // Since we are not running in a tty environment, we just implement he method statically
@@ -87,4 +85,4 @@ function preparePlatform()
             tty.getWindowSize = (): number[] => [ 80, 75 ];
         }
     }
-}
+};

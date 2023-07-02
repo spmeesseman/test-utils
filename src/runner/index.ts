@@ -25,11 +25,11 @@ export class TestRunner
                 sourceMapSupport: true,
                 tsNode: false
             },
-            tests: {
+            framework: {
                 config: {},
                 root: "",
                 suite: undefined,
-                tool: undefined,
+                type: undefined
             },
             verbose: false
         };

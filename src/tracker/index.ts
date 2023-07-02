@@ -1,10 +1,14 @@
-import { figures } from "../utils/figures";
+import { colors, figures } from "../utils/figures";
+import { startInput } from "../utils/input";
 import { TestUtilsUtilities } from "./utils";
 import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface";
 
 
 export class TestTracker
 {
+    private _symbols: any;
+    private _caughtControlC = false;
+    private _hasRollingCountError = false;
     private readonly _utils: TestUtilsUtilities;
     private readonly _options: ITestTrackerOptions;
     private readonly _results: ITestResults;
@@ -17,6 +21,7 @@ export class TestTracker
             clearAllBestTimes: false,
             clearBestTime: false,
             clearBestTimesOnTestCountChange: false,
+            framework: "mocha",
             isConsoleLogEnabled: false,
             isFileLogEnabled: false,
             isLogEnabled: false,
@@ -43,6 +48,11 @@ export class TestTracker
             numTestsSuccess: 0,
             suiteResults: {}
         };
+
+        //
+        // Catch CTRL+C and set hasRollingCountError if caught
+        //
+        startInput(this.setFailed);
 
         this._utils = new TestUtilsUtilities(this);
     }
@@ -127,24 +137,6 @@ export class TestTracker
         console.log(preMsg + figures.withColor(prevMsg, figures.colors.grey));
         console.log(preMsg + figures.withColor(slowMsg, figures.colors.grey));
         // console.log(preMsg);
-    };
-
-
-    logErrorsAreFine = () =>
-    {
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.up}  ${figures.withColor("  THESE ERRORS WERE SUPPOSED TO HAPPEN!!!  ", figures.colors.green)}  ` +
-                    `${figures.color.up}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
     };
 
 
@@ -306,6 +298,10 @@ export class TestTracker
             timeElapsed = timeFinished - timeStarted,
             tzOffset = (new Date()).getTimezoneOffset() * 60000,
             timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+        //
+        // If rolling count error is set, reset the mocha success icon for "cleanup" final test/step
+        //
+        if (this._hasRollingCountError && this._symbols) { this._symbols.ok = figures.color.success; }
 
         console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + this.getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
@@ -334,6 +330,19 @@ export class TestTracker
         await this._options.store.updateStoreValue(key, timeElapsed);
         await this._options.store.updateStoreValue(key + "Fmt", timeElapseFmt);
         await this._options.store.updateStoreValue(key + "NumTests", numTests);
+    };
+
+
+    private setFailed = (ctrlc = true) =>
+    {
+        this._caughtControlC = ctrlc;
+        this._hasRollingCountError = true;
+        if (this._options.framework === "mocha")
+        {
+            const { symbols } = require("mocha/lib/reporters/base");
+            this._symbols = symbols;
+            symbols.ok = figures.withColor(figures.pointer, colors.blue);
+        }
     };
 
 }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 
 import Nyc from "./nyc";
 import Mocha from "./mocha";
@@ -7,7 +8,7 @@ export default async(options: ITestRunOptions) =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
           cover = !xArgs.includes("--no-coverage");
-          
+
     if (cover)
     {
         if (options.isTypescript || options.register.tsNode)

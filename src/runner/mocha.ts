@@ -9,41 +9,30 @@ import { ITestRunOptions, ITestToolConfig } from "../interface";
 
 export default (options: ITestRunOptions) =>
 {
-	const config: MochaOptions = Object.assign({}, defaultConfig(options), <Readonly<MochaOptions>>options.tests.config);
-
-	// if (options.register.tsNode) {
-	// 	mocha.require = [
-	// 		"ts-node/register"
-	// 	];
-	// }
-	// if (options.register.sourceMapSupport) {
-	// 	mocha.require = [
-	// 		"source-map-support/register"
-	// 	];
-	// }
-
-	const mocha = new Mocha(config);
+	const config: MochaOptions = Object.assign({}, defaultConfig(options), <Readonly<MochaOptions>>options.framework.config),
+		  mocha = new Mocha(config),
+		  suite = options.framework.suite;
 
 	let filesToTest = "**/*.{spec,test}.js";
-	if (options.tests.suite && options.tests.suite.length > 0)
+	if (suite && suite.length > 0)
 	{
-		filesToTest = (options.tests.suite.length > 1 ? "{" : "");
-		options.tests.suite.forEach((a: string) =>
+		filesToTest = (suite.length > 1 ? "{" : "");
+		suite.forEach((a: string) =>
 		{
 			if (filesToTest.length > 1) {
 				filesToTest += ",";
 			}
 			filesToTest += `**/${a}.{spec,test}.js`;
 		});
-		filesToTest += (options.tests.suite.length > 1 ? "}" : "");
+		filesToTest += (suite.length > 1 ? "}" : "");
 	}
 
 	//
 	// Add all files to the test suite
 	//
-	const root = <string>options.tests.root,
-		  sortGroup = options.tests.sortGroup,
-		  files = glob.sync(filesToTest, { cwd: options.tests.root });
+	const root = <string>options.framework.root,
+		  sortGroup = options.framework.sortGroup,
+		  files = glob.sync(filesToTest, { cwd: options.framework.root });
 	if (!sortGroup)
 	{
 		files.sort((a: string, b: string) => basename(a) < basename(b) ? -1 : 1);
