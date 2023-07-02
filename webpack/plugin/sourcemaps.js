@@ -24,6 +24,8 @@ const sourcemaps = (env, wpConfig) =>
     {
         test: /\.(js|jsx)($|\?)/i,
         exclude: /((vendor|runtime)\.js|node_modules)/,
+        filename: "[name].js.map",
+        fallbackModuleFilenameTemplate: "[absolute-resource-path]?[hash]",
         //
         // The bundled node_modules will produce reference tags within the main entry point
         // files in the form:
@@ -36,16 +38,14 @@ const sourcemaps = (env, wpConfig) =>
         // coverage report is being built (via nyc.report()).  Replace the quote and space
         // characters in this external reference name with filename firiendly characters.
         //
-        /** @type {any} */moduleFilenameTemplate: (/** @type {any} */info) =>
+        /** @type {any} */
+        moduleFilenameTemplate: (/** @type {any} */info) =>
         {
             if ((/[\" \|]/).test(info.absoluteResourcePath)) {
                 return info.absoluteResourcePath.replace(/\"/g, "").replace(/[ \|]/g, "_");
             }
             return `${info.absoluteResourcePath}`;
-        },
-        // moduleFilenameTemplate: ".[resource-path]",
-        // moduleFilenameTemplate: '[absolute-resource-path]',
-        fallbackModuleFilenameTemplate: "[absolute-resource-path]?[hash]"
+        }
     };
     if (isDev)
     {
