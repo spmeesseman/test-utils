@@ -6,6 +6,7 @@
         "declarationMap": true,
         "declarationDir": "dist/types",
         "esModuleInterop": true,
+        "emitDeclarationOnly": true,
 		"forceConsistentCasingInFileNames": true,
 		"incremental": true,
 		"lib": [ "es2020" ],

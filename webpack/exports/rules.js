@@ -84,7 +84,7 @@ const rules = (env, wpConfig) =>
 	}
 	else
 	{
-		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.webpack.json";
+		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json";
 
 		wpConfig.module.rules.push(...[
 		{
