@@ -7,8 +7,10 @@
  */
 
 const fs = require("fs");
-const { spawnSync } = require("child_process");
 const path = require("path");
+const webpack = require("webpack");
+const { spawnSync } = require("child_process");
+const ContextMapPlugin = require("context-map-webpack-plugin");
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -18,12 +20,13 @@ const path = require("path");
 /**
  * @param {WebpackEnvironment} env
  * @param {WebpackConfig} wpConfig Webpack config object
- * @returns {WebpackPluginInstance | undefined}
+ * @returns {WebpackPluginInstance[]}
  */
 const build = (env, wpConfig) =>
 {
 	const _env = { ...env };
-	const plugin =
+
+	const plugins = [
 	{   /** @param {import("webpack").Compiler} compiler Compiler */
 		apply: (compiler) =>
 		{
@@ -38,8 +41,65 @@ const build = (env, wpConfig) =>
 				} catch {}
 			});
 		}
-	};
-	// const plugin =
+	}];
+
+	// plugins.push(
+	// 	new webpack.DefinePlugin({
+    //         __REQUIRE_MODULE__: env.environment === "dev" ? "" : "require",
+    //     })
+	// );
+
+	// plugins.push(
+	// 	new ContextMapPlugin("node_modules/nyc/lib", [
+	// 		"../lib/register-env.js",
+	// 		"../lib/wrap.js",
+	// 		"../bin/wrap.js"
+	// 	])
+	// );
+	// lugins.push(
+	// 	new webpack.ContextReplacementPlugin(
+	// 		/(.*)/,
+	// 		(resource) =>
+	// 		{
+	// 			console.log("--------------------------------------------------");
+	// 			console.log("ctx: " + resource.context);
+	// 			console.log("req: " + resource.request);
+	// 			console.log(resource.recursive);
+	// 			console.log(resource.resolveOptions);
+	// 			console.log(resource.contextInfo);
+	// 			console.log("mode: " + resource.mode);
+	// 			console.log(resource.resource);
+	// 			console.log(resource.request);
+	// 			resource.request = resource.request.replace(
+	// 				/\./,
+	// 				"../.."
+	// 			);
+	// 			// resource.context = resource.context.replace(
+	// 			// 	/src[\/\\]runner/,
+	// 			// 	"node_modules\\nyc\\lib"
+	// 			// );
+	// 			// resource.recursive = false;
+	// 		}
+	// 	)
+	// ;
+/*
+	plugins.push(
+		new webpack.ContextReplacementPlugin(/(.*)/, (context) =>
+		{
+			console.log(context.context);
+			Object.keys(context).forEach(k => console.log(k));
+			if (!/[\/\\]runner/.test(context.context)) {
+				return;
+			}
+			Object.assign(context,
+			{
+				regExp: /^\w+/,
+				request: "../../node_modules/nyc/lib", // resolved relatively
+			});
+		})
+	);
+*/
+	// plugins.push(
 	// {
 	// 	/** @param {import("webpack").Compiler} compiler Compiler */
 	// 	apply: (compiler) =>
@@ -76,8 +136,8 @@ const build = (env, wpConfig) =>
 	// 			// } catch {}
 	// 		});
 	// 	}
-	// };
-	return plugin;
+	// });
+	return plugins;
 };
 
 

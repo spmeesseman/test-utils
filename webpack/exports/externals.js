@@ -23,7 +23,16 @@ const externals = (env, wpConfig) =>
 	// if (env.build === "tests")
 	// {
 		wpConfig.externals = [
-			// { registerEnv: "commonjs register-env.js" },
+			// ({ context, request }, callback) =>
+			// {
+			// 	if (request && /^register$/.test(request)) {
+			// 	  // Externalize to a commonjs module using the request path
+			// 	  return callback(undefined, "commonjs " + request);
+			// 	}
+			// 	// Continue without externalizing the import
+			// 	callback();
+			// },
+			// { "register-env.js": "commonjs register-env.js" },
 			/** @type {import("webpack").WebpackPluginInstance}*/(nodeExternals())
 		];
 	// }

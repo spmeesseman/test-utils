@@ -39,13 +39,18 @@ const afterdone = (env, wpConfig) =>
                            renameSync(path.join(env.buildPath, "dist", "testutils.js.LICENSE.txt"), path.join(env.buildPath, "dist", "testutils.LICENSE"));
                        } catch {}
                    }
-                   else if (_env.build === "node" && _env.environment === "test")
+                   else if (_env.build === "node")
                    {
                        const outFile = path.join(env.buildPath, "dist", "testutils.js");
                        if (existsSync(outFile))
                        {
-                           const regex = /\n[ \t]*module\.exports \= require\(/mg,
-                                   content = readFileSync(outFile, "utf8").replace(regex, (v) => "/* istanbul ignore next */" + v);
+                            let content = readFileSync(outFile, "utf8");
+                            if (_env.environment === "test")
+                            {
+                                const regex = /\n[ \t]*module\.exports \= require\(/mg;
+                                content = content.replace(regex, (v) => "/* istanbul ignore next */" + v);
+                            }
+                            content = content.replace(/____require____\(mod/mg, "require(mod");
                            writeFileSync(outFile, content);
                        }
                    }

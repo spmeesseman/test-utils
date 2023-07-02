@@ -30,7 +30,7 @@ const plugins = (env, wpConfig) =>
 	wpConfig.plugins = [
 		progress(env, wpConfig),
 		clean(env, wpConfig),
-		build(env, wpConfig),
+		...build(env, wpConfig),
 		// wpPlugin.aftercompile(env, wpConfig),
 		ignore(env, wpConfig),
 		...tscheck(env, wpConfig)

@@ -22,8 +22,35 @@ const { spawnSync } = require("child_process");
  */
 const rules = (env, wpConfig) =>
 {
+
 	wpConfig.module = {};
 	wpConfig.module.rules = [];
+
+	// wpConfig.module.parser = {
+	// 	"javascript": {
+	// 		requireJs: false,
+	// 		requireContext: false,
+	// 		unknownContextRequest: "../../node_modules",
+	// 		exprContextRecursive: false,
+	// 		commonjs: true,
+	// 		import: false,
+	// 		requireEnsure: false,
+	// 		exprContextRequest: "../../node_modules",
+	// 		exprContextRegExp: false
+	// 	},
+	// 	"javascript/dynamic": {
+	// 		requireJs: false,
+	// 		requireContext: false,
+	// 		unknownContextRequest: "../../node_modules",
+	// 		exprContextRecursive: false,
+	// 		commonjs: true,
+	// 		import: false,
+	// 		requireEnsure: false,
+	// 		exprContextRequest: "../../node_modules",
+	// 		exprContextRegExp: false
+	// 	}
+	// };
+
 
 	if (env.build === "tests")
 	{
@@ -58,7 +85,21 @@ const rules = (env, wpConfig) =>
 	else
 	{
 		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.webpack.json";
+
 		wpConfig.module.rules.push(...[
+		{
+			test: /nyc\.ts$/,
+			include: path.join(env.buildPath, "src", "runner"),
+			loader: "string-replace-loader",
+			enforce: /** @type {"pre"|"post"}*/("pre"),
+			options: {
+				multiple: [
+				{
+					search: "require(mod",
+					replace: "____require____(mod"
+				}]
+			}
+		},
 		{
 			test: /\.ts$/,
 			include: path.join(env.buildPath, "src"),

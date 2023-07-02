@@ -26,7 +26,7 @@ module.exports = {
         createDefaultProgram: true,
         ecmaVersion: 2020,
         ecmaFeatures: {
-            impliedStrict: true
+            "jsx": true
         }
     },
     ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**" ],
@@ -34,6 +34,12 @@ module.exports = {
     {
         files: [ "src/**/*.ts", "script/**/*.js", "webpack.*.js", "webpack/**/*.js" ],
         excludedFiles: [ "types", "*.json", "dist" ]
+    },
+    {
+        "files": [ "nyc.ts" ],
+        "rules": {
+            "no-undef": "off"
+        }
     }],
     plugins: [
         "eslint-plugin-jsdoc",
@@ -46,7 +52,8 @@ module.exports = {
         "@typescript-eslint/tslint"
     ],
     globals: {
-        "__non_webpack_require__": "readonly"
+        __non_webpack_require__: "readonly",
+        "__REQUIRE_MODULE__": "readonly"
     },
     rules: {
         "@spmeesseman/extjs-array-bracket-newline": 1,
