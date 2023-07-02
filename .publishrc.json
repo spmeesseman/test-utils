@@ -1,0 +1,24 @@
+{
+    "projectName":              "test-utils",
+    "branch":                   "main",
+    "buildCommand":             "npm run rebuild-tsc",
+    "changelogFile":            "CHANGELOG.md",
+    "distReleasePathSrc":       "dist",
+    "githubAssets": [
+        "CHANGELOG.md|Changelog File",
+        "test-utils-$(VERSION).tgz|NPM Tarball"
+    ],
+    "githubRelease":            "Y",
+    "githubReleasePostCommand": "npx rimraf \"test-utils*.tgz\"",
+    "githubUser":               "spmeesseman",
+    "npmPackDist":              "Y",
+    "npmRegistry":              "https://registry.npmjs.org",
+    "npmRelease":               "Y",
+    "npmScope":                 "@spmeesseman",
+    "promptVersion":            "Y",
+    "repo":                     "https://github.com/spmeesseman/test-utils.git",
+    "repoType":                 "git",
+    "skipChangelogEdits":       "N",
+    "skipVersionEdits":         "Y",
+    "vcWebPath":                "https://github.com/spmeesseman/test-utils"
+}

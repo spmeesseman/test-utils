@@ -38,7 +38,8 @@
 		"access": "public"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"example"
 	],
 	"scripts": {
 		"build-tsc": "tsc -p ./",
@@ -48,7 +49,13 @@
 		"build-dev": "webpack --mode development --config ./webpack.config.js",
 		"clean-all": "npm run clean-build && npm run clean-types",
 		"clean-build": "rimraf dist && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
-		"clean-types": "rimraf node_modules/.cache/tsconfig.types.tsbuildinfo && rimraf types/lib"
+		"clean-types": "rimraf node_modules/.cache/tsconfig.types.tsbuildinfo && rimraf types/lib",
+		"publish-types": "",
+		"rebuild-all": "npm run clean-all && npm run build-types && npm run build-tsc",
+		"rebuild-dev": "npm run clean-build && npm run build-dev",
+		"rebuild-prod": "npm run clean-build && npm run build-prod",
+		"rebuild-tsc": "npm run clean-build && npm run build-tsc",
+		"rebuild-types": "npm run clean-types &&  && npm run build-types"
 	},
 	"dependencies": {
 		"glob": "^10.3.0",
