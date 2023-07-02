@@ -1,0 +1,64 @@
+{
+	"name": "vscode-my-extension",
+	"version": "0.0.1",
+	"displayName": "My Extension",
+	"description": "My extension description",
+	"icon": "res/logo.png",
+	"publisher": "my_vsmarketplace_username",
+	"license": "MIT",
+	"homepage": "https://github.com/my_github_username/vscode-my-extension/blob/master/README.md",
+	"author": {
+		"name": "My Name",
+		"email": "my_email_address@domain.com"
+	},
+	"bugs": {
+		"url": "https://github.com/my_github_username/vscode-my-extension/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/my-extension/vscode-my-extension.git"
+	},
+	"engines": {
+		"node": ">=14.0.0",
+		"vscode": "^1.68.1"
+	},
+	"categories": [
+		"Other"
+	],
+	"galleryBanner": {
+		"color": "#EEEEEE",
+		"theme": "light"
+	},
+	"keywords": [
+		"multi-root ready"
+	],
+	"main": "./dist/extension",
+	"activationEvents": [
+		"*"
+	],
+	"scripts": {
+		"build": "tsc -p ./tsconfig.test.json",
+		"clean": "rimraf dist && rimraf node_modules/.cache/*.tsbuildinfo",
+		"lint": "eslint -c .eslintrc.js --ext .ts .",
+		"test-single-multi_root-ant": "npm run build && node ./dist/test/runTest.js"
+	},
+	"dependencies": {
+	},
+	"devDependencies": {
+		"@spmeesseman/test-utils": "file:../@spmeesseman/test-utils",
+		"@types/vscode": "^1.68.1",
+		"@vscode/test-electron": "^2.2.2",
+		"nyc": "^15.1.0",
+		"rimraf": "^3.0.2",
+		"source-map-support": "^0.5.21",
+		"ts-loader": "^8.0.17",
+		"ts-node": "^8.10.2",
+		"tsc-alias": "^1.8.2",
+		"tsconfig-paths": "^4.1.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"contributes": {
+	}
+}

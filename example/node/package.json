@@ -1,0 +1,37 @@
+{
+    "name": "my-node-module",
+    "version": "0.0.1",
+    "description": "My node module description",
+    "license": "MIT",
+	"homepage": "https://github.com/my_github_username/my-node-module/blob/master/README.md",
+    "author": {
+		"name": "My Name",
+		"email": "my_email_address@domain.com"
+	},
+	"bugs": {
+		"url": "https://github.com/my_github_username/my-node-module/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/my-extension/my-node-module.git"
+	},
+    "scripts": {
+        "build": "webpack --mode production --progress",
+        "clean-coverage": "rimraf .nyc_output && rimraf .coverage",
+        "test-dev-all": "npm run clean-coverage && npx ./src/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.1",
+        "mocha": "^10.2.0",
+        "nyc": "^15.1.0",
+        "rimraf": "^3.0.2"
+    },
+    "main": "./my-node-module.js",
+    "bin": {
+        "my-node-module": "./my-node-module.js"
+    },
+    "files": [
+        "my-node-module.js",
+        "res"
+    ]
+}

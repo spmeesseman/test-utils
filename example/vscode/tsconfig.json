@@ -19,14 +19,18 @@
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": false,
         "noEmit": true,
-        "rootDir": ".",
+        "rootDir": "src",
         "tsBuildInfoFile": "./node_modules/.cache/tsconfig.example.tsbuildinfo",
         "paths": {
-			"@spmeesseman/test-utils": [ ".." ],
-            "@vscode/test-electron": [ "" ]
+			"@spmeesseman/test-utils": [ "../.." ],
+            "@vscode/test-electron": [ "../../../../vscode-taskexplorer/node_modules/@vscode/test-electron" ],
+            "vscode": [ "../../../../vscode-taskexplorer/node_modules/vscode" ]
 		}
     },
     "include": [
-        "./**/*.ts"
+        "src"
+    ],
+    "exclude": [
+        "src/test"
     ]
 }

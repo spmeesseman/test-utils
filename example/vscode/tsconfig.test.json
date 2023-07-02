@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+		"baseUrl": ".",
+        "rootDir": "src",
+        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.test.tsbuildinfo",
+        "paths": {
+			"@spmeesseman/test-utils": [ "../.." ],
+            "@vscode/test-electron": [ "../../../../vscode-taskexplorer/node_modules/@vscode/test-electron" ],
+            "vscode": [ "../../../../vscode-taskexplorer/node_modules/vscode" ]
+		}
+    },
+    "exclude": []
+}

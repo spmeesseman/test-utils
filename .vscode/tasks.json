@@ -3,33 +3,6 @@
     "tasks": [
     {
         "type": "npm",
-        "script": "tsc-watch",
-        // "problemMatcher": "$tsc-watch",
-        "isBackground": true,
-        "presentation": {
-            "reveal": "never",
-            "panel": "dedicated"
-        },
-        "group": {
-            "kind": "build",
-            "isDefault": true
-        },
-        "problemMatcher": {
-            "base": "$tsc-watch",
-            // "applyTo": "allDocuments"
-            "background": {
-                "activeOnStart":true,
-                "beginsPattern": {
-                    "regexp":"^\\[(?:0|1)\\] \\d{1,2}\\:\\d{1,2}\\:\\d{1,2} (?:AM|PM) \\- (Starting compilation in watch mode|File change detected\\. Starting incremental compilation)\\.\\.\\."
-                },
-                "endsPattern": {
-                    "regexp":"^\\[(?:0|1)\\] \\d{1,2}\\:\\d{1,2}\\:\\d{1,2} (?:AM|PM) \\- (?:Compilation complete\\.|Found \\d+ errors?\\.) Watching for file changes\\."
-                }
-            }
-        }
-    },
-    {
-        "type": "npm",
         "script": "webpack-watch",
         "problemMatcher": "$webpackTe",
         "isBackground": true,
@@ -38,22 +11,8 @@
             "panel": "dedicated"
         },
         "group": {
-            "kind": "build"
-        }
-    },
-    {
-        "label": "Publish Types Package",
-        "type": "shell",
-        "command": "npm publish",
-        "options": {
-            "cwd": "types"
-        },
-        "group": "none",
-        "presentation": {
-            "echo": true,
-            "reveal": "always",
-            "focus": false,
-            "panel": "shared"
+            "kind": "test",
+            "isDefault": true
         }
     }]
 }

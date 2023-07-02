@@ -20,7 +20,7 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     parserOptions: {
         project: [
-            "tsconfig.json"
+            "tsconfig.json", "example/vscode/tsconfig.json", "example/vscode/tsconfig.test.json"
         ],
         sourceType: "module",
         createDefaultProgram: true,
@@ -29,11 +29,11 @@ module.exports = {
             impliedStrict: true
         }
     },
-    ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**", "example/**" ],
+    ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**" ],
     overrides: [
     {
         files: [ "src/**/*.ts", "script/**/*.js", "webpack.*.js", "webpack/**/*.js" ],
-        excludedFiles: [ "types", "*.json", "dist", "example" ]
+        excludedFiles: [ "types", "*.json", "dist" ]
     }],
     plugins: [
         "eslint-plugin-jsdoc",
