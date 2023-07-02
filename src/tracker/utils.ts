@@ -55,7 +55,7 @@ export class TestUtilsUtilities
         const mTest = (!isSetup && !isTeardown ? instance.test : instance.currentTest) as Mocha.Runnable,
               suite = mTest.parent as Mocha.Suite,
               suiteKey = this.getSuiteKey(suite.title);
-        
+
         if (!this._results.suiteResults[suiteKey])
         {
             this._results.suiteResults[suiteKey] = {

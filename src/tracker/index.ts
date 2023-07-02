@@ -1,5 +1,5 @@
 import { colors, figures } from "../utils/figures";
-import { startInput } from "../utils/input";
+import { startInput, stopInput } from "../utils/input";
 import { TestUtilsUtilities } from "./utils";
 import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface";
 
@@ -7,6 +7,7 @@ import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interfa
 export class TestTracker
 {
     private _symbols: any;
+    private _timeStarted = 0;
     private _caughtControlC = false;
     private _hasRollingCountError = false;
     private readonly _utils: TestUtilsUtilities;
@@ -17,6 +18,16 @@ export class TestTracker
 
     constructor(options?: Partial<ITestTrackerOptions>)
     {
+        this._results = {
+            numSuites: 0,
+            numSuitesFail: 0,
+            numSuitesSuccess: 0,
+            numTests: 0,
+            numTestsFail: 0,
+            numTestsSuccess: 0,
+            suiteResults: {}
+        };
+
         this._options = {
             clearAllBestTimes: false,
             clearBestTime: false,
@@ -30,7 +41,9 @@ export class TestTracker
             isSingleSuiteTest: false,
             printSuiteRuntimes: false,
             store: {
+                // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
                 async updateStoreValue(..._args: any[]) {},
+                // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
                 async getStoreValue<T>(..._args: any[]) { return 0 as T; }
             }
         };
@@ -39,27 +52,16 @@ export class TestTracker
             Object.assign(this._options, options);
         }
 
-        this._results = {
-            numSuites: 0,
-            numSuitesFail: 0,
-            numSuitesSuccess: 0,
-            numTests: 0,
-            numTestsFail: 0,
-            numTestsSuccess: 0,
-            suiteResults: {}
-        };
+        startInput(this.setFailed); // Catch CTRL+C
 
-        //
-        // Catch CTRL+C and set hasRollingCountError if caught
-        //
-        startInput(this.setFailed);
-
+        this._timeStarted = Date.now();
         this._utils = new TestUtilsUtilities(this);
     }
 
 
     get options(): ITestTrackerOptions { return this._options; }
-    set options(options: Partial<ITestTrackerOptions>) { Object.assign(this._options, options); }
+
+    set options(options: Partial<ITestTrackerOptions>) { this._timeStarted = Date.now(); Object.assign(this._options, options); }
 
     get results(): ITestResults { return this._results; }
 
@@ -292,21 +294,25 @@ export class TestTracker
     };
 
 
-    processTimes = async (timeStarted: number, hadRollingCountError: boolean) =>
+    processTimes = async () =>
     {
         const timeFinished = Date.now(),
-            timeElapsed = timeFinished - timeStarted,
-            tzOffset = (new Date()).getTimezoneOffset() * 60000,
-            timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+              timeElapsed = timeFinished - this._timeStarted,
+              tzOffset = (new Date()).getTimezoneOffset() * 60000,
+              timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
         //
-        // If rolling count error is set, reset the mocha success icon for "cleanup" final test/step
+        // If ctrl+c or rolling count error is set, reset the mocha success icon for "cleanup" final test/step
         //
         if (this._hasRollingCountError && this._symbols) { this._symbols.ok = figures.color.success; }
+        if (this._caughtControlC) {
+            console.log(`    ${figures.color.info} ${figures.withColor("User cancelled (caught CTRL+C)", colors.grey)}`);
+        }
+        stopInput();
 
         console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + this.getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
 
-        if (this._results.numTestsFail === 0 && !hadRollingCountError)
+        if (this._results.numTestsFail === 0 && !this._hasRollingCountError)
         {
             if (this._results.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
                 await this.processBestTime("", this.getStorageKey("bestTimeElapsed"), timeElapsed, this._results.numTests);
