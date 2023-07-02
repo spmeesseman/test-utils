@@ -23,14 +23,17 @@ module.exports = {
             "tsconfig.json"
         ],
         sourceType: "module",
+        createDefaultProgram: true,
         ecmaVersion: 2020,
-        createDefaultProgram: true
+        ecmaFeatures: {
+            impliedStrict: true
+        }
     },
-    ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**" ],
+    ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**", "example/**" ],
     overrides: [
     {
         files: [ "src/**/*.ts", "script/**/*.js", "webpack.*.js", "webpack/**/*.js" ],
-        excludedFiles: [ "types", "*.json", "dist" ]
+        excludedFiles: [ "types", "*.json", "dist", "example" ]
     }],
     plugins: [
         "eslint-plugin-jsdoc",

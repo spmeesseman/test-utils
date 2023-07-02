@@ -2,31 +2,31 @@
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
-        "declaration": true,
-        "declarationMap": true,
-        "declarationDir": "dist/types",
         "esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"incremental": true,
+		"isolatedModules": true,
 		"lib": [ "es2020" ],
         "module": "commonjs",
 		"moduleResolution": "node",
 		"noImplicitOverride": true,
         "noUnusedLocals": false,
-        // "noUnusedParameters": true,
-        "outDir": "dist",
-		// "resolveJsonModule": true,
-		"rootDir": "src",
-        "sourceMap": false,
-        "inlineSourceMap": true,
+        "noEmitOnError": true,
+		"skipLibCheck": true,
+        "sourceMap": true,
         "strict": true,
         "target": "es2020",
-        "typeRoots": [ "./types" ],
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": false,
-        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
+        "noEmit": true,
+        "rootDir": ".",
+        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.example.tsbuildinfo",
+        "paths": {
+			"@spmeesseman/test-utils": [ ".." ],
+            "@vscode/test-electron": [ "" ]
+		}
     },
     "include": [
-        "src"
+        "./**/*.ts"
     ]
 }
