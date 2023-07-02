@@ -23,6 +23,7 @@ const externals = (env, wpConfig) =>
 	// if (env.build === "tests")
 	// {
 		wpConfig.externals = [
+			// { registerEnv: "commonjs register-env.js" },
 			/** @type {import("webpack").WebpackPluginInstance}*/(nodeExternals())
 		];
 	// }

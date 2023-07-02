@@ -15,23 +15,23 @@
  */
 const optimization = (env, wpConfig) =>
 {
-	wpConfig.optimization =
-	{
-		runtimeChunk: env.environment === "prod" || env.environment === "test" ? "single" : undefined,
-		splitChunks: false
-	};
-	if (env.build !== "browser")
-	{
-		wpConfig.optimization.splitChunks = {
-			cacheGroups: {
-				vendor: {
-					test: /node_modules/,
-					name: "vendor",
-					chunks: "all"
-				}
-			}
-		};
-	}
+	// wpConfig.optimization =
+	// {
+	// 	runtimeChunk: env.environment === "prod" || env.environment === "test" ? "single" : undefined,
+	// 	splitChunks: false
+	// };
+	// if (env.build !== "browser")
+	// {
+	// 	wpConfig.optimization.splitChunks = {
+	// 		cacheGroups: {
+	// 			vendor: {
+	// 				test: /node_modules/,
+	// 				name: "vendor",
+	// 				chunks: "all"
+	// 			}
+	// 		}
+	// 	};
+	// }
 };
 
 

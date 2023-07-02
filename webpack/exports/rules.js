@@ -57,7 +57,7 @@ const rules = (env, wpConfig) =>
 	}
 	else
 	{
-		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json";
+		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.webpack.json";
 		wpConfig.module.rules.push(...[
 		{
 			test: /\.ts$/,
@@ -69,10 +69,33 @@ const rules = (env, wpConfig) =>
 			{
 				loader: "esbuild-loader",
 				options: {
+					color: true,
 					implementation: esbuild,
 					loader: "ts",
-					target: [ "es2020", "chrome91", "node16.20" ],
-					tsconfigRaw: getTsConfig(env, path.join(env.buildPath, configFile))
+					// packages: "external",
+					// target: [ "es2020", "chrome91", "node16.20" ],
+					target: [ "node16.20", "es2020" ],
+					tsconfigRaw: getTsConfig(env, path.join(env.buildPath, configFile)),
+					// transform: () => {
+					// 	console.log("transform!!!!!!!!!!!!!");
+					// }
+					// plugins: [
+					// {
+					// 	name: "example",
+					// 	setup: (build) =>
+					// 	{
+					// 		// Load ".txt" files and return an array of words
+					// 		build.onLoad({ filter: /\.txt$/ }, async (args) =>
+					// 		{
+					// 			console.log(args.path);
+					// 			// const text = await fs.promises.readFile(args.path, "utf8");
+					// 			// return {
+					// 			//   contents: JSON.stringify(text.split(/\s+/)),
+					// 			//   loader: "json",
+					// 			// };
+					// 		});
+					// 	},
+					// }]
 				}
 			} :
 			{

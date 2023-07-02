@@ -5,8 +5,10 @@
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
+const { sources } = require("webpack");
 const { spawnSync } = require("child_process");
 const CopyPlugin = require("copy-webpack-plugin");
+// @ts-ignore
 const VisualizerPlugin = require("webpack-visualizer-plugin2");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
@@ -47,6 +49,7 @@ const wpPlugin =
 		 * @param {WebpackConfig} wpConfig Webpack config object
 		 * @returns {BundleAnalyzerPlugin | undefined}
 		 */
+		// @ts-ignore
 		bundle: (env, wpConfig) =>
 		{
 			let plugin;
@@ -69,6 +72,7 @@ const wpPlugin =
 		 * @param {WebpackConfig} wpConfig Webpack config object
 		 * @returns {CircularDependencyPlugin | undefined}
 		 */
+		// @ts-ignore
 		circular: (env, wpConfig) =>
 		{
 			let plugin;
@@ -93,6 +97,7 @@ const wpPlugin =
 		 * @param {WebpackConfig} wpConfig Webpack config object
 		 * @returns {VisualizerPlugin | undefined}
 		 */
+		// @ts-ignore
 		visualizer: (env, wpConfig) =>
 		{
 			let plugin;
@@ -136,6 +141,7 @@ const wpPlugin =
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {webpack.BannerPlugin | undefined}
 	 */
+	// @ts-ignore
 	banner: (env, wpConfig) =>
 	{
 		let plugin;
@@ -145,7 +151,7 @@ const wpPlugin =
 			{
 				banner: `Copyright ${(new Date()).getFullYear()} Scott P Meesseman`,
 				entryOnly: true,
-				test: /taskexplorer\.js/
+				test: /testutils\.js/
 				// raw: true
 			});
 		}
@@ -158,9 +164,9 @@ const wpPlugin =
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {WebpackPluginInstance | undefined}
 	 */
+	// @ts-ignore
 	beforecompile: (env, wpConfig) =>
 	{
-		const isTestsBuild = (env.build === "tests" || env.environment.startsWith("test"));
 		const _env = { ...env };
 		const plugin =
 		{   /** @param {import("webpack").Compiler} compiler Compiler */
@@ -168,6 +174,7 @@ const wpPlugin =
 			{
 				compiler.hooks.beforeCompile.tap("BeforeCompilePlugin", () =>
 				{
+					const isTestsBuild = (_env.build === "tests" || _env.environment.startsWith("test"));
 					try {
 						wpPlugin.tsc.buildTypes(_env);
 						if (isTestsBuild) {
@@ -178,6 +185,52 @@ const wpPlugin =
 			}
 		};
 		return plugin;
+	},
+
+	// @ts-ignore
+	aftercompile: (env, wpConfig) =>
+	{
+		// @ts-ignore
+		// const _env = { ...env };
+		// const plugin =
+		// {
+		// 	/** @param {import("webpack").Compiler} compiler Compiler */
+		// 	apply: (compiler) =>
+		// 	{
+		// 		compiler.hooks.compilation.tap("CompilationPlugin", (compilation) =>
+		// 		{
+		// 			compilation.hooks.afterProcessAssets.tap(
+		// 			{
+		// 				name: "CompilationPlugin",
+		// 				stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL
+		// 			},
+		// 			 (assets) =>
+		// 			{
+		// 				Object.keys(assets).forEach(k => console.log("" + k));
+		// 				const oldSource = assets["testutils.js"];
+		// 				const { ReplaceSource } = compiler.webpack.sources;
+		// 				const newSource = new ReplaceSource(oldSource, "CompilationPlugin");
+		// 				const codeToReplace = "require(",
+		// 					  newCode = "__non_webpack_require__(",
+		// 					  start = oldSource.source().indexOf(codeToReplace),
+		// 					  end = start + codeToReplace.length;
+		// 				newSource.replace(start, end, newCode, "CompilationPlugin");
+		// 				compilation.updateAsset("testutils.js", newSource);
+		// 			});
+		// 			// try {
+		// 			// 	const outFile = path.join(env.buildPath, "dist", "testutils.js");
+		// 			// 	if (fs.existsSync(outFile))
+		// 			// 	{
+		// 			// 		console.log("HHHHHHHHH");
+		// 			// 		const regex = /^require\(/mg,
+		// 			// 			  content = fs.readFileSync(outFile, "utf8").replace(regex, (v) => { console.log("here"); return "__non_webpack_require__("; });
+		// 			// 		fs.writeFileSync(outFile, content);
+		// 			// 	}
+		// 			// } catch {}
+		// 		});
+		// 	}
+		// };
+		// return plugin;
 	},
 
 
@@ -256,6 +309,7 @@ const wpPlugin =
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {webpack.optimize.LimitChunkCountPlugin | undefined}
 	 */
+	// @ts-ignore
 	limitchunks: (env, wpConfig) =>
 	{
 		/** @type {webpack.optimize.LimitChunkCountPlugin | undefined} */
@@ -275,6 +329,7 @@ const wpPlugin =
 		 * @param {WebpackConfig} wpConfig Webpack config object
 		 * @returns {webpack.NoEmitOnErrorsPlugin | undefined}
 		 */
+		// @ts-ignore
 		noEmitOnError: (env, wpConfig) =>
 		{
 			return new webpack.NoEmitOnErrorsPlugin();
@@ -302,9 +357,9 @@ const wpPlugin =
 		 */
 		buildTypes: (env) =>
 		{
-			const tscArgs = [  "tsc", "-p", "./types" ];
-			if (!fs.existsSync(path.join(env.buildPath, "types", "lib"))) {
-				try { fs.unlinkSync(path.join(env.buildPath, "node_modules", ".cache", "tsconfig.tytpes.tsbuildinfo")); } catch {}
+			const tscArgs = [  "tsc", "-p", "./" ];
+			if (!fs.existsSync(path.join(env.buildPath, "dist", "types"))) {
+				try { fs.unlinkSync(path.join(env.buildPath, "node_modules", ".cache", "tsconfig.tsbuildinfo")); } catch {}
 			}
 			spawnSync("npx", tscArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
 		}

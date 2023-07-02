@@ -2,6 +2,8 @@
 
 import Nyc from "./nyc";
 import Mocha from "./mocha";
+import { existsSync } from "fs";
+import { join, resolve } from "path";
 import { ITestRunOptions } from "../interface";
 
 export default async(options: ITestRunOptions) =>
@@ -19,6 +21,17 @@ export default async(options: ITestRunOptions) =>
         {
             require("source-map-support/register");
         }
+    }
+
+    options.coverage.config.cwd = options.coverage.config.cwd || __dirname;
+    if (!existsSync(join(options.projectRoot, "package.json")) || !existsSync(join(options.coverage.config.cwd, "package.json")))
+    {
+        let projectDir = __dirname;
+        while (projectDir.length > 3 && !existsSync(join(projectDir, "package.json"))) {
+            projectDir = resolve(projectDir, "..");
+        }
+        options.projectRoot = projectDir;
+        options.coverage.config.cwd = projectDir;
     }
 
     return {

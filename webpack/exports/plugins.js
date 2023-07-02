@@ -29,6 +29,7 @@ const plugins = (env, wpConfig) =>
 		progress(env, wpConfig),
 		clean(env, wpConfig),
 		wpPlugin.beforecompile(env, wpConfig),
+		// wpPlugin.aftercompile(env, wpConfig),
 		ignore(env, wpConfig),
 		...tscheck(env, wpConfig)
 	];

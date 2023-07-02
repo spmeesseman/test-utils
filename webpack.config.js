@@ -90,6 +90,7 @@ const getWebpackConfig = (buildTarget, env, argv) =>
 	rules(env, wpConfig);                // Loaders & build rules
 	stats(env, wpConfig);                // Stats i.e. console output & verbosity
 	wpConfig.name = `${buildTarget}:${wpConfig.mode}`;
+	wpConfig.node ={ global: false };
 	return wpConfig;
 };
 
