@@ -70,16 +70,20 @@ export default async(options: ITestRunOptions) =>
 	//
 	if (!nycConfig.useSpawnWrap)
 	{
-		const nycLibPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
+		// const nycLibPath = join(nyc.cwd, "node_modules", "nyc", "lib");
+		// const nycLibPath = relative(__dirname, resolve(options.projectRoot, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
+		const nycLibPath = join(options.projectRoot, "node_modules", "nyc", "lib");
 		const requireModules = [
-			require.resolve(`${nycLibPath}/register-env.js`),
+			join(nycLibPath, "register-env.js"),
+			// require.resolve(`${nycLibPath}/wrap.js`)
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
 		// eslint-disable-next-line import/no-extraneous-dependencies
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			require.resolve(`${nycLibPath}/wrap.js`)
+			join(nycLibPath, "wrap.js")
+			// require.resolve(`${nycLibPath}/wrap.js`)
 		);
 		Object.assign(process.env, env);
 		requireModules.forEach(mod => { require(mod); });
