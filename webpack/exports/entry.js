@@ -48,7 +48,7 @@ const entry = (env, wpConfig) =>
 		{
 			testutils: {
 				import: "./src/index.ts",
-				filename: "testutils.js",
+				filename: "testutils.cjs",
 				library: {
 					type: "commonjs2"
 				}

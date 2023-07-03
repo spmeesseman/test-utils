@@ -36,10 +36,10 @@ const afterdone = (env, wpConfig) =>
                    if (_wpConfig.mode === "production")
                    {
                        try {
-                           renameSync(join(env.buildPath, "dist", "testutils.js.LICENSE.txt"), join(env.buildPath, "dist", "testutils.LICENSE"));
+                           renameSync(join(env.buildPath, "dist", "testutils.cjs.LICENSE.txt"), join(env.buildPath, "dist", "testutils.LICENSE"));
                        } catch {}
                    }
-                    const outFile = join(env.buildPath, "dist", "testutils.js");
+                    const outFile = join(env.buildPath, "dist", "testutils.cjs");
                     if (existsSync(outFile))
                     {
                         let content = readFileSync(outFile, "utf8");

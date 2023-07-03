@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 // @ts-check
 
-import { dirname, join } from "path";
+import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
-import { writeInfo } from "../console";
+import { writeInfo } from "../console.js";
 
 /**
  * @module webpack.exports.environment
@@ -27,12 +27,12 @@ const __dirname = dirname(__filename);
 const environment = (buildTarget, env, argv) =>
 {
 	env.build = buildTarget;
-	env.buildPath = __dirname;
+	env.buildPath = resolve(__dirname, "..", "..");
 	if (env.build === "tests") {
-		env.basePath = join(__dirname, "src", "test");
+		env.basePath = join(env.buildPath, "src", "test");
 	}
 	else {
-		env.basePath = __dirname;
+		env.basePath = env.buildPath;
 	}
 	writeInfo("Environment:");
 	Object.keys(env).forEach((k) => { writeInfo(`   ${k.padEnd(15)}: ${env[k]}`); });

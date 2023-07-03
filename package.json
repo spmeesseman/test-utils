@@ -41,7 +41,7 @@
         "vscode unit testing"
     ],
     "type": "module",
-    "main": "./dist/testutils.js",
+    "main": "./dist/testutils.cjs",
     "types": "./dist/types/index.d.ts",
     "publishConfig": {
         "access": "public"
@@ -58,8 +58,8 @@
         "clean-all": "npm run clean-build && npm run clean-types",
         "clean-build": "rimraf dist",
         "clean-types": "rimraf dist/types && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
-        "copy-extjs": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils /i /y",
-        "copy-taskexplorer": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils /i /y",
+        "copy_to-extjs": "cmd /c xcopy .\\dist\\*.*js* ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils /i /y",
+        "copy_to-taskexplorer": "cmd /c xcopy .\\dist\\*.*js* ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils /i /y",
         "rebuild-dev": "npm run clean-all && npm run build-dev",
         "rebuild-prod": "npm run clean-all && npm run build-prod",
         "rebuild-types": "npm run clean-types &&  && npm run build-types"

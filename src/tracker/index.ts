@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.tracker.testtracker
+ */
+
 import { TestUtilsUtilities } from "./utils.js";
 import { colors, figures } from "../utils/figures.js";
 import { startInput, stopInput } from "../utils/input.js";

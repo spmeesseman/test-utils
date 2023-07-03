@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.utils.input
+ */
+
 import * as readline from "readline";
 
 let stdinInterface: readline.Interface | undefined;

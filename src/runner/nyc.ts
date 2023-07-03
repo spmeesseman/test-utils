@@ -1,6 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/naming-convention */
 
+/**
+ * @module testutils.runner.nyc
+ */
+
 import resolveFrom from "resolve-from";
 import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
@@ -15,7 +19,7 @@ export default async(options: ITestRunOptions) =>
     const nycConfig = Object.assign({}, defaultConfig(options), options.coverage.config);
 	//
 	// Instantiate an NYC instance and wrap the current running extension host process. This
-	// differs a bit from the way nyc is normally used on the command line.
+	// differs a bit from the way nyc is normally used on the command line.  Iafb&Iwmbb:(
 	//
 	const nyc = new NYC(nycConfig);
 	nyc.wrap();
@@ -54,33 +58,29 @@ export default async(options: ITestRunOptions) =>
 		NYC_CWD: nycConfig.cwd
 	};
    	//
-	// Babel's cache interferes with some configurations, so is disabled by default, it can be
-	// re-enabled with the configuration babelCache=`false`
+	// Babel's cache interferes with some configurations, so is disabled by default, it
+	// can be re-enabled with the configuration babelCache=`false`.  Iafb&Iwmbb:(
 	//
 	if (nycConfig.babelCache === false)
 	{
 		env.BABEL_DISABLE_CACHE = process.env.BABEL_DISABLE_CACHE = "1";
 	}
 	//
-	// Initialize nyc environment vars and process wrap if not using the spawn-wrap module/option
+	// Initialize nyc environment vars and process wrap if not using the spawn-wrap option
 	//
 	if (!nycConfig.useSpawnWrap)
 	{
 		const nycLibPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
 		const requireModules = [
-			aliasResolve(`${nycLibPath}/register-env.js`),
-			// `${nycLibPath}/register-env.js`,
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
-		// eslint-disable-next-line import/no-extraneous-dependencies
-		const preloadList = require("node-preload");
-		preloadList.push(
+		require("node-preload").push(                 // Modules to load for each new proc spawn
 			...requireModules,
-			aliasResolve(`${nycLibPath}/wrap.js`)
-			// `${nycLibPath}/wrap.js`
+			require.resolve(`${nycLibPath}/wrap.js`)  // This is where magic is for VSCode Lang Svr tests
 		);
-		Object.assign(process.env, env);
-		requireModules.forEach(mod => { aliasRequire(mod); });
+		Object.assign(process.env, env);              // Write variables to process environment
+		nycLibRequire("./register-env.js");           // Webpack crap - no way to leave 'require' alone
+		requireModules.forEach(m => { require(m); }); // See weback/plugin/afterdone ____require____
 	}
 	//
 	// Call addAllFiles() AFTER importing register-env module (if (!nycConfig.useSpawnWrap))
@@ -103,50 +103,33 @@ export default async(options: ITestRunOptions) =>
 		//        programatically, and use foreground() in indext.ts to launch it.  THis would pretty
 		//        much replicate how nyc/bin/nyc.js works.
 		//
-		// UPDATE 6/22/23 - Have language server srapped FINALLY "without" using useSpawnWrap.  Key was
-		//                  to use a node runtime to directly spawn the server, as opposed to the
-		//                  default fork.
+		// UPDATE 6/22/23 - Have language client and  server FINALLY covered by same test suites,
+		//                  "without" using useSpawnWrap.  Key was to use a node runtime to directly
+		//                  spawn the server, as opposed to the default fork.  Only took 3 years to
+		//                  figure that out. Or 4 years?  Iafb&Iwmbb:(
+		//                  > See: file:///c:/Projects/vscode-extjs/client/src/lib/language/client.ts
 		//
 		const sw = require("spawn-wrap"),
-			  nycBinPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "bin")).replace(/\\/g, "/"),
-		      wrapper = require.resolve(`${nycBinPath}/wrap.js`);
+			  nycBinPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "bin")).replace(/\\/g, "/");
 		sw.runMain();
 		env.SPAWN_WRAP_SHIM_ROOT = process.env.SPAWN_WRAP_SHIM_ROOT || process.env.XDG_CACHE_HOME || require("os").homedir();
-		sw([ wrapper ], env);
+		sw([ require.resolve(`${nycBinPath}/wrap.js`) ], env);
 	}
 
 	return nyc;
 };
 
 
-const aliasRequire = (moduleName: string) =>
+const nycLibRequire = (moduleName: string) =>
 {
-    let aliasRequire;
-    if (modules[moduleName] === undefined && typeof module !== 'undefined' && module && module.exports)
-	{
-		aliasRequire = require;
+    if (modules[moduleName] === undefined)
+	{;
         try {
-            // aliasRequire("../../../node_modules/nyc/lib/" + moduleName);
-            aliasRequire(moduleName);
+            require("../../node_modules/nyc/lib/" + moduleName);
         }
-		catch (e) { modules[moduleName] = null; }
+		catch { modules[moduleName] = null; }
     }
     return modules[moduleName];
-}
-
-
-const aliasResolve = (moduleName: string) =>
-{
-    let aliasRequire, aliasResolve, moduleResolved = moduleName;
-    if (typeof module !== 'undefined' && module && module.exports)
-	{
-		aliasRequire = require;
-		aliasResolve= aliasRequire.resolve;
-        try {
-			moduleResolved = aliasResolve(moduleName);
-		} catch {}
-    }
-    return moduleResolved;
 }
 
 

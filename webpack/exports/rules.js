@@ -87,26 +87,26 @@ const rules = (env, wpConfig) =>
 		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json";
 
 		wpConfig.module.rules.push(...[
-		// {
-		// 	test: /nyc\.ts$/,
-		// 	include: join(env.buildPath, "src", "runner"),
-		// 	loader: "string-replace-loader",
-		// 	enforce: /** @type {"pre"|"post"}*/("pre"),
-		// 	options: {
-		// 		multiple: [
-		// 		{
-		// 			search: "require(mod",
-		// 			replace: "____require____(mod"
-		// 		}]
-		// 	}
-		// },
+		{
+			test: /nyc\.ts$/,
+			include: join(env.buildPath, "src", "runner"),
+			loader: "string-replace-loader",
+			enforce: /** @type {"pre"|"post"}*/("pre"),
+			options: {
+				multiple: [
+				{
+					search: "require(m)",
+					replace: "____require____(m)"
+				}]
+			}
+		},
 		{
 			test: /\.ts$/,
 			include: join(env.buildPath, "src"),
 			exclude: [
 				/node_modules/, /test[\\/]/, /types[\\/]/, /\.d\.ts$/
 			],
-			use: [ env.esbuild ?
+			use:
 			{
 				loader: "esbuild-loader",
 				options: {
@@ -138,15 +138,7 @@ const rules = (env, wpConfig) =>
 					// 	},
 					// }]
 				}
-			} :
-			{
-				loader: "ts-loader",
-				options: {
-					configFile,
-					// experimentalWatchApi: true,
-					transpileOnly: true
-				}
-			} ]
+			}
 		}]);
 	}
 };

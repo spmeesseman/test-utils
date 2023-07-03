@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.utils.figures
+ */
+
 export type LogColor = [ number, number ];
 export type LogStyle = [ number, number ];
 

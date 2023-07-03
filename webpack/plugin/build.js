@@ -131,7 +131,7 @@ const build = (env, wpConfig) =>
 	// 			 (assets) =>
 	// 			{
 	// 				Object.keys(assets).forEach(k => console.log("" + k));
-	// 				const oldSource = assets["testutils.js"];
+	// 				const oldSource = assets["testutils.cjs"];
 	// 				const { ReplaceSource } = compiler.webpack.sources;
 	// 				const newSource = new ReplaceSource(oldSource, "CompilationPlugin");
 	// 				const codeToReplace = "require(",
@@ -139,10 +139,10 @@ const build = (env, wpConfig) =>
 	// 					  start = oldSource.source().indexOf(codeToReplace),
 	// 					  end = start + codeToReplace.length;
 	// 				newSource.replace(start, end, newCode, "CompilationPlugin");
-	// 				compilation.updateAsset("testutils.js", newSource);
+	// 				compilation.updateAsset("testutils.cjs", newSource);
 	// 			});
 	// 			// try {
-	// 			// 	const outFile = path.join(env.buildPath, "dist", "testutils.js");
+	// 			// 	const outFile = path.join(env.buildPath, "dist", "testutils.cjs");
 	// 			// 	if (fs.existsSync(outFile))
 	// 			// 	{
 	// 			// 		console.log("HHHHHHHHH");

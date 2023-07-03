@@ -1,3 +1,8 @@
+
+/**
+ * @module testutils.utils.utils
+ */
+
 import { figures } from "./figures.js";
 
 

@@ -6,6 +6,9 @@ import { existsSync, readFileSync } from "fs";
 import { basename, join, relative, resolve } from "path";
 import { ITestRunOptions, ITestToolConfig } from "../interface/index.js";
 
+/**
+ * @module testutils.runner.mocha
+ */
 
 export default (options: ITestRunOptions) =>
 {

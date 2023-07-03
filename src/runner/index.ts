@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.runner.testrunner
+ */
+
 import { run } from "./run.js";
 import { ITestRunOptions } from "../interface/index.js";
 

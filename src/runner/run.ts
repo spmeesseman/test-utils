@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.runner.run
+ */
+
 import runConfig from "./config.js";
 import { ITestRunOptions } from "../interface/index.js";
 

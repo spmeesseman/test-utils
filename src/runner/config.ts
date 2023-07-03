@@ -1,5 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
+/**
+ * @module testutils.runner.config
+ */
+
 import Nyc from "./nyc.js";
 import Mocha from "./mocha.js";
 import { existsSync } from "fs";

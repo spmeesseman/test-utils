@@ -1,4 +1,8 @@
 
+/**
+ * @module testutils.tracker.utils
+ */
+
 import { figures } from "../utils/figures.js";
 import { TestTracker } from "../tracker/index.js";
 import { ITestTrackerOptions, ITestResults } from "../interface/index.js";

@@ -24,7 +24,7 @@ const banner = (env, wpConfig) =>
         {
             banner: `Copyright ${(new Date()).getFullYear()} Scott P Meesseman`,
             entryOnly: true,
-            test: /testutils\.js/
+            test: /testutils\.c?js/
             // raw: true
         });
     }
