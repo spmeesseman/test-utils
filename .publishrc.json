@@ -6,7 +6,7 @@
     "distReleasePathSrc":       "dist",
     "githubAssets": [
         "CHANGELOG.md|Changelog File",
-        "test-utils-$(VERSION).tgz|NPM Tarball"
+        "test-utils.tgz|NPM Tarball"
     ],
     "githubRelease":            "Y",
     "githubUser":               "spmeesseman",
