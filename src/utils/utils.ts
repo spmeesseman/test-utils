@@ -1,4 +1,4 @@
-import { figures } from "./figures";
+import { figures } from "./figures.js";
 
 
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

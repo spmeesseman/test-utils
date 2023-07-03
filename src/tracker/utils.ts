@@ -1,7 +1,7 @@
 
-import { figures } from "../utils/figures";
-import { TestTracker } from "../tracker";
-import { ITestTrackerOptions, ITestResults } from "../interface";
+import { figures } from "../utils/figures.js";
+import { TestTracker } from "../tracker/index.js";
+import { ITestTrackerOptions, ITestResults } from "../interface/index.js";
 
 
 export class TestUtilsUtilities

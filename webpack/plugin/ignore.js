@@ -5,7 +5,7 @@
  * @module webpack.plugin.ignore
  */
 
-const webpack = require("webpack");
+import webpack from "webpack";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -28,4 +28,4 @@ const ignore = (env, wpConfig) =>
     return plugin;
 };
 
-module.exports = ignore;
+export default ignore;

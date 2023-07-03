@@ -7,7 +7,7 @@
  */
 
 // const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -59,4 +59,4 @@ const clean = (env, wpConfig) =>
 };
 
 
-module.exports = clean;
+export default clean;

@@ -76,4 +76,4 @@ const minification = (env, wpConfig) =>
 
 
 
-module.exports = minification;
+export default minification;

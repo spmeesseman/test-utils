@@ -38,4 +38,4 @@ const devtool = (env, wpConfig) =>
 };
 
 
-module.exports = devtool;
+export default devtool;

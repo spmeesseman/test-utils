@@ -1,6 +1,6 @@
 
-import runConfig from "./config";
-import { ITestRunOptions } from "../interface";
+import runConfig from "./config.js";
+import { ITestRunOptions } from "../interface/index.js";
 
 
 export const run = async (options: ITestRunOptions): Promise<void> =>

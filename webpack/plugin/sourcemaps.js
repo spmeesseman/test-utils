@@ -5,7 +5,7 @@
  * @module webpack.plugin.sourcemaps
  */
 
-const webpack = require("webpack");
+import webpack from "webpack";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -63,4 +63,4 @@ const sourcemaps = (env, wpConfig) =>
 };
 
 
-module.exports = sourcemaps;
+export default sourcemaps;

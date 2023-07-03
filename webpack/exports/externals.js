@@ -8,7 +8,7 @@
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const nodeExternals = require("webpack-node-externals");
+import nodeExternals from "webpack-node-externals";
 
 
 /**
@@ -59,4 +59,4 @@ const externals = (env, wpConfig) =>
 	}
 };
 
-module.exports = externals;
+export default externals;

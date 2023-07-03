@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import Nyc from "./nyc";
-import Mocha from "./mocha";
+import Nyc from "./nyc.js";
+import Mocha from "./mocha.js";
 import { existsSync } from "fs";
 import { join, resolve } from "path";
-import { ITestRunOptions } from "../interface";
+import { ITestRunOptions } from "../interface/index.js";
 
 export default async(options: ITestRunOptions) =>
 {

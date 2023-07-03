@@ -6,7 +6,7 @@
  * @module webpack.plugin.progress
  */
 
-const webpack = require("webpack");
+import webpack from "webpack";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -24,4 +24,4 @@ const progress = (env, wpConfig) =>
 };
 
 
-module.exports = progress;
+export default progress;

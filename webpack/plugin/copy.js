@@ -6,7 +6,7 @@
  * @module webpack.plugin.copy
  */
 
-const CopyPlugin = require("copy-webpack-plugin");
+import CopyPlugin from "copy-webpack-plugin";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -61,4 +61,4 @@ const copy =(env, wpConfig) =>
 }
 
 
-module.exports = copy;
+export default copy;

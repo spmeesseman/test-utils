@@ -24,4 +24,4 @@ const target = (env, wpConfig) =>
 };
 
 
-module.exports = target;
+export default target;

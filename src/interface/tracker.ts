@@ -1,4 +1,4 @@
-import { TestsFramework } from "./framework";
+import { TestsFramework } from "./framework.js";
 
 export interface ITestUtilsStore
 {

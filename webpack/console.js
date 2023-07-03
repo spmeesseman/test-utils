@@ -1,5 +1,5 @@
 
-const colors = {
+export const colors = {
 	white: [ 37, 39 ],
 	grey: [ 90, 39 ],
 	blue: [ 34, 39 ],
@@ -14,39 +14,31 @@ const colors = {
  * @param {String} msg
  * @param {Number[]} color Webpack config object
  */
-const withColor = (msg, color) => "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
+export const write = (msg, color) => "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
 
 
-const consoleWrite = (msg, icon, pad = "") =>
-    console.log(`     ${pad}${icon || figures.color.info}${msg ? " " + figures.withColor(msg, figures.colors.grey) : ""}`);
+export const writeInfo = (msg, icon, pad = "") =>
+    console.log(`     ${pad}${icon || figures.color.info}${msg ? " " + figures.write(msg, figures.colors.grey) : ""}`);
 
 
-const figures =
+export const figures =
 {
     colors,
     error: "✘",
     info: "ℹ",
     success: "✔",
     warning: "⚠",
-    withColor,
+    write,
+    writeInfo,
     color:
     {
-        success: withColor("✔", colors.green),
-        successBlue: withColor("✔", colors.blue),
-        info: withColor("ℹ", colors.magenta),
-        infoTask: withColor("ℹ", colors.blue),
-        warning: withColor("⚠", colors.yellow),
-        warningTests: withColor("⚠", colors.blue),
-        error: withColor("✘", colors.red),
-        errorTests: withColor("✘", colors.blue)
+        success: write("✔", colors.green),
+        successBlue: write("✔", colors.blue),
+        info: write("ℹ", colors.magenta),
+        infoTask: write("ℹ", colors.blue),
+        warning: write("⚠", colors.yellow),
+        warningTests: write("⚠", colors.blue),
+        error: write("✘", colors.red),
+        errorTests: write("✘", colors.blue)
     }
 };
-
-const wpConsole = {
-    colors,
-    figures,
-    write: withColor,
-    writeInfo: consoleWrite
-};
-
-module.exports = wpConsole;

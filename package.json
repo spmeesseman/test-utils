@@ -20,7 +20,7 @@
         "Testing"
     ],
     "engines": {
-        "node": ">=10.0.0"
+        "node": ">=16.0.0"
     },
     "keywords": [
         "tests",
@@ -32,8 +32,9 @@
         "unit test",
         "vscode unit testing"
     ],
-    "main": "dist/testutils.js",
-    "types": "dist/types/index.d.ts",
+    "type": "module",
+    "main": "./dist/testutils.js",
+    "types": "./dist/types/index.d.ts",
     "publishConfig": {
         "access": "public"
     },
@@ -49,7 +50,9 @@
         "clean-all": "npm run clean-build && npm run clean-types",
         "clean-build": "rimraf dist",
         "clean-types": "rimraf dist/types && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
-        "rebuild-dev": "npm run clean-all && npm run build-dev",
+        "copy-extjs": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils /s /i /y",
+		"copy-taskexplorer": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils /s /i /y",
+		"rebuild-dev": "npm run clean-all && npm run build-dev",
         "rebuild-prod": "npm run clean-all && npm run build-prod",
         "rebuild-types": "npm run clean-types &&  && npm run build-types"
     },

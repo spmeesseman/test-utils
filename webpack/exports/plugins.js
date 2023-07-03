@@ -5,17 +5,17 @@
  * @module webpack.exports.plugins
  */
 
-const afterdone = require("../plugin/afterdone");
-const banner = require("../plugin/banner");
-const build = require("../plugin/build");
-const clean = require("../plugin/clean");
-const copy = require("../plugin/copy");
-const ignore = require("../plugin/ignore");
-const optimization = require("../plugin/optimization");
-const progress = require("../plugin/progress");
-const sourcemaps = require("../plugin/sourcemaps");
-const tscheck = require("../plugin/tscheck");
-const { wpPlugin } = require("../plugin/plugins");
+import afterdone from "../plugin/afterdone.js";
+import banner from "../plugin/banner.js";
+import build from "../plugin/build.js";
+import clean from "../plugin/clean.js";
+import copy from "../plugin/copy.js";
+import ignore from "../plugin/ignore.js";
+import optimization from "../plugin/optimization.js";
+import progress from "../plugin/progress.js";
+import sourcemaps from "../plugin/sourcemaps.js";
+import tscheck from "../plugin/tscheck.js";
+import { wpPlugin } from "../plugin/plugins.js";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -63,4 +63,4 @@ const plugins = (env, wpConfig) =>
 	});
 };
 
-module.exports = plugins;
+export default plugins;

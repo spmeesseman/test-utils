@@ -57,4 +57,5 @@ const entry = (env, wpConfig) =>
 	}
 };
 
-module.exports = entry;
+
+export default entry;

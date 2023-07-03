@@ -4,7 +4,7 @@ import * as glob from "glob";
 import Mocha, { MochaOptions } from "mocha";
 import { existsSync, readFileSync } from "fs";
 import { basename, join, relative, resolve } from "path";
-import { ITestRunOptions, ITestToolConfig } from "../interface";
+import { ITestRunOptions, ITestToolConfig } from "../interface/index.js";
 
 
 export default (options: ITestRunOptions) =>

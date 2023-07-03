@@ -19,4 +19,4 @@ const context = (env, wpConfig) =>
 };
 
 
-module.exports = context;
+export default context;

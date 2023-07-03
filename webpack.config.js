@@ -2,12 +2,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // @ts-check
 
-const path = require("path");
-const wpConsole = require("./webpack/console");
-const {
-	context, devtool, entry, externals, ignorewarnings, minification,  mode, plugins, optimization,
-	output, resolve, rules, stats, target, watch
-} = require("./webpack/exports");
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import { figures, writeInfo } from "./webpack/console.js";
+import {
+	context, devtool, entry, externals, ignorewarnings, minification, mode, plugins,
+	optimization, output, resolve, rules, stats, target, watch
+} from "./webpack/exports/index.js";
 
 /** @typedef {import("./webpack/types/webpack").WebpackBuild} WebpackBuild */
 /** @typedef {import("./webpack/types/webpack").WebpackConfig} WebpackConfig */
@@ -15,7 +16,8 @@ const {
 /** @typedef {{ mode: "none"|"development"|"production"|undefined, env: WebpackEnvironment, config: String[] }} WebpackArgs */
 
 let buildStep = 0;
-
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = dirname(__filename);
 
 /**
  * Webpack Export
@@ -25,9 +27,16 @@ let buildStep = 0;
  * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig|WebpackConfig[]}
  */
-module.exports = (env, argv) =>
+export default (env, argv) =>
 {
-	wpConsole.writeInfo("Start Webpack build");
+	writeInfo("---------------------------------------------------");
+	writeInfo(" Start Webpack build");
+	writeInfo("---------------------------------------------------");	
+	writeInfo("   Argv:");
+	writeInfo("   " + JSON.stringify(argv, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
+	writeInfo("   Env :");
+	writeInfo("   " + JSON.stringify(env, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
+	writeInfo("---------------------------------------------------");
 
 	env = Object.assign(
 	{
@@ -67,7 +76,7 @@ module.exports = (env, argv) =>
 const getWebpackConfig = (buildTarget, env, argv) =>
 {
 	if (buildStep > 0) { console.log(""); }
-	wpConsole.writeInfo(`Start Webpack build step ${++buildStep}`);
+	writeInfo(`Start Webpack build step ${++buildStep}`);
 	/** @type {WebpackConfig}*/
 	const wpConfig = {};
 	environment(buildTarget, env, argv); // Base path / Build path
@@ -103,21 +112,24 @@ const environment = (buildTarget, env, argv) =>
 	env.build = buildTarget;
 	env.buildPath = __dirname;
 	if (env.build === "tests") {
-		env.basePath = path.join(__dirname, "src", "test");
+		env.basePath = join(__dirname, "src", "test");
 	}
 	else {
 		env.basePath = __dirname;
 	}
-	wpConsole.writeInfo("Environment:");
-	Object.keys(env).forEach((k) => { wpConsole.writeInfo(`   ${k.padEnd(15)}: ${env[k]}`); });
+	writeInfo("Environment:");
+	Object.keys(env).forEach((k) => { writeInfo(`   ${k.padEnd(15)}: ${env[k]}`); });
 	if (argv)
 	{
-		wpConsole.writeInfo("Arguments:");
+		writeInfo("Arguments:");
 		if (argv.mode) {
-			wpConsole.writeInfo(`   mode          : ${argv.mode}`);
+			writeInfo(`   mode          : ${argv.mode}`);
 		}
 		if (argv.config) {
-			wpConsole.writeInfo(`   config        : ${argv.config.join(", ")}`);
+			writeInfo(`   config        : ${argv.config.join(", ")}`);
 		}
+		// if (argv.watch) {
+		// 	writeInfo(`   watch         : ${argv.config.watch}`);
+		// }
 	}
 };

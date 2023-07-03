@@ -9,10 +9,10 @@
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
 
-const path = require("path");
-const JSON5 = require("json5");
-const esbuild = require("esbuild");
-const { spawnSync } = require("child_process");
+import { join } from "path";
+import esbuild from "esbuild";
+import JSON5 from "json5/dist/index.js";
+import { spawnSync } from "child_process";
 
 
 /**
@@ -54,11 +54,11 @@ const rules = (env, wpConfig) =>
 
 	if (env.build === "tests")
 	{
-		const testsRoot = path.join(env.buildPath, "src", "test");
+		const testsRoot = join(env.buildPath, "src", "test");
 		wpConfig.module.rules.push(...[
 		{
 			test: /index\.js$/,
-			include: path.join(env.buildPath, "node_modules", "nyc"),
+			include: join(env.buildPath, "node_modules", "nyc"),
 			loader: "string-replace-loader",
 			options: {
 				search: "selfCoverageHelper = require('../self-coverage-helper')",
@@ -89,7 +89,7 @@ const rules = (env, wpConfig) =>
 		wpConfig.module.rules.push(...[
 		{
 			test: /nyc\.ts$/,
-			include: path.join(env.buildPath, "src", "runner"),
+			include: join(env.buildPath, "src", "runner"),
 			loader: "string-replace-loader",
 			enforce: /** @type {"pre"|"post"}*/("pre"),
 			options: {
@@ -102,7 +102,7 @@ const rules = (env, wpConfig) =>
 		},
 		{
 			test: /\.ts$/,
-			include: path.join(env.buildPath, "src"),
+			include: join(env.buildPath, "src"),
 			exclude: [
 				/node_modules/, /test[\\/]/, /types[\\/]/, /\.d\.ts$/
 			],
@@ -116,7 +116,7 @@ const rules = (env, wpConfig) =>
 					// packages: "external",
 					// target: [ "es2020", "chrome91", "node16.20" ],
 					target: [ "node16.20", "es2020" ],
-					tsconfigRaw: getTsConfig(env, path.join(env.buildPath, configFile)),
+					tsconfigRaw: getTsConfig(env, join(env.buildPath, configFile)),
 					// transform: () => {
 					// 	console.log("transform!!!!!!!!!!!!!");
 					// }
@@ -171,4 +171,4 @@ const getTsConfig = (env, tsConfigFile) =>
 };
 
 
-module.exports = rules;
+export default rules;

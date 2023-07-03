@@ -28,4 +28,4 @@ const ignorewarnings = (env, wpConfig) =>
 };
 
 
-module.exports = ignorewarnings;
+export default ignorewarnings;

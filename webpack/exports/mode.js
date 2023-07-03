@@ -46,4 +46,4 @@ const mode = (env, argv, wpConfig) =>
 };
 
 
-module.exports = mode;
+export default mode;

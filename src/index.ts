@@ -1,6 +1,6 @@
 
-export * from "./interface";
-export * from "./utils/utils";
-export * from "./utils/figures";
-export { TestRunner } from "./runner";
-export { TestTracker } from "./tracker";
+export * from "./interface/index.js";
+export * from "./utils/utils.js";
+export * from "./utils/figures.js";
+export { TestRunner } from "./runner/index.js";
+export { TestTracker } from "./tracker/index.js";

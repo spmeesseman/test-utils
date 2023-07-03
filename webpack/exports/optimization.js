@@ -35,4 +35,4 @@ const optimization = (env, wpConfig) =>
 };
 
 
-module.exports = optimization;
+export default optimization;

@@ -5,7 +5,7 @@
  * @module webpack.plugin.banner
  */
 
-const webpack = require("webpack");
+import webpack from "webpack";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -32,4 +32,4 @@ const banner = (env, wpConfig) =>
 };
 
 
-module.exports = banner;
+export default banner;

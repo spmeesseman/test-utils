@@ -1,7 +1,8 @@
-import { colors, figures } from "../utils/figures";
-import { startInput, stopInput } from "../utils/input";
-import { TestUtilsUtilities } from "./utils";
-import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface";
+
+import { TestUtilsUtilities } from "./utils.js";
+import { colors, figures } from "../utils/figures.js";
+import { startInput, stopInput } from "../utils/input.js";
+import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface/index.js";
 
 
 export class TestTracker

@@ -1,9 +1,25 @@
 // @ts-check
 
-const plugins = require("./plugins");
-const ignore = require("./ignore");
+import banner from "./banner.js";
+import build from "./build.js";
+import clean from "./clean.js";
+import copy from "./copy.js";
+import ignore from "./ignore.js";
+import optimization from "./optimization.js";
+import { wpPlugin } from "./plugins.js";
+import progress from "./progress.js";
+import sourcemaps from "./sourcemaps.js";
+import tscheck from "./tscheck.js";
 
-module.exports = {
+export {
+    banner,
+    build,
+    clean,
+    copy,
 	ignore,
-    plugins
+    optimization,
+    wpPlugin,
+    progress,
+    sourcemaps,
+    tscheck
 };

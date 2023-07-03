@@ -5,7 +5,7 @@
  * @module webpack.plugin.optimization
  */
 
-const webpack = require("webpack");
+import webpack from "webpack";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -30,4 +30,4 @@ const optimization = (env, wpConfig) =>
 };
 
 
-module.exports = optimization;
+export default optimization;

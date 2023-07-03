@@ -4,7 +4,7 @@
 import resolveFrom from "resolve-from";
 import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
-import { ITestCoverageToolConfig, ITestRunOptions } from "../interface";
+import { ITestCoverageToolConfig, ITestRunOptions } from "../interface/index.js";
 
 const NYC = require("nyc");
 

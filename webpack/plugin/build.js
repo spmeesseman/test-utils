@@ -6,11 +6,11 @@
  * @module webpack.plugin.build
  */
 
-const fs = require("fs");
-const path = require("path");
-// const webpack = require("webpack");
+import { join } from "path";
+// import webpack from "webpack";
 // const { sources } = require("webpack");
-const { spawnSync } = require("child_process");
+import { spawnSync } from "child_process";
+import { existsSync, unlinkSync } from "fs";
 // const ContextMapPlugin = require("context-map-webpack-plugin");
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
@@ -168,7 +168,7 @@ const tsc =
 	{
 		// const tscArgs = [ "tsc", "-p", "./src/test/tsconfig.json" ];
 		// spawnSync("npx", tscArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
-		const npmArgs = [ "npm", "run", "build-test-suite" ];
+		const npmArgs = [ "npm", "run", "build-tests" ];
 		spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
 	},
 
@@ -179,13 +179,17 @@ const tsc =
 	buildTypes: (env) =>
 	{
 		const npmArgs = [ "npm", "run", "build-types" ];
-		if (!fs.existsSync(path.join(env.buildPath, "dist", "types"))) {
-			try { fs.unlinkSync(path.join(env.buildPath, "node_modules", ".cache", "tsconfig.tsbuildinfo")); } catch {}
+		if (!existsSync(join(env.buildPath, "dist", "types"))) {
+			try { unlinkSync(join(env.buildPath, "node_modules", ".cache", "tsconfig.tsbuildinfo")); } catch {}
 		}
-		spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
+		// const result =
+			spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
+		// if (result.status !== 0) {
+		// 	compilation.warnings.push(/** @type {*}*/(new webpack.WebpackError(paths.join(" -> "))));
+		// }
 	}
 
 };
 
 
-module.exports = build;
+export default build;

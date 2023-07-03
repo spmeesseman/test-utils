@@ -1,6 +1,6 @@
 // @ts-check
 
-const path = require("path");
+import { join } from "path";
 
 /**
  * @module webpack.exports.output
@@ -25,7 +25,7 @@ const output = (env, wpConfig) =>
 			// libraryExport: "run",
 			// globalObject: "this",
 			// libraryTarget: 'commonjs2',
-			path: path.join(env.buildPath, "dist", "test"),
+			path: join(env.buildPath, "dist", "test"),
 			filename: "[name].js",
 			// module: true,
 			// chunkFormat: "commonjs",
@@ -41,11 +41,11 @@ const output = (env, wpConfig) =>
 		const isTests = env.environment.startsWith("test");
 		wpConfig.output = {
 			clean: env.clean === true ? (isTests ? { keep: /(test)[\\/]/ } : true) : undefined,
-			path: env.build === "browser" ? path.join(env.buildPath, "dist", "browser") : path.join(env.buildPath, "dist"),
+			path: env.build === "browser" ? join(env.buildPath, "dist", "browser") : join(env.buildPath, "dist"),
 			filename: "[name].js",
 			libraryTarget: "commonjs2"
 		};
 	}
 };
 
-module.exports = output;
+export default output;

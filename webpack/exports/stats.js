@@ -31,4 +31,4 @@ const stats = (env, wpConfig) =>
 };
 
 
-module.exports = stats;
+export default stats;

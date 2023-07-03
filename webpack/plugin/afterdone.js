@@ -6,8 +6,8 @@
  * @module webpack.plugin.afterdone
  */
 
-const path = require("path");
-const { renameSync, existsSync, writeFileSync, readFileSync } = require("fs");
+import { join } from "path";
+import { renameSync, existsSync, writeFileSync, readFileSync } from "fs";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -36,10 +36,10 @@ const afterdone = (env, wpConfig) =>
                    if (_wpConfig.mode === "production")
                    {
                        try {
-                           renameSync(path.join(env.buildPath, "dist", "testutils.js.LICENSE.txt"), path.join(env.buildPath, "dist", "testutils.LICENSE"));
+                           renameSync(join(env.buildPath, "dist", "testutils.js.LICENSE.txt"), join(env.buildPath, "dist", "testutils.LICENSE"));
                        } catch {}
                    }
-                    const outFile = path.join(env.buildPath, "dist", "testutils.js");
+                    const outFile = join(env.buildPath, "dist", "testutils.js");
                     if (existsSync(outFile))
                     {
                         let content = readFileSync(outFile, "utf8");
@@ -59,4 +59,4 @@ const afterdone = (env, wpConfig) =>
 };
 
 
-module.exports = afterdone;
+export default afterdone;

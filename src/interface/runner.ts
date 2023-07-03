@@ -1,6 +1,6 @@
 
-import { ITestToolOptions } from "./framework";
-import { ITestCoverageToolOptions } from "./coverage";
+import { ITestToolOptions } from "./framework.js";
+import { ITestCoverageToolOptions } from "./coverage.js";
 
 export interface ITestModules
 {

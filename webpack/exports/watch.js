@@ -24,4 +24,4 @@ const watch = (env, wpConfig) =>
 };
 
 
-module.exports = watch;
+export default watch;

@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 // @ts-check
 
-const webpack = require("webpack");
+import webpack from "webpack";
 // @ts-ignore
-const VisualizerPlugin = require("webpack-visualizer-plugin2");
-const CircularDependencyPlugin = require("circular-dependency-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+import VisualizerPlugin from "webpack-visualizer-plugin2";
+import CircularDependencyPlugin from "circular-dependency-plugin";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -82,6 +82,6 @@ const wpPlugin =
 	}
 };
 
-module.exports = {
+export {
 	wpPlugin
 };

@@ -6,8 +6,8 @@
  * @module webpack.plugin.tscheck
  */
 
-const path = require("path");
-const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
+import { join } from "path";
+import ForkTsCheckerPlugin from "fork-ts-checker-webpack-plugin";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
@@ -31,7 +31,7 @@ const tscheck = (env, wpConfig) =>
 				typescript: {
 					// build: true,
 					mode: "write-tsbuildinfo",
-					configFile: path.join(env.buildPath, "src", "test", "tsconfig.json"),
+					configFile: join(env.buildPath, "src", "test", "tsconfig.json"),
 				}
 			})
 		);
@@ -46,7 +46,7 @@ const tscheck = (env, wpConfig) =>
 				typescript: {
 					// build: true,
 					mode: "write-tsbuildinfo",
-					configFile: path.join(env.buildPath, env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json"),
+					configFile: join(env.buildPath, env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json"),
 				}
 			})
 		);
@@ -70,4 +70,4 @@ const tscheck = (env, wpConfig) =>
 };
 
 
-module.exports = tscheck;
+export default tscheck;
