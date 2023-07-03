@@ -83,6 +83,22 @@ const build = (env, wpConfig) =>
 	// 		}
 	// 	)
 	// ;
+		// {
+		// 	test: /clean\-webpack\-plugin\.js$/,
+		// 	include: path.join(env.buildPath, "node_modules", "clean-webpack-plugin", "dist"),
+		// 	loader: "string-replace-loader",
+		// 	options: {
+		// 		multiple: [
+		// 		{
+		// 			search: "hooks.emit.tap('clean-webpack-plugin', compilation => {",
+		// 			replace: "hooks.beforeCompile.tap('clean-webpack-plugin', compilation => {"
+		// 		},
+		// 		{
+		// 			search: "const stats = compilation.getStats();",
+		// 			replace: "this.removeFiles(this.cleanOnceBeforeBuildPatterns); return;"
+		// 		}]
+		// 	}
+		// },
 /*
 	plugins.push(
 		new webpack.ContextReplacementPlugin(/(.*)/, (context) =>
