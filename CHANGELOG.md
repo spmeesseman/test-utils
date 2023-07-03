@@ -1,5 +1,11 @@
 # TEST-UTILS CHANGE LOG
 
+## Version 0.0.4 (July 2nd, 2023)
+
+### Refactoring
+
+- covert back to commonjs
+
 ## Version 0.0.3 (July 2nd, 2023)
 
 ### Refactoring
