@@ -11,9 +11,9 @@ import { ITestTrackerOptions, ITestResults } from "../interface/index.js";
 export class TestUtilsUtilities
 {
     private _testTimer = 0;
-    private _hasRollingCountError = false;
     private readonly _results: ITestResults;
     private readonly _options: ITestTrackerOptions;
+    private _hasRollingCountError: Record<string, string | number> | undefined;
 
 
     constructor(bestTimesInst: TestTracker)
@@ -88,10 +88,10 @@ export class TestUtilsUtilities
         }
         catch (e: any)
         {
-            if (!this._hasRollingCountError) {
+            if (this._hasRollingCountError === undefined) {
                 this.consoleWrite(`rolling success count failure @ test ${(testIdx || -1) + 1}, skipping remaining tests`);
             }
-            this._hasRollingCountError = true;
+            this._hasRollingCountError = { suiteKey, testIdx };
             const { symbols } = require("mocha/lib/reporters/base");
             symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
             if (suite.tests.filter(t => t.isFailed).length === 0) {
@@ -100,7 +100,7 @@ export class TestUtilsUtilities
         }
 
         this._testTimer = Date.now();
-        return !isTeardown ? this._hasRollingCountError : !suiteResults && this._hasRollingCountError;
+        return this._hasRollingCountError;
     };
 
 
@@ -116,15 +116,16 @@ export class TestUtilsUtilities
     getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
 
 
-    isRollingCountError = () => this._hasRollingCountError;
+    isRollingCountError = () => !!this._hasRollingCountError;
 
 
     private properCase = (name: string | undefined, removeSpaces?: boolean) =>
     {
         if (!name) {
-        return "";
+            return "";
         }
-        return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(/[ ]+/g, !removeSpaces ? " " : "");
+        return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase())
+                   .replace(/[ ]+/g, !removeSpaces ? " " : "");
     };
 
 
