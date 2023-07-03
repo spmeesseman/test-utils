@@ -1,6 +1,6 @@
 {
     "name": "@spmeesseman/test-utils",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "displayName": "Unit Test Utility",
     "description": "Unit Testing utilities including best and slowest time tracking",
     "license": "MIT",
@@ -59,8 +59,8 @@
         "clean-build": "rimraf dist",
         "clean-types": "rimraf dist/types && rimraf node_modules/.cache/tsconfig.tsbuildinfo",
         "copy-extjs": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-extjs\\node_modules\\@spmeesseman\\test-utils /i /y",
-		"copy-taskexplorer": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils /i /y",
-		"rebuild-dev": "npm run clean-all && npm run build-dev",
+        "copy-taskexplorer": "cmd /c xcopy .\\dist\\*.js* ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils\\dist /s /i /y && cmd /c xcopy .\\package*.json ..\\..\\vscode-taskexplorer\\node_modules\\@spmeesseman\\test-utils /i /y",
+        "rebuild-dev": "npm run clean-all && npm run build-dev",
         "rebuild-prod": "npm run clean-all && npm run build-prod",
         "rebuild-types": "npm run clean-types &&  && npm run build-types"
     },
