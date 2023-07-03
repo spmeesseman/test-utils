@@ -49,6 +49,7 @@ const afterdone = (env, wpConfig) =>
                             content = content.replace(regex, (v) => "/* istanbul ignore next */" + v);
                         }
                         content = content.replace(/____require____\(/mg, "require(");
+                        content = content.replace(/____require.resolve____/mg, "require.resolve");
                         writeFileSync(outFile, content);
                     }
                });

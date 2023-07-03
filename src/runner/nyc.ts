@@ -72,15 +72,17 @@ export default async(options: ITestRunOptions) =>
 	{
 		const nycLibPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
 		const requireModules = [
+			require.resolve(`${nycLibPath}/register-env.js`),
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
-		require("node-preload").push(                 // Modules to load for each new proc spawn
+		// eslint-disable-next-line import/no-extraneous-dependencies
+		const preloadList = require("node-preload");
+		preloadList.push(
 			...requireModules,
-			require.resolve(`${nycLibPath}/wrap.js`)  // This is where magic is for VSCode Lang Svr tests
+			require.resolve(`${nycLibPath}/wrap.js`)
 		);
-		Object.assign(process.env, env);              // Write variables to process environment
-		nycLibRequire("./register-env.js");           // Webpack crap - no way to leave 'require' alone
-		requireModules.forEach(m => { require(m); }); // See weback/plugin/afterdone ____require____
+		Object.assign(process.env, env);
+		requireModules.forEach(mod => { require(mod); });
 	}
 	//
 	// Call addAllFiles() AFTER importing register-env module (if (!nycConfig.useSpawnWrap))

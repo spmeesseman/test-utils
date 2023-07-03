@@ -95,8 +95,12 @@ const rules = (env, wpConfig) =>
 			options: {
 				multiple: [
 				{
-					search: "require(m)",
-					replace: "____require____(m)"
+					search: "require(mod)",
+					replace: "____require____(mod)"
+				},
+				{
+					search: /require\.resolve\(`\$\{nycLibPath\}\//gm,
+					replace: "____require.resolve____(`${nycLibPath}/"
 				}]
 			}
 		},
