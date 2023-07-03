@@ -15,6 +15,8 @@
  */
 const optimization = (env, wpConfig) =>
 {
+	wpConfig.parallelism = 1;
+
 	// wpConfig.optimization =
 	// {
 	// 	runtimeChunk: env.environment === "prod" || env.environment === "test" ? "single" : undefined,

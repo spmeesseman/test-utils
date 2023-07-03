@@ -87,19 +87,19 @@ const rules = (env, wpConfig) =>
 		const configFile = env.build === "browser" ? "tsconfig.browser.json" : "tsconfig.json";
 
 		wpConfig.module.rules.push(...[
-		{
-			test: /nyc\.ts$/,
-			include: join(env.buildPath, "src", "runner"),
-			loader: "string-replace-loader",
-			enforce: /** @type {"pre"|"post"}*/("pre"),
-			options: {
-				multiple: [
-				{
-					search: "require(mod",
-					replace: "____require____(mod"
-				}]
-			}
-		},
+		// {
+		// 	test: /nyc\.ts$/,
+		// 	include: join(env.buildPath, "src", "runner"),
+		// 	loader: "string-replace-loader",
+		// 	enforce: /** @type {"pre"|"post"}*/("pre"),
+		// 	options: {
+		// 		multiple: [
+		// 		{
+		// 			search: "require(mod",
+		// 			replace: "____require____(mod"
+		// 		}]
+		// 	}
+		// },
 		{
 			test: /\.ts$/,
 			include: join(env.buildPath, "src"),

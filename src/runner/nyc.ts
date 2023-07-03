@@ -7,6 +7,7 @@ import { join, relative, resolve } from "path";
 import { ITestCoverageToolConfig, ITestRunOptions } from "../interface/index.js";
 
 const NYC = require("nyc");
+const modules: Record<string,string | null> = {};
 
 
 export default async(options: ITestRunOptions) =>
@@ -67,19 +68,19 @@ export default async(options: ITestRunOptions) =>
 	{
 		const nycLibPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
 		const requireModules = [
-			// require.resolve(`${nycLibPath}/register-env.js`),
-			`${nycLibPath}/register-env.js`,
+			aliasResolve(`${nycLibPath}/register-env.js`),
+			// `${nycLibPath}/register-env.js`,
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
 		// eslint-disable-next-line import/no-extraneous-dependencies
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			// require.resolve(`${nycLibPath}/wrap.js`)
-			`${nycLibPath}/wrap.js`
+			aliasResolve(`${nycLibPath}/wrap.js`)
+			// `${nycLibPath}/wrap.js`
 		);
 		Object.assign(process.env, env);
-		requireModules.forEach(mod => { require(mod); });
+		requireModules.forEach(mod => { aliasRequire(mod); });
 	}
 	//
 	// Call addAllFiles() AFTER importing register-env module (if (!nycConfig.useSpawnWrap))
@@ -116,6 +117,37 @@ export default async(options: ITestRunOptions) =>
 
 	return nyc;
 };
+
+
+const aliasRequire = (moduleName: string) =>
+{
+    let aliasRequire;
+    if (modules[moduleName] === undefined && typeof module !== 'undefined' && module && module.exports)
+	{
+		aliasRequire = require;
+        try {
+            // aliasRequire("../../../node_modules/nyc/lib/" + moduleName);
+            aliasRequire(moduleName);
+        }
+		catch (e) { modules[moduleName] = null; }
+    }
+    return modules[moduleName];
+}
+
+
+const aliasResolve = (moduleName: string) =>
+{
+    let aliasRequire, aliasResolve, moduleResolved = moduleName;
+    if (typeof module !== 'undefined' && module && module.exports)
+	{
+		aliasRequire = require;
+		aliasResolve= aliasRequire.resolve;
+        try {
+			moduleResolved = aliasResolve(moduleName);
+		} catch {}
+    }
+    return moduleResolved;
+}
 
 
 const defaultConfig = (options: ITestRunOptions): Partial<ITestCoverageToolConfig> =>

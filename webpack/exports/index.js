@@ -3,6 +3,7 @@
 import context from "./context.js";
 import devtool from "./devtool.js";
 import entry from "./entry.js";
+import environment from "./environment.js";
 import externals from "./externals.js";
 import ignorewarnings from "./ignorewarnings.js";
 import minification from "./minification.js";
@@ -20,6 +21,7 @@ export {
     context,
     devtool,
 	entry,
+    environment,
     externals,
     ignorewarnings,
     minification,

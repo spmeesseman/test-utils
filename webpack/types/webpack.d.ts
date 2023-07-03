@@ -17,7 +17,6 @@ declare interface WebpackEnvironment
     buildPath: string;
     clean: boolean;
     environment: WebpackBuildEnvironment;
-    esbuild: boolean; // Is ES build
     imageOpt: boolean; // Perform image optimization
     target: WebpakTarget;
     verbosity: WebpackLogLevel;

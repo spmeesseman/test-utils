@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable import/no-extraneous-dependencies */
-// @ts-check
 
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 import { figures, writeInfo } from "./webpack/console.js";
 import {
 	context, devtool, entry, externals, ignorewarnings, minification, mode, plugins,
-	optimization, output, resolve, rules, stats, target, watch
+	optimization, output, resolve, rules, stats, target, watch, environment
 } from "./webpack/exports/index.js";
 
 /** @typedef {import("./webpack/types/webpack").WebpackBuild} WebpackBuild */
@@ -16,8 +11,7 @@ import {
 /** @typedef {{ mode: "none"|"development"|"production"|undefined, env: WebpackEnvironment, config: String[] }} WebpackArgs */
 
 let buildStep = 0;
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = dirname(__filename);
+
 
 /**
  * Webpack Export
@@ -29,20 +23,19 @@ export const __dirname = dirname(__filename);
  */
 export default (env, argv) =>
 {
-	writeInfo("---------------------------------------------------");
-	writeInfo(" Start Webpack build");
-	writeInfo("---------------------------------------------------");	
+	writeInfo("--------------------------------------------");
+	writeInfo(" Start Test-Utils NPM Package Webpack build");
+	writeInfo("--------------------------------------------");
 	writeInfo("   Argv:");
 	writeInfo("   " + JSON.stringify(argv, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
 	writeInfo("   Env :");
 	writeInfo("   " + JSON.stringify(env, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
-	writeInfo("---------------------------------------------------");
+	writeInfo("--------------------------------------------");
 
 	env = Object.assign(
 	{
 		clean: false,
 		analyze: false,
-		esbuild: false,
 		fa: "custom",
 		imageOpt: true,
 		environment: "prod",
@@ -53,8 +46,6 @@ export default (env, argv) =>
 	{
 		env[k] = env[k].toLowerCase() === "true";
 	});
-
-	env.esbuild = true;
 
 	if (env.build){
 		return getWebpackConfig(env.build, env, argv);
@@ -98,38 +89,4 @@ const getWebpackConfig = (buildTarget, env, argv) =>
 	wpConfig.name = `${buildTarget}:${wpConfig.mode}`;
 	wpConfig.node ={ global: false };
 	return wpConfig;
-};
-
-
-/**
- * @method environment
- * @param {WebpackBuild} buildTarget
- * @param {WebpackEnvironment} env Webpack build environment
- * @param {WebpackArgs} argv Webpack command line args
- */
-const environment = (buildTarget, env, argv) =>
-{
-	env.build = buildTarget;
-	env.buildPath = __dirname;
-	if (env.build === "tests") {
-		env.basePath = join(__dirname, "src", "test");
-	}
-	else {
-		env.basePath = __dirname;
-	}
-	writeInfo("Environment:");
-	Object.keys(env).forEach((k) => { writeInfo(`   ${k.padEnd(15)}: ${env[k]}`); });
-	if (argv)
-	{
-		writeInfo("Arguments:");
-		if (argv.mode) {
-			writeInfo(`   mode          : ${argv.mode}`);
-		}
-		if (argv.config) {
-			writeInfo(`   config        : ${argv.config.join(", ")}`);
-		}
-		// if (argv.watch) {
-		// 	writeInfo(`   watch         : ${argv.config.watch}`);
-		// }
-	}
 };
