@@ -6,6 +6,9 @@
 import { figures } from "./figures.js";
 
 
+export const pluralize = (s: string, itemLength: number) => { if (itemLength!== 1 ) return s + "s"; return s; }
+
+
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 

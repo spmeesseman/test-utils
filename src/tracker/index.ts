@@ -352,14 +352,14 @@ export class TestTracker
     {
         if (!this._hasRollingCountError)
         {
+            const isError = eObj instanceof Error;
             this._caughtControlC = typeof eObj === "boolean";
             this._hasRollingCountError = { suite: suite!.title, test: test!.title, testIdx: test!.index };
             if (this._options.framework === "mocha")
             {
                 const { symbols } = require("mocha/lib/reporters/base");
-                this._symbols = symbols;  //  + " [ Skipped: Rolling Error ]"
-                // symbols.ok = (msg: string) => { figures.withColor(figures.pointer, colors.blue); }
-                symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
+                this._symbols = symbols;
+                symbols.ok = figures.withColor(figures.pointer, colors.blue) +  figures.withColor(" [Skipped]", colors.grey);
             }
             if (test) {
                 writeInfo(`rolling success count failure @ test ${test.index + 1}, skipping remaining tests`);
@@ -368,8 +368,13 @@ export class TestTracker
                 throw new Error("Caught CTRL-C");
             }
             if (suite?.tests.filter(t => t.isFailed()).length === 0) {
-                throw new Error("Rolling count error: " + (eObj instanceof Error ? eObj.message : ""));
+                process.env.TEST_UTILS_FAILURE_EXCEPTION = (isError ? eObj.message : "");
+                throw new Error("Rolling count error: " + process.env.TEST_UTILS_FAILURE_EXCEPTION);
             }
+            // else if (isError) {
+            //     TODO - hmmm, how to get mocha runtime exception
+            //     process.env.TEST_UTILS_FAILURE_EXCEPTION = `${eObj.message}\n${eObj.stack}`;
+            // }
         }
     };
 

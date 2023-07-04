@@ -4,6 +4,7 @@
  */
 
 import runConfig from "./config.js";
+import { pluralize } from "../utils/utils.js";
 import { ITestRunOptions } from "../interface/index.js";
 
 
@@ -42,7 +43,11 @@ export const run = async (options: ITestRunOptions): Promise<void> =>
 
     if (failures > 0 || mochaError)
     {
-        throw new Error(!mochaError ? `${failures} tests failed.` : mochaError.message);
+        let message = !mochaError ? `${failures} ${pluralize("test", failures)} failed.` : mochaError.message;
+        if (process.env.TEST_UTILS_FAILURE_EXCEPTION) {
+            message = `${message}\n${process.env.TEST_UTILS_FAILURE_EXCEPTION}`;
+        }
+        throw new Error(message);
     }
 };
 
