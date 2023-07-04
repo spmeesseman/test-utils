@@ -3,7 +3,7 @@
  * @module testutils.tracker.utils
  */
 
-import { figures } from "../utils/figures.js";
+import { writeInfo } from "../utils/utils.js";
 import { TestTracker } from "../tracker/index.js";
 import { ITestTrackerOptions, ITestResults } from "../interface/index.js";
 
@@ -11,20 +11,20 @@ import { ITestTrackerOptions, ITestResults } from "../interface/index.js";
 export class TestUtilsUtilities
 {
     private _testTimer = 0;
+    private readonly _inst: TestTracker;
     private readonly _results: ITestResults;
     private readonly _options: ITestTrackerOptions;
-    private _hasRollingCountError: Record<string, string | number> | undefined;
 
 
     constructor(bestTimesInst: TestTracker)
     {
+        this._inst = bestTimesInst;
         this._options = bestTimesInst.options;
         this._results = bestTimesInst.results;
     }
 
 
-    consoleWrite = (msg?: string, icon?: string, pad = "") =>
-        console.log(`    ${pad}${icon || figures.color.info}${msg ? " " + figures.withColor(msg, figures.colors.grey) : ""}`);
+    get writeConsole() { return writeInfo; }
 
 
     getSuccessCount = (instance: Mocha.Context) =>
@@ -48,7 +48,7 @@ export class TestUtilsUtilities
         suiteResults.runTime = Date.now() - this._testTimer;
         suiteResults.runTimeFmt = `${Math.floor(suiteResults.runTime / 1000)} s, ${suiteResults.runTime % 1000} ms`;
         if (this._options.printSuiteRuntimes && this._testTimer > 0) {
-            this.consoleWrite(`suite runtime  : ${suiteResults.runTimeFmt}`);
+            writeInfo(`suite runtime  : ${suiteResults.runTimeFmt}`);
         }
         this._testTimer = 0;
     };
@@ -81,26 +81,16 @@ export class TestUtilsUtilities
                         suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
                         (isSetup ? -1 : suite.tests.length);
         try
-        {
-            if (suiteResults.successCount !== testIdx) {
+        {   if (suiteResults.successCount !== testIdx) {
                 throw new Error(`Expected success count to be ${suiteResults.successCount}, got ${testIdx}`);
             }
         }
-        catch (e: any)
-        {
-            if (this._hasRollingCountError === undefined) {
-                this.consoleWrite(`rolling success count failure @ test ${(testIdx || -1) + 1}, skipping remaining tests`);
-            }
-            this._hasRollingCountError = { suiteKey, testIdx };
-            const { symbols } = require("mocha/lib/reporters/base");
-            symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
-            if (suite.tests.filter(t => t.isFailed).length === 0) {
-                throw new Error("Rolling count error: " + e.message);
-            }
+        catch (e) {
+            this._inst.setFailed(e, suite, Object.assign({ index: testIdx }, mTest));
         }
 
         this._testTimer = Date.now();
-        return this._hasRollingCountError;
+        return this._inst.isRollingCountError;
     };
 
 
@@ -114,9 +104,6 @@ export class TestUtilsUtilities
 
 
     getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
-
-
-    isRollingCountError = () => !!this._hasRollingCountError;
 
 
     private properCase = (name: string | undefined, removeSpaces?: boolean) =>

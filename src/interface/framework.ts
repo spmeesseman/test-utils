@@ -19,3 +19,17 @@ export interface ITestToolConfig
     timeout?: number;  // Default to 10s for Mocha
     ui?: string;
 }
+
+export interface ITestToolRuntimeSuite
+{
+    title: string;
+    tests: Omit<ITestToolRuntimeTest, "index">[];
+}
+
+export interface ITestToolRuntimeTest
+{
+    title: string;
+    index: number;
+    isFailed(): boolean;
+    isPassed(): boolean;
+}

@@ -3,10 +3,11 @@
  * @module testutils.tracker.testtracker
  */
 
+import { writeInfo } from "../utils/utils.js";
 import { TestUtilsUtilities } from "./utils.js";
-import { colors, figures } from "../utils/figures.js";
+import { figures, colors } from "../utils/figures.js";
 import { startInput, stopInput } from "../utils/input.js";
-import { ITestTrackerOptions, ITestResults, ITestSuiteResults } from "../interface/index.js";
+import { ITestTrackerOptions, ITestResults, ITestSuiteResults, ITestToolRuntimeSuite, ITestToolRuntimeTest } from "../interface/index.js";
 
 
 export class TestTracker
@@ -14,10 +15,11 @@ export class TestTracker
     private _symbols: any;
     private _timeStarted = 0;
     private _caughtControlC = false;
-    private _hasRollingCountError = false;
+    private _hasRollingCountError: Record<string, string | number> | undefined;
+
+    private readonly _results: ITestResults;
     private readonly _utils: TestUtilsUtilities;
     private readonly _options: ITestTrackerOptions;
-    private readonly _results: ITestResults;
     private readonly _timeSep = "----------------------------------------------------------------------------------------------------";
 
 
@@ -57,12 +59,14 @@ export class TestTracker
             Object.assign(this._options, options);
         }
 
-        startInput(this.setFailed); // Catch CTRL+C
+        startInput(() => { this.setFailed(true); }); // Catch CTRL+C
 
         this._timeStarted = Date.now();
         this._utils = new TestUtilsUtilities(this);
     }
 
+
+    get isRollingCountError() { return !!this._hasRollingCountError; }
 
     get options(): ITestTrackerOptions { return this._options; }
 
@@ -344,15 +348,28 @@ export class TestTracker
     };
 
 
-    private setFailed = (ctrlc = true) =>
+    setFailed = (eObj: boolean | Error, suite?: ITestToolRuntimeSuite, test?: ITestToolRuntimeTest) =>
     {
-        this._caughtControlC = ctrlc;
-        this._hasRollingCountError = true;
-        if (this._options.framework === "mocha")
+        if (!this._hasRollingCountError)
         {
-            const { symbols } = require("mocha/lib/reporters/base");
-            this._symbols = symbols;
-            symbols.ok = figures.withColor(figures.pointer, colors.blue);
+            this._caughtControlC = typeof eObj === "boolean";
+            this._hasRollingCountError = { suite: suite!.title, test: test!.title, testIdx: test!.index };
+            if (this._options.framework === "mocha")
+            {
+                const { symbols } = require("mocha/lib/reporters/base");
+                this._symbols = symbols;  //  + " [ Skipped: Rolling Error ]"
+                // symbols.ok = (msg: string) => { figures.withColor(figures.pointer, colors.blue); }
+                symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
+            }
+            if (test) {
+                writeInfo(`rolling success count failure @ test ${test.index + 1}, skipping remaining tests`);
+            }
+            else {
+                throw new Error("Caught CTRL-C");
+            }
+            if (suite?.tests.filter(t => t.isFailed()).length === 0) {
+                throw new Error("Rolling count error: " + (eObj instanceof Error ? eObj.message : ""));
+            }
         }
     };
 

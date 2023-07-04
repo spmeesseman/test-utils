@@ -9,6 +9,10 @@ import { figures } from "./figures.js";
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
+export const writeInfo = (msg?: string, icon?: string, pad = "") =>
+    console.log(`    ${pad}${icon || figures.color.info}${msg ? " " + figures.withColor(msg, figures.colors.grey) : ""}`);
+
+
 export const writeErrorsAreOk = () =>
 {
 
