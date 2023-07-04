@@ -5,12 +5,12 @@
  * @module testutils.runner.nyc
  */
 
+import NYC from "nyc";
 import resolveFrom from "resolve-from";
 import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
 import { ITestCoverageToolConfig, ITestRunOptions } from "../interface/index.js";
 
-const NYC = require("nyc");
 const modules: Record<string,string | null> = {};
 
 
@@ -72,18 +72,20 @@ export default async(options: ITestRunOptions) =>
 	{
 		// const nycLibPath = join(nyc.cwd, "node_modules", "nyc", "lib");
 		// const nycLibPath = relative(__dirname, resolve(options.projectRoot, "node_modules", "nyc", "lib")).replace(/\\/g, "/");
-		const nycLibPath = join(options.projectRoot, "node_modules", "nyc", "lib");
+		// const nycLibPath = join(options.projectRoot, "node_modules", "nyc", "lib");
 		const requireModules = [
-			join(nycLibPath, "register-env.js"),
-			// require.resolve(`${nycLibPath}/wrap.js`)
+			// join(nycLibPath, "register-env.js"),
+			// require.resolve(`${nycLibPath}/register-env.js`)
+			require.resolve("nyc/lib/register-env"),
 			...nyc.require.map((mod: string) => resolveFrom.silent(nyc.cwd, mod) || mod)
 		];
 		// eslint-disable-next-line import/no-extraneous-dependencies
 		const preloadList = require("node-preload");
 		preloadList.push(
 			...requireModules,
-			join(nycLibPath, "wrap.js")
+			// join(nycLibPath, "wrap.js")
 			// require.resolve(`${nycLibPath}/wrap.js`)
+			require.resolve("nyc/lib/wrap")
 		);
 		Object.assign(process.env, env);
 		requireModules.forEach(mod => { require(mod); });
@@ -126,17 +128,17 @@ export default async(options: ITestRunOptions) =>
 };
 
 
-const nycLibRequire = (moduleName: string) =>
-{
-    if (modules[moduleName] === undefined)
-	{;
-        try {
-            require("../../node_modules/nyc/lib/" + moduleName);
-        }
-		catch { modules[moduleName] = null; }
-    }
-    return modules[moduleName];
-}
+// const nycLibRequire = (moduleName: string) =>
+// {
+//     if (modules[moduleName] === undefined)
+// 	{;
+//         try {
+//             require("../../node_modules/nyc/lib/" + moduleName);
+//         }
+// 		catch { modules[moduleName] = null; }
+//     }
+//     return modules[moduleName];
+// }
 
 
 const defaultConfig = (options: ITestRunOptions): Partial<ITestCoverageToolConfig> =>
