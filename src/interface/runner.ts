@@ -11,7 +11,7 @@ export interface ITestModules
 
 export interface ITestRunOptions
 {
-    coverage: ITestCoverageToolOptions;
+    coverage: Partial<ITestCoverageToolOptions>;
     isTypescript: boolean;
     moduleBuildDir: string;
     moduleName: string;

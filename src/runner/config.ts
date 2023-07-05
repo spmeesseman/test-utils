@@ -27,15 +27,18 @@ export default async(options: ITestRunOptions) =>
         }
     }
 
-    options.coverage.config.cwd = options.coverage.config.cwd || __dirname;
-    if (!existsSync(join(options.projectRoot, "package.json")) || !existsSync(join(options.coverage.config.cwd, "package.json")))
+    if (options.coverage.config)
     {
-        let projectDir = __dirname;
-        while (projectDir.length > 3 && !existsSync(join(projectDir, "package.json"))) {
-            projectDir = resolve(projectDir, "..");
+        options.coverage.config.cwd = options.coverage.config.cwd || __dirname;
+        if (!existsSync(join(options.projectRoot, "package.json")) || !existsSync(join(options.coverage.config.cwd, "package.json")))
+        {
+            let projectDir = __dirname;
+            while (projectDir.length > 3 && !existsSync(join(projectDir, "package.json"))) {
+                projectDir = resolve(projectDir, "..");
+            }
+            options.projectRoot = projectDir;
+            options.coverage.config.cwd = projectDir;
         }
-        options.projectRoot = projectDir;
-        options.coverage.config.cwd = projectDir;
     }
 
     return {

@@ -47,5 +47,6 @@ export interface ITestCoverageToolOptions
 {
     clean: boolean;
     config: Partial<ITestCoverageToolConfig>;
+    htmlReportDark: boolean;
     tool: CoverageTool;
 }

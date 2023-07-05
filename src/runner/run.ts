@@ -6,13 +6,28 @@
 import runConfig from "./config.js";
 import { pluralize } from "../utils/utils.js";
 import { ITestRunOptions } from "../interface/index.js";
+import { copyFileSync } from "fs";
+import { join, resolve } from "path";
 
 
 export const run = async (options: ITestRunOptions): Promise<void> =>
 {
-    const runCfg = await runConfig(options); // JSON.parse(process.env.testUtilOptions || "{}"));
+    const runCfg = await runConfig(options), // JSON.parse(process.env.testUtilOptions || "{}"));
+          htmlReportDark = options.coverage.htmlReportDark && options.coverage.tool === "nyc" && options.coverage.config?.reporter?.includes("html");
 
     preparePlatform();
+
+    if (htmlReportDark)
+    {
+        try {
+            const istanbulReportPath = resolve(options.projectRoot, "node_modules", "istanbul-reports", "lib"),
+                  istanbulHtmlReportPath = resolve(istanbulReportPath, "html", "assets"),
+                  istanbulHtmlReportCssFile = join(istanbulHtmlReportPath, "base.css");
+            copyFileSync(istanbulHtmlReportCssFile, join(istanbulHtmlReportPath, "_base.css"));
+            copyFileSync(resolve(__dirname, "..", "..", "res", "runner", "istanbul", "html", "base.css"), istanbulHtmlReportPath);
+        }
+        catch {}
+    }
 
     let mochaError: Error | undefined,
         failures = 0;
@@ -39,6 +54,16 @@ export const run = async (options: ITestRunOptions): Promise<void> =>
             console.log("!!!");
             try { await runCfg.nyc.showProcessTree(); } catch {}
         }
+    }
+
+    if (htmlReportDark)
+    {
+        try {
+            const istanbulHtmlReportPath = resolve(options.projectRoot, "node_modules", "istanbul-reports", "lib", "html", "assets");
+            copyFileSync(join(istanbulHtmlReportPath, "_base.css"), join(istanbulHtmlReportPath, "base.css"));
+            copyFileSync(resolve(__dirname, "..", "..", "res", "runner", "istanbul", "html", "base.css"), istanbulHtmlReportPath);
+        }
+        catch {}
     }
 
     if (failures > 0 || mochaError)

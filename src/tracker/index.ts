@@ -3,6 +3,7 @@
  * @module testutils.tracker.testtracker
  */
 
+import { argv } from "../utils/argv.js";
 import { writeInfo } from "../utils/utils.js";
 import { TestUtilsUtilities } from "./utils.js";
 import { figures, colors } from "../utils/figures.js";
@@ -55,9 +56,7 @@ export class TestTracker
             }
         };
 
-        if (options) {
-            Object.assign(this._options, options);
-        }
+        Object.assign(this._options, options || {}, argv());
 
         startInput(() => { this.setFailed(true); }); // Catch CTRL+C
 

@@ -6,6 +6,9 @@
 import { figures } from "./figures.js";
 
 
+export const isNumeric = (v: any) => !isNaN(parseFloat(v)) && isFinite(v);
+
+
 export const pluralize = (s: string, itemLength: number) => { if (itemLength!== 1 ) return s + "s"; return s; }
 
 

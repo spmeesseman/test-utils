@@ -4,6 +4,7 @@
  */
 
 import { run } from "./run.js";
+import { argv } from "../utils/argv.js";
 import { ITestRunOptions } from "../interface/index.js";
 
 
@@ -11,7 +12,7 @@ export class TestRunner
 {
     private readonly _options: ITestRunOptions;
 
-    run = () => run(this._options);
+    run = () => run(Object.assign(this._options, argv()));
 
     constructor(options: Partial<ITestRunOptions>)
     {
@@ -19,7 +20,8 @@ export class TestRunner
             coverage: {
                 clean: false,
                 config: {},
-                tool: undefined,
+                htmlReportDark: false,
+                tool: undefined
             },
             isTypescript: false,
             moduleBuildDir: "dist",
