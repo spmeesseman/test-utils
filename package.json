@@ -43,6 +43,7 @@
     "type": "module",
     "main": "./dist/testutils.cjs",
     "bin": {
+        "testutils": "./dist/bin/testutils.js",
         "test-utils": "./dist/bin/testutils.js"
     },
     "types": "./dist/types/index.d.ts",
@@ -51,8 +52,7 @@
     },
     "files": [
         "dist",
-        "example",
-        "res"
+        "example"
     ],
     "scripts": {
         "build-types": "tsc -p ./",

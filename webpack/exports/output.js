@@ -42,7 +42,7 @@ const output = (env, wpConfig) =>
 		wpConfig.output = {
 			clean: env.clean === true ? (isTests ? { keep: /(test)[\\/]/ } : true) : undefined,
 			path: env.build === "browser" ? join(env.buildPath, "dist", "browser") : join(env.buildPath, "dist"),
-			filename: "[name].cjs",
+			filename: "[name].[ext]",
 			libraryTarget: "commonjs2"
 		};
 	}

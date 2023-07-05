@@ -99,8 +99,8 @@ const rules = (env, wpConfig) =>
 					replace: "____require____(mod)"
 				},
 				{
-					search: /require\.resolve\(`\$\{nycLibPath\}\//gm,
-					replace: "____require.resolve____(`${nycLibPath}/"
+					search: /require\.resolve\("nyc\//gm,
+					replace: "____require.resolve____(\"nyc/"
 				}]
 			}
 		},

@@ -46,12 +46,17 @@ const entry = (env, wpConfig) =>
 	{
 		wpConfig.entry =
 		{
-			testutils: {
+			testUtilsLib: {
 				import: "./src/index.ts",
 				filename: "testutils.cjs",
 				library: {
 					type: "commonjs2"
 				}
+			},
+			testUtilsBin: {
+				import: "./bin/testutils.js",
+				filename: "bin/testutils.js",
+				dependOn: "testUtilsLib"
 			}
 		};
 	}

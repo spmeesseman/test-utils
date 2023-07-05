@@ -6,6 +6,7 @@
  * @module webpack.plugin.copy
  */
 
+import path from "path";
 import CopyPlugin from "copy-webpack-plugin";
 
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
@@ -21,38 +22,17 @@ import CopyPlugin from "copy-webpack-plugin";
 const copy =(env, wpConfig) =>
 {
 	let plugin;
-	const /** @type {CopyPlugin.Pattern[]} */patterns = []; // ,
-		  // psx__dirname = env.buildPath.replace(/\\/g, "/"),
-		  // psxBasePath = env.basePath.replace(/\\/g, "/"),
-		  // psxBaseCtxPath = path.posix.join(psxBasePath, "res");
-	if (env.build === "tests")
+	const /** @type {CopyPlugin.Pattern[]} */patterns = [];
+	if (env.build === "node" && wpConfig.mode === "production")
 	{
-		// apps.filter(app => fs.existsSync(path.join(env.basePath, app, "res"))).forEach(
-		// 	app => patterns.push(
-		// 	{
-		// 		from: path.posix.join(psxBasePath, app, "res", "*.*"),
-		// 		to: path.posix.join(psx__dirname, "res", "webview"),
-		// 		context: path.posix.join(psxBasePath, app, "res")
-		// 	})
-		// );
-		// if (fs.existsSync(path.join(env.basePath, "res")))
-		// {
-		// 	patterns.push({
-		// 		from: path.posix.join(psxBasePath, "res", "*.*"),
-		// 		to: path.posix.join(psx__dirname, "res", "webview"),
-		// 		context: psxBaseCtxPath
-		// 	});
-		// }
-	}
-	else if (env.build === "node" && wpConfig.mode === "production")
-	{
-		// const psx__dirname_info = path.posix.normalize(path.posix.join(psx__dirname, "..", "vscode-taskexplorer-info"));
-		// patterns.push(
-		// {
-		// 	from: path.posix.join(psxBasePath, "res", "img", "**"),
-		// 	to: path.posix.join(psx__dirname_info, "res"),
-		// 	context: psxBaseCtxPath
-		// });
+		const psx__buildpath = path.posix.normalize(env.buildPath),
+			  psx_basePath = path.posix.normalize(env.basePath);
+		patterns.push(
+		{
+			from: path.posix.join(psx_basePath, "res"),
+			to: path.posix.join(psx__buildpath, "res"),
+			context: path.posix.join(psx_basePath, "res")
+		});
 	}
 	if (patterns.length > 0) {
 		plugin = new CopyPlugin({ patterns });

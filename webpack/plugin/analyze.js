@@ -1,0 +1,101 @@
+/* eslint-disable import/no-extraneous-dependencies */
+// @ts-check
+
+/**
+ * @module webpack.plugin.analyze
+ */
+
+import webpack from "webpack";
+import VisualizerPlugin from "webpack-visualizer-plugin2";
+import CircularDependencyPlugin from "circular-dependency-plugin";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+
+/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types/webpack").WebpackPluginInstance} WebpackPluginInstance */
+
+
+// /**
+//  * @param {WebpackEnvironment} env
+//  * @param {WebpackConfig} wpConfig Webpack config object
+//  * @returns {(WebpackPluginInstance | undefined)[]}
+//  */
+// const analyze = (env, wpConfig) =>
+// {
+//     const plugins = [];
+// 	if (env.build !== "tests")
+// 	{
+// 		plugins.push(
+// 			bundle(env, wpConfig),
+// 			visualizer(env, wpConfig),
+// 			circular(env, wpConfig)
+// 		);
+// 	}
+// 	return plugins;
+// };
+
+const analyze = 
+{
+	/**
+	 * @param {WebpackEnvironment} env
+	 * @param {WebpackConfig} wpConfig Webpack config object
+	 * @returns {BundleAnalyzerPlugin | undefined}
+	 */
+	bundle(env, wpConfig)
+	{
+		let plugin;
+		if (env.analyze === true)
+		{
+			plugin = new BundleAnalyzerPlugin({
+				analyzerPort: "auto",
+				analyzerMode: "static",
+				generateStatsFile: true,
+				statsFilename: "../.coverage/analyzer-stats.json",
+				reportFilename: "../.coverage/analyzer.html",
+				openAnalyzer: true
+			});
+		}
+		return plugin;
+	},
+
+	/**
+	 * @param {WebpackEnvironment} env
+	 * @param {WebpackConfig} wpConfig Webpack config object
+	 * @returns {CircularDependencyPlugin | undefined}
+	 */
+	circular(env, wpConfig)
+	{
+		let plugin;
+		if (env.analyze === true)
+		{
+			plugin = new CircularDependencyPlugin(
+			{
+				cwd: env.buildPath,
+				exclude: /node_modules/,
+				failOnError: false,
+				onDetected: ({ module: _webpackModuleRecord, paths, compilation }) =>
+				{
+					compilation.warnings.push(/** @type {*}*/(new webpack.WebpackError(paths.join(" -> "))));
+				}
+			});
+		}
+		return plugin;
+	},
+
+	/**
+	 * @param {WebpackEnvironment} env
+	 * @param {WebpackConfig} wpConfig Webpack config object
+	 * @returns {VisualizerPlugin | undefined}
+	 */
+	visualizer(env, wpConfig)
+	{
+		let plugin;
+		if (env.analyze === true) {
+			plugin = new VisualizerPlugin({ filename: "../.coverage/visualizer.html" });
+		}
+		return /** @type {VisualizerPlugin | undefined}) */(plugin);
+	}
+}
+
+
+export default analyze;
