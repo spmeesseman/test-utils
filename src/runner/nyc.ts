@@ -121,7 +121,7 @@ export default async(options: ITestRunOptions) =>
 			  nycBinPath = relative(__dirname, resolve(nyc.cwd, "node_modules", "nyc", "bin")).replace(/\\/g, "/");
 		sw.runMain();
 		env.SPAWN_WRAP_SHIM_ROOT = process.env.SPAWN_WRAP_SHIM_ROOT || process.env.XDG_CACHE_HOME || require("os").homedir();
-		sw([ require.resolve(`${nycBinPath}/wrap.js`) ], env);
+		sw([ require.resolve("nyc/bin/wrap.js") ], env);
 	}
 
 	return nyc;
