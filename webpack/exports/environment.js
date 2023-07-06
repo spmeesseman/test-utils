@@ -9,10 +9,10 @@ import { writeInfo } from "../console.js";
  * @module webpack.exports.environment
  */
 
+/** @typedef {import("..//types/webpack").WebpackArgs} WebpackArgs */
 /** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
 /** @typedef {import("../types/webpack").WebpackBuild} WebpackBuild */
-/** @typedef {{ mode: "none"|"development"|"production"|undefined, env: WebpackEnvironment, config: String[] }} WebpackArgs */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,12 +42,12 @@ const environment = (buildTarget, env, argv) =>
 		if (argv.mode) {
 			writeInfo(`   mode          : ${argv.mode}`);
 		}
+		if (argv.watch) {
+			writeInfo(`   watch         : ${argv.config.join(", ")}`);
+		}
 		if (argv.config) {
 			writeInfo(`   config        : ${argv.config.join(", ")}`);
 		}
-		// if (argv.watch) {
-		// 	writeInfo(`   watch         : ${argv.config.watch}`);
-		// }
 	}
 };
 
