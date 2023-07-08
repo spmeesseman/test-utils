@@ -11,7 +11,7 @@ https://github.com/typescript-eslint/tslint-to-eslint-config/blob/master/docs/FA
 
 Happy linting! 💖
 */
-module.exports = {
+export default {
     root: true,
     env: {
         node: true,
@@ -32,7 +32,7 @@ module.exports = {
     ignorePatterns: [ "types/**", "*.json", "**/node_modules/**", "**/.eslint*", "dist/**" ],
     overrides: [
     {
-        files: [ "src/**/*.ts", "script/**/*.js", "webpack.*.js", "webpack/**/*.js" ],
+        files: [ "src/**/*.ts", "bin/**/*.js", "script/**/*.js", "webpack.*.js", "webpack/**/*.js" ],
         excludedFiles: [ "types", "*.json", "dist" ]
     },
     {
