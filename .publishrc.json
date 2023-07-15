@@ -6,12 +6,12 @@
     "distReleasePathSrc":       "dist",
     "githubAssets": [
         "CHANGELOG.md|Changelog File",
-        "test-utils.tgz|NPM Tarball"
+        "dist\\test-utils.tgz|NPM Tarball"
     ],
     "githubRelease":            "Y",
     "githubUser":               "spmeesseman",
-    "githubReleasePostCommand": "npx rimraf \"dist/*.tgz\"",
-    "npmPackDist":              "N",
+    "githubReleasePostCommand": "npx rimraf -g \"*.tgz\"",
+    "npmPackDist":              "Y",
     "npmRegistry":              "https://registry.npmjs.org",
     "npmRelease":               "Y",
     "npmScope":                 "@spmeesseman",
