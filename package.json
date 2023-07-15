@@ -1,6 +1,6 @@
 {
     "name": "@spmeesseman/test-utils",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "displayName": "Unit Test Utility",
     "description": "Unit Testing utilities including best and slowest time tracking",
     "license": "MIT",
