@@ -1,5 +1,19 @@
 # TEST-UTILS CHANGE LOG
 
+## Version 0.1.1 (July 15th, 2023)
+
+### Bug Fixes
+
+- **Nyc:** spawn-wrap option not working (unable to resolve ./bin/wrap in production env
+
+### Documentation
+
+- start readme. iwmbb :(broken4ever<3.
+
+### Refactoring
+
+- add bin shell
+
 ## Version 0.1.0 (July 5th, 2023)
 
 ### Bug Fixes
