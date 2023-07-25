@@ -1,3 +1,4 @@
+
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -11,7 +12,7 @@ import { existsSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
 import { ITestCoverageToolConfig, ITestRunOptions } from "../interface/index.js";
 
-const modules: Record<string,string | null> = {};
+const modules: Record<string, string | null> = {};
 
 
 export default async(options: ITestRunOptions) =>
