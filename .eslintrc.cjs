@@ -215,7 +215,7 @@ module.exports = {
         "jsdoc/check-syntax": 1,
         "jsdoc/check-tag-names": 1, // Recommended
         "jsdoc/check-types": 1, // Recommended
-        "jsdoc/check-values": 1, // Recommended
+        "jsdoc/check-values": 0, // Recommended
         "jsdoc/empty-tags": 1, // Recommended
         "jsdoc/implements-on-classes": 1, // Recommended
         "jsdoc/informative-docs": 1,
@@ -226,7 +226,7 @@ module.exports = {
         "jsdoc/multiline-blocks": 1, // Recommended
         "jsdoc/no-bad-blocks": 1,
         "jsdoc/no-blank-block-descriptions": 1,
-        "jsdoc/no-defaults": 1,
+        "jsdoc/no-defaults": 0,
         "jsdoc/no-missing-syntax": 0,
         "jsdoc/no-multi-asterisks": 1, // Recommended
         "jsdoc/no-restricted-syntax": 0,
@@ -242,7 +242,7 @@ module.exports = {
         "jsdoc/require-param": 1, // Recommended
         "jsdoc/require-param-description": 0, // Recommended
         "jsdoc/require-param-name": 1, // Recommended
-        "jsdoc/require-param-type": 1, // Recommended
+        "jsdoc/require-param-type": 0, // Recommended
         "jsdoc/require-property": 1, // Recommended
         "jsdoc/require-property-description": 1, // Recommended
         "jsdoc/require-property-name": 1, // Recommended
@@ -254,9 +254,9 @@ module.exports = {
         "jsdoc/require-throws": 1,
         "jsdoc/require-yields": 1, // Recommended
         "jsdoc/require-yields-check": 1, // Recommended
-        "jsdoc/sort-tags": 1,
+        "jsdoc/sort-tags": 0,
         "jsdoc/tag-lines": 0, // Recommended
-        "jsdoc/valid-types": 1, // Recommended
+        "jsdoc/valid-types": 1,
         "key-spacing":"warn",
         "linebreak-style": "off",
         "max-classes-per-file": "off",
