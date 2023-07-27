@@ -7,8 +7,9 @@
 
 import webpack from "webpack";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+
 
 /**
  * @param {WebpackEnvironment} env
@@ -18,17 +19,17 @@ import webpack from "webpack";
 const banner = (env, wpConfig) =>
 {
     let plugin;
-    if (wpConfig.mode === "production")
-    {
-        plugin = new webpack.BannerPlugin(
-        {
-            banner: `Copyright ${(new Date()).getFullYear()} Scott P Meesseman`,
-            entryOnly: true,
-            test: /testutils\.cjs/
-            // raw: true
-        });
-    }
-    return plugin;
+	if (wpConfig.mode === "production")
+	{
+		plugin = new webpack.BannerPlugin(
+		{
+			banner: `Copyright ${(new Date()).getFullYear()} ${env.pkgJson.name || env.pkgJson.author?.name || "Scott P Meesseman"}`,
+			entryOnly: true,
+			test: new RegExp(`${env.app.mainChunk}\\.js`)
+			// raw: true
+		});
+	}
+	return plugin;
 };
 
 

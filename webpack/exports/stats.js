@@ -4,8 +4,8 @@
  * @module webpack.exports.stats
  */
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 /**
  * @method stats
@@ -22,11 +22,12 @@ const stats = (env, wpConfig) =>
 		errorsCount: true,
 		warningsCount: true,
 		timings: true
+		// warningsFilter: /Cannot find module \'common\' or its corresponding type declarations/
 	};
 
 	wpConfig.infrastructureLogging = {
 		colors: true,
-		level: env.verbosity || "info" // enables logging required for problem matchers
+		level: env.verbosity || "none"
 	};
 };
 

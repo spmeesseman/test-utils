@@ -4,8 +4,8 @@
  * @module webpack.exports.target
  */
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 
 /**
@@ -15,7 +15,7 @@
  */
 const target = (env, wpConfig) =>
 {
-	if (env.build === "browser") {
+	if (env.build === "webview"|| env.build === "browser") {
 		wpConfig.target = "webworker";
 	}
 	else {

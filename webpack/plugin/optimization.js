@@ -7,9 +7,9 @@
 
 import webpack from "webpack";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types/webpack").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
 
 
 /**
@@ -25,7 +25,10 @@ const optimization = (env, wpConfig) =>
 	{
 		plugins.push(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
 	}
-	plugins.push(new webpack.NoEmitOnErrorsPlugin());
+	if (env.build !== "webview")
+	{
+		plugins.push(new webpack.NoEmitOnErrorsPlugin());
+	}
 	return plugins;
 };
 
