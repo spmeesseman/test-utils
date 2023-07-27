@@ -1,24 +1,24 @@
 // @ts-check
 
-const context = require("./context");
-const devtool = require("./devtool");
-const entry = require("./entry");
-const environment = require("./environment");
-const externals = require("./externals");
-const ignorewarnings = require("./ignorewarnings");
-const minification = require("./minification");
-const { mode, getMode } = require("./mode");
-const name = require("./name");
-const optimization = require("./optimization");
-const plugins = require("./plugins");
-const output = require("./output");
-const resolve = require("./resolve");
-const rules = require("./rules");
-const stats = require("./stats");
-const target = require("./target");
-const watch = require("./watch");
+import context from "./context";
+import devtool from "./devtool";
+import entry from "./entry";
+import environment from "./environment";
+import externals from "./externals";
+import ignorewarnings from "./ignorewarnings";
+import minification from "./minification";
+import { mode, getMode } from "./mode";
+import name from "./name";
+import optimization from "./optimization";
+import plugins from "./plugins";
+import output from "./output";
+import resolve from "./resolve";
+import rules from "./rules";
+import stats from "./stats";
+import target from "./target";
+import watch from "./watch";
 
-export default {
+export {
     context,
     devtool,
 	entry,

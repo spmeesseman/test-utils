@@ -5,62 +5,85 @@
  * @module webpack.exports.plugins
  */
 
-import afterdone from "../plugin/afterdone.js";
-import analyze from "../plugin/analyze.js";
-import banner from "../plugin/banner.js";
-import build from "../plugin/build.js";
-import clean from "../plugin/clean.js";
-import copy from "../plugin/copy.js";
-import ignore from "../plugin/ignore.js";
-import optimization from "../plugin/optimization.js";
-import progress from "../plugin/progress.js";
-import sourcemaps from "../plugin/sourcemaps.js";
-import tscheck from "../plugin/tscheck.js";
+import {
+	analyze, banner, build, clean, compile, copy, finalize, hash, hookSteps, ignore,
+	optimization, prehash, progress, sourcemaps, tscheck, upload, cssextract, htmlcsp,
+	imageminimizer, htmlinlinechunks, webviewapps, asset, scm
+} from "../plugin";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types/webpack").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").IWebpackApp} IWebpackApp */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
 
 
 /**
- * @method
- * @param {WebpackEnvironment} env Webpack build environment
+ * @function
+ * @param {WebpackEnvironment} env Webpack build specific environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
 const plugins = (env, wpConfig) =>
 {
-	wpConfig.plugins = [
-		progress(env, wpConfig),
-		clean(env, wpConfig),
-		...build(env, wpConfig),
-		// wpPlugin.aftercompile(env, wpConfig),
-		ignore(env, wpConfig),
-		...tscheck(env, wpConfig)
-	];
+	wpConfig.plugins = [];
 
-	if (env.build !== "tests")
+	if (env.verbosity &&  env.verbosity !== "none")
 	{
 		wpConfig.plugins.push(
-			sourcemaps(env, wpConfig),
-			copy(env, wpConfig),
-			analyze.bundle(env, wpConfig),
-			analyze.visualizer(env, wpConfig),
-			analyze.circular(env, wpConfig),
-			banner(env, wpConfig)
+			progress(env, wpConfig)
 		);
 	}
 
 	wpConfig.plugins.push(
-		...optimization(env, wpConfig),
-		afterdone(env, wpConfig)
+		prehash(env, wpConfig),                  // compiler.hooks.initialize
+		clean(env, wpConfig),                    // compiler.hooks.emit, compiler.hooks.done
+		build(env, wpConfig),                    // compiler.hooks.beforeCompile
+		compile(env, wpConfig),                  // compiler.hooks.emit
+		ignore(env, wpConfig),                   // compiler.hooks.normalModuleFactory
+		...tscheck(env, wpConfig),               // compiler.hooks.afterEnvironment, hooks.afterCompile
+		...hookSteps(env, wpConfig)              // compiler.hooks.*
 	);
 
-	wpConfig.plugins.slice().reverse().forEach((p, index, object) =>
+	if (env.build === "webview")
+	{
+		const apps = Object.keys(env.app.);
+		wpConfig.plugins.push(
+			cssextract(env, wpConfig),           //
+			...webviewapps(apps, env, wpConfig), //
+			// @ts-ignore
+			htmlcsp(env, wpConfig),              //
+			htmlinlinechunks(env, wpConfig),     //
+			copy(apps, env, wpConfig),           // compiler.hooks.thisCompilation -> compilation.hooks.processAssets
+			imageminimizer(env, wpConfig)        //
+		);
+	}
+	else if (env.build !== "tests")
+	{
+		wpConfig.plugins.push(
+			sourcemaps(env, wpConfig),           // compiler.hooks.compilation -> compilation.hooks.processAssets
+			banner(env, wpConfig),               // compiler.hooks.compilation -> compilation.hooks.processAssets
+			copy([], env, wpConfig),             // compiler.hooks.thisCompilation -> compilation.hooks.processAssets
+			analyze.bundle(env, wpConfig),       // compiler.hooks.done
+			analyze.visualizer(env, wpConfig),   // compiler.hooks.emit
+			analyze.circular(env, wpConfig)      // compiler.hooks.compilation -> compilation.hooks.optimizeModules
+		);
+	}
+
+	wpConfig.plugins.push(                       // compiler.hooks.compilation -> compilation.hooks.optimizeChunks, ...
+		...optimization(env, wpConfig),          // ^ compiler.hooks.shouldEmit, compiler.hooks.compilation -> compilation.hooks.shouldRecord
+		hash(env, wpConfig),                     // compiler.hooks.done
+		upload(env, wpConfig),                   // compiler.hooks.afterDone
+		asset(env, wpConfig),                    //
+		finalize(env, wpConfig),                 // compiler.hooks.shutdown
+		scm(env, wpConfig)                       // compiler.hooks.shutdown
+	);
+
+	wpConfig.plugins.slice().reverse().forEach((p, i, a) =>
 	{
 		if (!p) {
-			/** @type {(WebpackPluginInstance|undefined)[]} */(wpConfig.plugins).splice(object.length - 1 - index, 1);
+			wpConfig.plugins.splice(a.length - 1 - i, 1);
 		}
 	});
 };
+
 
 export default plugins;

@@ -1,24 +1,25 @@
 // @ts-check
 
-const analyze = require("./analyze");
-const asset = require("./asset");
-const banner = require("./banner");
-const build = require("./build");
-const clean = require("./clean");
-const compile = require("./compile");
-const copy = require("./copy");
-const finalize = require("./finalize");
-const { hash, prehash } = require("./hash");
-const ignore = require("./ignore");
-const optimization = require("./optimization");
-const hookSteps = require("./plugins");
-const progress = require("./progress");
-const sourcemaps = require("./sourcemaps");
-const tscheck = require("./tscheck");
-const upload = require("./upload");
-const { cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps } = require("./html");
+import analyze from "./analyze";
+import asset from "./asset";
+import banner from "./banner";
+import build from "./build";
+import clean from "./clean";
+import compile from "./compile";
+import copy from "./copy";
+import finalize from "./finalize";
+import { hash, prehash } from "./hash";
+import ignore from "./ignore";
+import optimization from "./optimization";
+import hookSteps from "./plugins";
+import progress from "./progress";
+import scm from "./scm";
+import sourcemaps from "./sourcemaps";
+import tscheck from "./tscheck";
+import upload from "./upload";
+import { cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps } from "./html";
 
-export default {
+export {
     analyze,
     asset,
     banner,
@@ -37,6 +38,7 @@ export default {
     optimization,
     prehash,
     progress,
+    scm,
     sourcemaps,
     tscheck,
     upload,

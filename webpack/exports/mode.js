@@ -57,4 +57,4 @@ const getMode = (env, argv) =>
 };
 
 
-export default { mode, getMode };
+export { mode, getMode };

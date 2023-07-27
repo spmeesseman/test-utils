@@ -6,10 +6,10 @@
  * @module webpack.plugin.finalize
  */
 
-const { join, resolve } = require("path");
-const { existsSync, copyFileSync, readdirSync } = require("fs");
-const { rename, unlink, readdir } = require("fs/promises");
-const { asArray } = require("../utils");
+import { join, resolve } from "path";
+import { existsSync, copyFileSync, readdirSync } from "fs";
+import { rename, unlink, readdir } from "fs/promises";
+import { asArray } from "../utils";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
@@ -35,8 +35,13 @@ const finalize = (env, wpConfig) =>
             {
                 compiler.hooks.shutdown.tapPromise("FinalizeShutdownPlugin", async () =>
                 {
-                    dupHashFile(env, wpConfig);
-                    await licenseFiles(env);
+                    if (env.environment !== "prod")
+                    {
+                        dupHashFile(env, wpConfig);
+                    }
+                    else {
+                        await licenseFiles(env);
+                    }
                 });
                 // if (compilation.hooks.statsPrinter)
                 // {
@@ -87,7 +92,7 @@ const dupHashFile= (env, wpConfig) =>
  */
 const licenseFiles = async (env) =>
 {
-    const distPath = env.buildMode === "release" ? env.paths.dist : env.paths.temp,
+    const distPath = env.paths.distBuild,
           items = existsSync(distPath) ? await readdir(distPath) : [];
     for (const file of items.filter(i => i.includes("LICENSE")))
     {
