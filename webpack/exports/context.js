@@ -4,8 +4,8 @@
  * @module webpack.exports.context
  */
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 
 /**
@@ -15,7 +15,7 @@
  */
 const context = (env, wpConfig) =>
 {
-	wpConfig.context = env.basePath;
+	wpConfig.context = env.paths.base;
 };
 
 
