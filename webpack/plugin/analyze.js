@@ -10,7 +10,7 @@
 import webpack from "webpack";
 import VisualizerPlugin from "webpack-visualizer-plugin2";
 import CircularDependencyPlugin from "circular-dependency-plugin";
-import BundleAnalyzerPlugin.BundleAnalyzerPlugin from "webpack-bundle-analyzer";;
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
