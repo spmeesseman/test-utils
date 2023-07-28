@@ -9,9 +9,9 @@
 import path from "path";
 import CopyPlugin from "copy-webpack-plugin";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types/webpack").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
 
 
 /**
@@ -23,10 +23,10 @@ const copy =(env, wpConfig) =>
 {
 	let plugin;
 	const /** @type {CopyPlugin.Pattern[]} */patterns = [];
-	if (env.build === "node" && wpConfig.mode === "production")
+	if (env.paths.build === "node" && wpConfig.mode === "production")
 	{
-		const psx__buildpath = path.posix.normalize(env.buildPath),
-			  psx_basePath = path.posix.normalize(env.basePath);
+		const psx__buildpath = path.posix.normalize(env.paths.build),
+			  psx_basePath = path.posix.normalize(env.paths.base);
 		patterns.push(
 		{
 			from: path.posix.join(psx_basePath, "res"),

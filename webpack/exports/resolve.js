@@ -5,8 +5,8 @@
  * @module webpack.exports.resolve
  */
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 import { resolve as _resolve } from "path";
 
@@ -25,13 +25,13 @@ const resolve = (env, wpConfig) =>
 		extensions: [ ".ts", ".tsx", ".js", ".jsx", ".json" ],
 		fullySpecified: false,
 		alias: {
-			":env": _resolve(env.buildPath, "src", "lib", "env", env.build === "browser" ? "browser" : "node"),
-			":types": _resolve(env.buildPath, "types")
+			":env": _resolve(env.paths.build, "src", "lib", "env", env.build === "browser" ? "browser" : "node"),
+			":types": _resolve(env.paths.build, "types")
 		},
 		extensionAlias: {
-			'.js': ['.ts', '.js'],
-			'.mjs': '.mts',
-			'.cjs': '.cts'
+			".js": [ ".ts", ".js" ],
+			".mjs": ".mts",
+			".cjs": ".cts"
 		}
 	};
 };
