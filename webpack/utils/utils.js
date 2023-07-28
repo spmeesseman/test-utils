@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable import/no-extraneous-dependencies */
+// @ts-check
 
-import { resolve } from "path";
 import globalEnv from "./global";
+import { resolve } from "path";
 const gradient = require("gradient-string");
 import { WebpackError } from "webpack";
 import { readFileSync, existsSync } from "fs";
-import { withColor, figures, colors } = require("@spmeesseman/test-utils");
+import { write, writeInfo, withColor, figures, colors } from "./console";
 
-/** @typedef {import("./types").IWebpackApp} IWebpackApp */
-/** @typedef {import("./types").IWebpackPackageJson} IWebpackPackageJson */
+/** @typedef {import("../types").IWebpackApp} IWebpackApp */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").IWebpackPackageJson} IWebpackPackageJson */
 
 
 /**
@@ -77,10 +79,20 @@ const clone = (item) =>
 
 
 /**
+ * @function getEntriesRegex
+ * @param {WebpackConfig} wpConfig Webpack config object
+ */
+const getEntriesRegex = (wpConfig) =>
+{
+	return `(?:${Object.keys(wpConfig.entry).reduce((e, c) => `${!!e ? `${e}|` : e}${c}`, "")})`;
+};
+
+
+/**
  * @function initGlobalEnvObject
  * @param {string} baseProp
  * @param {any} [initialValue]
- * @param {...any} [props]
+ * @param {...any} props
  */
 const initGlobalEnvObject = (baseProp, initialValue, ...props) =>
 {
@@ -227,14 +239,14 @@ const printBanner = (app, appDetailName, version, mode, env, argv) =>
 const readConfigFiles = () =>
 {
     /** @type {IWebpackApp} */
-    const rc = {},
-          rcPath = join(__dirname, ".wpbuildrc"),
-          pkgJsonPath = resolve(__dirname, "..", "package.json");
+    const appRc = {},
+          rcPath = resolve(__dirname, "..", ".wpbuildrc.json"),
+          pkgJsonPath = resolve(__dirname, "..", "..", "package.json");
 
     try
     {   if (existsSync(rcPath))
         {
-            merge(rc, JSON.parse(readFileSync(rcPath)));
+            merge(appRc, JSON.parse(readFileSync(rcPath, "utf8")));
         }
         else {
             throw new WebpackError("Could not locate .wpbuildrc.json");
@@ -251,9 +263,10 @@ const readConfigFiles = () =>
                 "author", "displayName", "name", "description", "main", "module", "publisher", "version"
             ];
             /** @type {IWebpackPackageJson} */
-            const pkgJso = JSON.parse(readFileSync(pkgJsonPath)),
+            const pkgJso = JSON.parse(readFileSync(pkgJsonPath, "utf8")),
                   pkgJsoPartial = pickBy(pkgJso, p => props.includes(p));
-            merge(rc, { pkgJson: pkgJsoPartial });
+            merge(appRc, { pkgJson: { ...pkgJsoPartial }});
+            merge(globalEnv, { pkgJson: { ...pkgJsoPartial }});
         }
         else {
             throw new WebpackError("Could not locate package.json");
@@ -263,23 +276,27 @@ const readConfigFiles = () =>
         throw new WebpackError("Could not parse package.json, check syntax");
     }
 
-    if (!rc.name) {
-        rc.name = rc.pkgJson.name;
+    if (!appRc.name) {
+        appRc.name = appRc.pkgJson.name;
     }
 
-    if (!rc.nameDetail) {
-        rc.nameDetail = rc.name;
+    if (!appRc.nameDetail) {
+        appRc.nameDetail = appRc.name;
     }
 
-    if (!rc.vscode) {
-        rc.vscode = {};
+    if (!appRc.vscode) {
+        appRc.vscode = {};
     }
 
-    if (!rc.vscode.webview) {
-        rc.vscode.webview = {};
+    if (!appRc.vscode.webview) {
+        appRc.vscode.webview = {};
     }
 
-    return rc;
+    if (!appRc.name) {
+        appRc.version = appRc.pkgJson.version;
+    }
+
+    return appRc;
 };
 
 
@@ -301,6 +318,6 @@ const spmBanner = (app, version) =>
 
 
 export {
-    apply, asArray, clone, isArray, isDate, isEmpty, isObject, isObjectEmpty, printLineSep,
+    apply, asArray, clone, isArray, isDate, isEmpty, isObject, isObjectEmpty, printLineSep, getEntriesRegex,
     initGlobalEnvObject, merge, mergeIf, pick, pickBy, pickNot, printBanner, readConfigFiles, spmBanner
 };

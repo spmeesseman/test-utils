@@ -1,7 +1,6 @@
 // @ts-check
 
 import analyze from "./analyze";
-import asset from "./asset";
 import banner from "./banner";
 import build from "./build";
 import clean from "./clean";
@@ -10,6 +9,7 @@ import copy from "./copy";
 import finalize from "./finalize";
 import { hash, prehash } from "./hash";
 import ignore from "./ignore";
+import istanbul from "./istanbul";
 import optimization from "./optimization";
 import loghooks from "./loghooks";
 import progress from "./progress";
@@ -21,7 +21,6 @@ import { cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps } fr
 
 export {
     analyze,
-    asset,
     banner,
     build,
     clean,
@@ -34,6 +33,7 @@ export {
     htmlinlinechunks,
 	ignore,
     imageminimizer,
+    istanbul,
     loghooks,
     optimization,
     prehash,

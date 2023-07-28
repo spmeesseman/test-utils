@@ -6,6 +6,7 @@
  */
 
 import webpack from "webpack";
+import { getEntriesRegex } from "../utils/utils";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
@@ -21,11 +22,12 @@ const banner = (env, wpConfig) =>
     let plugin;
 	if (wpConfig.mode === "production")
 	{
+		const entriesRgx = getEntriesRegex(wpConfig);
 		plugin = new webpack.BannerPlugin(
 		{
-			banner: `Copyright ${(new Date()).getFullYear()} ${env.pkgJson.name || env.pkgJson.author?.name || "Scott P Meesseman"}`,
+			banner: `Copyright ${(new Date()).getFullYear()} ${env.app.pkgJson.name || env.app.pkgJson.author?.name || "Scott P Meesseman"}`,
 			entryOnly: true,
-			test: new RegExp(`${env.app.mainChunk}\\.js`)
+			test: new RegExp(`${entriesRgx}(?:\\.debug)?\\.js`)
 			// raw: true
 		});
 	}

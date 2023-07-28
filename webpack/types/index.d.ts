@@ -38,7 +38,7 @@ declare interface IWebpackPackageJson extends Record<string, any>
 {
     author: string | { name: string };
     description: string;
-    displayName: string;
+    displayName: string; 
     main: string;
     module: boolean;
     name: string;
@@ -49,14 +49,13 @@ declare interface IWebpackPackageJson extends Record<string, any>
 declare interface WebpackGlobalEnvironment extends Record<string, any>
 {
     buildCount: number;
-    pkgJson: Record<string, any>;
+    pkgJson: Record<string, any>; 
     valuePad: number;
 }
 
 declare interface IWebpackApp
 {
     exports: Record<string, boolean>;
-    mainChunk: string | string[];         // main module name(s)
     name: string;                         // app name (read from package.json)
     nameDetail: string;
     pkgJson: Record<string, any>;
