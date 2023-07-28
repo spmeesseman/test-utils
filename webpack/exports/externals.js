@@ -4,11 +4,11 @@
  * @module webpack.exports.externals
  */
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import nodeExternals from "webpack-node-externals";
+const nodeExternals = require("webpack-node-externals");
 
 
 /**
@@ -20,22 +20,17 @@ import nodeExternals from "webpack-node-externals";
  */
 const externals = (env, wpConfig) =>
 {
-	// if (env.build === "tests")
-	// {
+	if (env.build !== "tests")
+	{
+		wpConfig.externals = { vscode: "commonjs vscode" };
+	}
+	else {
 		wpConfig.externals = [
-			// ({ context, request }, callback) =>
-			// {
-			// 	if (request && /^register$/.test(request)) {
-			// 	  // Externalize to a commonjs module using the request path
-			// 	  return callback(undefined, "commonjs " + request);
-			// 	}
-			// 	// Continue without externalizing the import
-			// 	callback();
-			// },
-			// { "register-env.js": "commonjs register-env.js" },
+			{ vscode: "commonjs vscode" },
+			// { nyc: "commonjs nyc" },
 			/** @type {import("webpack").WebpackPluginInstance}*/(nodeExternals())
 		];
-	// }
+	}
 	// if (env.build === "webview")
 	// {
 	// 	wpConfig.externals = { vscode: "commonjs vscode" };
@@ -51,7 +46,7 @@ const externals = (env, wpConfig) =>
 	// else {
 	// 	wpConfig.externals = { vscode: "commonjs vscode" };
 	// }
-	if (env.build === "browser") {
+	if (env.build === "webview"|| env.build === "browser") {
 		wpConfig.externalsPresets = { web: true };
 	}
 	else {
