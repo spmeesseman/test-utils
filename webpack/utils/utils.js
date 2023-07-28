@@ -4,7 +4,7 @@
 
 import globalEnv from "./global";
 import { resolve } from "path";
-const gradient = require("gradient-string");
+import gradient from "gradient-string";
 import { WebpackError } from "webpack";
 import { readFileSync, existsSync } from "fs";
 import { write, writeInfo, withColor, figures, colors } from "./console";

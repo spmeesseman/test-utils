@@ -8,7 +8,7 @@
 /** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const nodeExternals = require("webpack-node-externals");
+import nodeExternals from "webpack-node-externals";
 
 
 /**

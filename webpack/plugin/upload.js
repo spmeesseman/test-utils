@@ -16,7 +16,7 @@
 
 import { join, basename } from "path";
 import globalEnv from "../utils/global";
-import { spawnSync } = require("child_process");
+import { spawnSync } from "child_process";
 import { initGlobalEnvObject } from "../utils/utils";
 import { writeInfo, figures, withColor, colors } from "../utils/console";
 import { renameSync, copyFileSync, mkdirSync, existsSync, rmSync, readdirSync } from "fs";
