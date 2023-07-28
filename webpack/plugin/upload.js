@@ -15,10 +15,10 @@
  */
 
 import { join } from "path";
-import globalEnv from "../global";
+import globalEnv from "../utils/global";
 import { spawnSync } = require("child_process");
-import { initGlobalEnvObject } from "../utils";
-import { writeInfo, figures, withColor, colors } from "../console";
+import { initGlobalEnvObject } from "../utils/utils";
+import { writeInfo, figures, withColor, colors } from "../utils/console";
 import { renameSync, copyFileSync, mkdirSync, existsSync, rmSync } from "fs";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */

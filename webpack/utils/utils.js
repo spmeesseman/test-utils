@@ -3,9 +3,9 @@
 
 import { resolve } from "path";
 import globalEnv from "./global";
-import { readFileSync, existsSync } from "fs";
 const gradient = require("gradient-string");
 import { WebpackError } from "webpack";
+import { readFileSync, existsSync } from "fs";
 import { withColor, figures, colors } = require("@spmeesseman/test-utils");
 
 /** @typedef {import("./types").IWebpackApp} IWebpackApp */

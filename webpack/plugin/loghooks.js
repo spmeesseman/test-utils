@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 // @ts-check
 
-import globalEnv from "../global";
-import { writeInfo, withColor, figures, colors } from "../console";
-import { initGlobalEnvObject } from "../utils";
+import globalEnv from "../utils/global";
+import { initGlobalEnvObject } from "../utils/utils";
+import { writeInfo, withColor, figures, colors } from "../utils/console";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
