@@ -11,7 +11,7 @@ import finalize from "./finalize";
 import { hash, prehash } from "./hash";
 import ignore from "./ignore";
 import optimization from "./optimization";
-import hookSteps from "./plugins";
+import loghooks from "./loghooks";
 import progress from "./progress";
 import scm from "./scm";
 import sourcemaps from "./sourcemaps";
@@ -34,7 +34,7 @@ export {
     htmlinlinechunks,
 	ignore,
     imageminimizer,
-    hookSteps,
+    loghooks,
     optimization,
     prehash,
     progress,

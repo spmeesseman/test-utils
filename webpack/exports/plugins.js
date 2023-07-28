@@ -6,7 +6,7 @@
  */
 
 import {
-	analyze, banner, build, clean, compile, copy, finalize, hash, hookSteps, ignore,
+	analyze, banner, build, clean, compile, copy, finalize, hash, loghooks, ignore,
 	optimization, prehash, progress, sourcemaps, tscheck, upload, cssextract, htmlcsp,
 	imageminimizer, htmlinlinechunks, webviewapps, asset, scm
 } from "../plugin";
@@ -40,12 +40,12 @@ const plugins = (env, wpConfig) =>
 		compile(env, wpConfig),                  // compiler.hooks.emit
 		ignore(env, wpConfig),                   // compiler.hooks.normalModuleFactory
 		...tscheck(env, wpConfig),               // compiler.hooks.afterEnvironment, hooks.afterCompile
-		...hookSteps(env, wpConfig)              // compiler.hooks.*
+		...loghooks(env, wpConfig)               // logs all compiler.hooks.* when they run
 	);
 
 	if (env.build === "webview")
 	{
-		const apps = Object.keys(env.app.);
+		const apps = Object.keys(env.app.vscode.webview);
 		wpConfig.plugins.push(
 			cssextract(env, wpConfig),           //
 			...webviewapps(apps, env, wpConfig), //

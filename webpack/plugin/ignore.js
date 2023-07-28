@@ -7,8 +7,8 @@
 
 import webpack from "webpack";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
 
 /**
  * @param {WebpackEnvironment} env
@@ -17,14 +17,16 @@ import webpack from "webpack";
  */
 const ignore = (env, wpConfig) =>
 {
+    /** @type {webpack.IgnorePlugin | undefined} */
     let plugin;
-    if (wpConfig.mode === "production")
-    {
-        // plugin = new webpack.IgnorePlugin({
-        //     resourceRegExp: /^\.\/locale$/,
-        //     contextRegExp: /moment$/,
-        // });
-    }
+    // if (wpConfig.mode === "production")
+    // {
+    //     plugin = new webpack.IgnorePlugin(
+    //     {
+    //         resourceRegExp: /^\.\/locale$/,
+    //         contextRegExp: /moment$/,
+    //     });
+    // }
     return plugin;
 };
 

@@ -271,6 +271,14 @@ const readConfigFiles = () =>
         rc.nameDetail = rc.name;
     }
 
+    if (!rc.vscode) {
+        rc.vscode = {};
+    }
+
+    if (!rc.vscode.webview) {
+        rc.vscode.webview = {};
+    }
+
     return rc;
 };
 

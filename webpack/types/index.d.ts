@@ -18,7 +18,7 @@ declare type WebpackOptimization = any;
 declare interface WebpackEnvironment extends WebpackEnvironmentInternal
 {
     analyze: boolean;                     // parform analysis after build
-    app: WebpackApp;                      // target js app info
+    app: IWebpackApp;                      // target js app info
     build: WebpackBuild;
     buildMode: WebpackBuildMode;
     clean: boolean;
@@ -62,6 +62,7 @@ declare interface IWebpackApp
     pkgJson: Record<string, any>;
     plugins: Record<string, boolean>;
     version: string;                      // app version (read from package.json)
+    vscode: IWebpackVsCodeBuild
 }
 
 declare interface WebpackBuildFilePaths
@@ -69,6 +70,11 @@ declare interface WebpackBuildFilePaths
     hash: string;
     sourceMapWasm: string;
 }
+declare interface IWebpackVsCodeBuild
+{
+    webview: Record<string, string>; // webviewsapp: "path/to/app"
+}
+
 
 declare interface WebpackBuildPaths
 {
@@ -124,5 +130,6 @@ export {
     WebpackLogLevel,
     WebpackStatsAsset,
     WebpackTarget,
-    WebpackBuildEnvironment
+    WebpackBuildEnvironment,
+    IWebpackVsCodeBuild
 };
