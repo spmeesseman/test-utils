@@ -1,92 +1,126 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable import/no-extraneous-dependencies */
+// @ts-check
 
-import { figures, writeInfo } from "./webpack/console.js";
+import globalEnv from "./webpack/utils/global";
+import { write, figures } from "./webpack/utils/console";
+import { merge, printBanner, readConfigFiles } from "./webpack/utils/utils";
 import {
-	context, devtool, entry, externals, ignorewarnings, minification, mode, plugins,
-	optimization, output, resolve, rules, stats, target, watch, environment
-} from "./webpack/exports/index.js";
+	context, devtool, entry, externals, ignorewarnings, minification, mode, name, plugins,
+	optimization, output, resolve, rules, stats, target, watch, environment, getMode
+} from "./webpack/exports";
 
-/** @typedef {import("./webpack/types/webpack").WebpackArgs} WebpackArgs */
-/** @typedef {import("./webpack/types/webpack").WebpackBuild} WebpackBuild */
-/** @typedef {import("./webpack/types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("./webpack/types/webpack").WebpackEnvironment} WebpackEnvironment */
-
-let buildStep = 0;
+/** @typedef {import("./webpack/types").IWebpackApp} IWebpackApp */
+/** @typedef {import("./webpack/types").WebpackArgs} WebpackArgs */
+/** @typedef {import("./webpack/types").WebpackBuild} WebpackBuild */
+/** @typedef {import("./webpack/types").WebpackConfig} WebpackConfig */
+/** @typedef {import("./webpack/types").WebpackTarget} WebpackTarget */
+/** @typedef {import("./webpack/types").WebpackBuildMode} WebpackBuildMode */
+/** @typedef {import("./webpack/types").WebpackBuildPaths} WebpackBuildPaths */
+/** @typedef {import("./webpack/types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("./webpack/types").WebpackGlobalEnvironment} WebpackGlobalEnvironment */
 
 
 /**
- * Webpack Export
+ * Export Webpack build config<WebpackConfig>(s)
  *
- * @param {WebpackEnvironment} env Environment variable containing runtime options passed
+ * @param {Partial<WebpackEnvironment>} env Environment variable containing runtime options passed
  * to webpack on the command line (e.g. `webpack --env environment=test --env clean=true`).
  * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig|WebpackConfig[]}
  */
-export default (env, argv) =>
+module.exports = (env, argv) =>
 {
-	writeInfo("--------------------------------------------");
-	writeInfo(" Start Test-Utils NPM Package Webpack build");
-	writeInfo("--------------------------------------------");
-	writeInfo("   Argv:");
-	writeInfo("   " + JSON.stringify(argv, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
-	writeInfo("   Env :");
-	writeInfo("   " + JSON.stringify(env, null, 3).replace(/\n/g, "\n     " + figures.color.info + "    "));
-	writeInfo("--------------------------------------------");
+	const appRc = readConfigFiles(),
+		  mode = getMode(env, argv);
 
-	env = Object.assign(
-	{
-		clean: false,
-		analyze: false,
-		fa: "custom",
-		imageOpt: true,
-		environment: "prod",
-		target: "node"
-	}, env);
+	printBanner(appRc, mode, env, argv);
 
-	Object.keys(env).filter(k => typeof env[k] === "string" && /(?:true|false)/i.test(env[k])).forEach((k) =>
-	{
-		env[k] = env[k].toLowerCase() === "true";
-	});
+	const mEnv = merge(getDefaultBuildEnv(), env);
 
-	if (env.build){
-		return getWebpackConfig(env.build, env, argv);
-	}
-
-	return [
-		getWebpackConfig("node", env, argv)
+	const extBuild = [
+		getBuildConfig("extension", appRc, { ...mEnv, buildMode: "debug" /* , clean: true */ }, argv),
+		getBuildConfig("extension", appRc, { ...mEnv, buildMode: "release" }, argv)
 	];
+
+	if (mEnv.build)
+	{
+		if (mEnv.build !== "extension") {
+			return getBuildConfig(mEnv.build, appRc, mEnv, argv);
+		}
+		return extBuild;
+	}
+	else if (mEnv.mEnvironment === "test")
+	{
+		return [ ...extBuild, getBuildConfig("webview", appRc, { ...mEnv, environment: "dev" }, argv) ];
+	}
+	else if (mEnv.environment === "testprod")
+	{
+		return [ ...extBuild, getBuildConfig("webview", appRc, { ...mEnv, environment: "prod" }, argv) ];
+	}
+	return [ ...extBuild, getBuildConfig("webview", appRc, mEnv, argv) ];
 };
 
 
 /**
- * @method getWebpackConfig
- * @param {WebpackBuild} buildTarget
- * @param {WebpackEnvironment} env Webpack build environment
+ * @function getBuildConfig
+ * @param {WebpackBuild} build
+ * @param {IWebpackApp} app Webpack app config, read from `.wpbuildrc.json` and `package.json`
+ * @param {Partial<WebpackEnvironment>} env Webpack build environment
  * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig}
  */
-const getWebpackConfig = (buildTarget, env, argv) =>
+const getBuildConfig = (build, app, env, argv) =>
 {
-	if (buildStep > 0) { console.log(""); }
-	writeInfo(`Start Webpack build step ${++buildStep}`);
+	write(`Start Webpack build step ${++globalEnv.buildCount }`, figures.color.start);
+	/** @type {WebpackEnvironment}*/
+	// @ts-ignore
+	const lEnv = merge({}, env);
 	/** @type {WebpackConfig}*/
-	const wpConfig = {};
-	environment(buildTarget, env, argv); // Base path / Build path
-	mode(env, argv, wpConfig);           // Mode i.e. "production", "development", "none"
-	target(env, wpConfig);               // Target i.e. "node", "webworker", "tests"
-	context(env, wpConfig);              // Context for build
-	entry(env, wpConfig);                // Entry points for built output
-	externals(env, wpConfig);            // External modules
-	ignorewarnings(env, wpConfig);       // Warnings from the compiler to ignore
-	optimization(env, wpConfig);         // Build optimization
-	minification(env, wpConfig);         // Minification / Terser plugin options
-	output(env, wpConfig);               // Output specifications
-	devtool(env, wpConfig);              // Dev tool / sourcemap control
-	plugins(env, wpConfig);              // Webpack plugins
-	resolve(env, wpConfig);              // Resolve config
-	rules(env, wpConfig);                // Loaders & build rules
-	stats(env, wpConfig);                // Stats i.e. console output & verbosity
-	watch(env, wpConfig, argv);			 // Watch-mode options
-	wpConfig.name = `${buildTarget}:${wpConfig.mode}`;
-	wpConfig.node ={ global: false };
+	const wpConfig = /** @type {WebpackConfig} */({});
+	environment(build, app, lEnv, argv, wpConfig); // Base path / Build path
+	mode(lEnv, argv, wpConfig);     // Mode i.e. "production", "development", "none"
+	name(build, lEnv, wpConfig);    // Build name / label
+	target(lEnv, wpConfig);         // Target i.e. "node", "webworker", "tests"
+	context(lEnv, wpConfig);        // Context for build
+	entry(lEnv, wpConfig);          // Entry points for built output
+	externals(lEnv, wpConfig);      // External modules
+	ignorewarnings(lEnv, wpConfig); // Warnings from the compiler to ignore
+	optimization(lEnv, wpConfig);   // Build optimization
+	minification(lEnv, wpConfig);   // Minification / Terser plugin options
+	output(lEnv, wpConfig);         // Output specifications
+	devtool(lEnv, wpConfig);        // Dev tool / sourcemap control
+	resolve(lEnv, wpConfig);        // Resolve config
+	rules(lEnv, wpConfig);          // Loaders & build rules
+	stats(lEnv, wpConfig);          // Stats i.e. console output & verbosity
+	watch(lEnv, wpConfig, argv);    // Watch-mode options
+	plugins(lEnv, wpConfig);        // Plugins - call last - `env` & `wpConfig` are fully populated
 	return wpConfig;
+};
+
+
+/**
+ * @function getDefaultBuildEnv
+ * @returns {Partial<WebpackEnvironment>}
+ */
+const getDefaultBuildEnv = () =>
+{
+	const env = {
+		analyze: false,
+		buildMode: /** @type {WebpackBuildMode} */("release"),
+		clean: false,
+		esbuild: false,
+		fa: "custom",
+		imageOpt: true,
+		isTests: false,
+		paths: /** @type {WebpackBuildPaths} */({ files: { hash: "" }, cache: "" }),
+		preRelease: true,
+		state: { hash: { current: {}, next: {} } },
+		target: /** @type {WebpackTarget} */("node")
+	};
+	Object.keys(env).filter(k => typeof env[k] === "string" && /(?:true|false)/i.test(env[k])).forEach((k) =>
+	{
+		env[k] = env[k].toLowerCase() === "true";
+	});
+	return env;
 };

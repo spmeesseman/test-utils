@@ -1,7 +1,16 @@
 {
-    "name": "Test Utils",
-    "nameDetail": "Test Utils Javascript/Typescript Utility Package",
+    "name": "test-utils",
+    "displayName": "Test Utils",
+    "detailedDisplayName": "Test Utils Javascript/Typescript Utility Package",
     "module": false,
+    "logPad": {
+        "plugin": {
+            "compilation": 20,
+            "loghooks": {
+                "buildTag": 23
+            }
+        }
+    },
     "exports": {
         "context": true,
         "devtool": true,
@@ -23,7 +32,6 @@
     },
     "plugins": {
         "analyze": true,
-        "asset": true,
         "banner": true,
         "build": true,
         "clean": true,
@@ -34,11 +42,14 @@
         "html": true,
         "ignore": true,
         "index": true,
+        "istanbul": true,
+        "loghooks": true,
         "optimization": true,
-        "plugins": true,
         "progress": true,
+        "scm": true,
+        "sourcemaps": true,
         "tscheck": true,
-        "upload": false
+        "upload": true
     },
     "vscode": {
         "webview": {
