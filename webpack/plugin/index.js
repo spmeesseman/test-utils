@@ -4,12 +4,12 @@ import analyze from "./analyze";
 import banner from "./banner";
 import build from "./build";
 import clean from "./clean";
-import compile from "./compile";
+import compilation from "./compilation";
 import copy from "./copy";
 import finalize from "./finalize";
 import { hash, prehash } from "./hash";
 import ignore from "./ignore";
-import istanbul from "./istanbul";
+import instrument from "./instrument";
 import optimization from "./optimization";
 import loghooks from "./loghooks";
 import progress from "./progress";
@@ -24,7 +24,7 @@ export {
     banner,
     build,
     clean,
-    compile,
+    compilation,
     copy,
     cssextract,
     finalize,
@@ -33,7 +33,7 @@ export {
     htmlinlinechunks,
 	ignore,
     imageminimizer,
-    istanbul,
+    instrument,
     loghooks,
     optimization,
     prehash,

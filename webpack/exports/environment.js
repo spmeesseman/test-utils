@@ -9,9 +9,9 @@
 import { join, resolve } from "path";
 import { WebpackError } from "webpack";
 import globalEnv from "../utils/global";
-import { writeInfo, figures, write } from "../utils/console";
 import { merge, isObjectEmpty } from "../utils/utils";
 import { readFileSync, existsSync, mkdirSync } from "fs";
+import { writeInfo, figures, write } from "../utils/console";
 
 /** @typedef {import("../types").IWebpackApp} IWebpackApp */
 /** @typedef {import("../types").WebpackArgs} WebpackArgs */
