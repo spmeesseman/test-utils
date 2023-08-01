@@ -1,24 +1,22 @@
 // @ts-check
 
 /**
- * @module webpack.exports.name
+ * @module wpbuild.exports.name
  */
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types").WebpackBuild} WebpackBuild */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WpBuildModule} WpBuildModule */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
 
 /**
  * @function
- * @param {WebpackBuild} buildTarget Build target e.g. `extension`, `webview` etc
- * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WpBuildEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-const name = (buildTarget, env, wpConfig) =>
+const name = (env, wpConfig) =>
 {
-	wpConfig.name = `${env.app.name}|${env.app.version}|${env.environment}|` +
-					`${buildTarget}|${wpConfig.mode}|${env.buildMode}`;
+	wpConfig.name = `${env.app.name}|${env.app.version}|${env.build}|${env.environment}|${env.target}|${wpConfig.mode}`;
 };
 
 

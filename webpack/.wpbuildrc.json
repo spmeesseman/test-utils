@@ -66,5 +66,6 @@
             "taskUsage": "./taskUsage/taskUsage.ts",
             "welcome": "./welcome/welcome.ts"
         }
-    }
+    },
+    "publicInfoProject": true
 }

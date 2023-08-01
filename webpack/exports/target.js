@@ -1,25 +1,31 @@
 // @ts-check
 
 /**
- * @module webpack.exports.target
+ * @module wpbuild.exports.target
  */
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WebpackTarget} WebpackTarget */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
 
 /**
  * @function target
- * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WpBuildEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
 const target = (env, wpConfig) =>
 {
-	if (env.build === "webview"|| env.build === "browser") {
-		wpConfig.target = "webworker";
+	if (env.build === "webview")
+	{
+		wpConfig.target = env.target = "webworker";
+	}
+	else if (env.build === "browser")
+	{
+		wpConfig.target = env.target = "web";
 	}
 	else {
-		wpConfig.target = "node";
+		wpConfig.target = env.target = "node";
 	}
 };
 

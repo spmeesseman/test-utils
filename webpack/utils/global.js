@@ -1,17 +1,32 @@
 // @ts-check
 
+import { resolve, join } from "path";
+import { existsSync, readFileSync, mkdirSync, writeFileSync } from "fs";
+
 /**
- * @module webpack.global
+ * @module wpbuildutils.global
  */
 
-/** @typedef {import("../types").WebpackPackageJson} WebpackPackageJson */
-/** @typedef {import("../types").WebpackGlobalEnvironment} WebpackGlobalEnvironment */
+/** @typedef {import("../types").WpBuildPackageJson} WpBuildPackageJson */
+/** @typedef {import("../types").WpBuildGlobalEnvironment} WpBuildGlobalEnvironment */
 
-/** @type {WebpackGlobalEnvironment} */
+
+
+const cacheDir = resolve(__dirname, "..", "..", "node_modules", ".cache", "wpbuild");
+if (!existsSync(cacheDir)) { mkdirSync(cacheDir, { recursive: true }); }
+
+const globalCacheFilePath = join(cacheDir, "global.json");
+if (!existsSync(globalCacheFilePath)) { writeFileSync(globalCacheFilePath, "{}"); }
+
+
+/** @type {WpBuildGlobalEnvironment} */
 const globalEnv = {
     buildCount: 0,
+    cache: JSON.parse(readFileSync(globalCacheFilePath, "utf8")),
+    cacheDir,
     valuePad: 45,
-    pkgJson: /** @type {WebpackPackageJson} */({})
+    pkgJson: /** @type {WpBuildPackageJson} */({})
 };
 
-export default globalEnv;
+
+export { globalEnv };

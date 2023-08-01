@@ -1,5 +1,11 @@
 // @ts-check
 
+/**
+ * @module wpbuildutils.console
+ */
+
+const basePad = "";
+
 /** @type {Record<string, [number, number]>} */
 const colors = {
     black: [ 0, 39 ],
@@ -18,11 +24,24 @@ const colors = {
 };
 
 /**
+ * @function
  * @param {string} msg
  * @param {[ number, number ]} color color value
+ * @returns {string}
  */
 const withColor = (msg, color) => "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
 
+
+/**
+ * @function
+ * @param {string} msg
+ * @param {[ number, number ]} [bracketColor] surrounding bracket color value
+ * @param {[ number, number ]} [msgColor] msg color value
+ * @returns {string}
+ */
+const tagColor = (msg, bracketColor, msgColor) => withColor("[", bracketColor || colors.blue) +
+                                                  withColor(msg, msgColor || colors.white)  +
+                                                  withColor("]", bracketColor || colors.blue);
 
 /**
  * @param {[ number, number ]} color color value
@@ -32,12 +51,26 @@ const withColor = (msg, color) => "\x1B[" + color[0] + "m" + msg + "\x1B[" + col
 const withColorLength = (color, msg) => (2 + color[0].toString().length + 1 + (msg ? msg.length : 0) + 2 + color[1].toString().length + 1);
 
 
+/**
+ * @function
+ * @param {string} msg
+ * @param {string} [icon]
+ * @param {string} [pad]
+ * @returns {void}
+ */
 const write = (msg, icon, pad = "") =>
-    console.log(`     ${pad}${icon || figures.color.info}${msg ? " " + msg : ""}`);
+    console.log(`${basePad}${pad}${icon || figures.color.info}${msg ? " " + msg : ""}`);
 
 
+/**
+ * @function
+ * @param {string} msg
+ * @param {string} [icon]
+ * @param {string} [pad]
+ * @returns {void}
+ */
 const writeInfo = (msg, icon, pad = "") =>
-    console.log(`     ${pad}${icon || figures.color.info}${msg ? " " + figures.withColor(msg, figures.colors.grey) : ""}`);
+    console.log(`${basePad}${pad}${icon || figures.color.info}${msg ? " " + figures.withColor(msg, figures.colors.grey) : ""}`);
 
 /*
 const consoleWriteInfo = (msg, icon, forceGrey = true, pad = "") =>
@@ -67,6 +100,9 @@ const consoleWriteInfo = (msg, icon, forceGrey = true, pad = "") =>
 };
 */
 
+/**
+ * @type {Readonly<Record<string, any>>}
+ */
 const figures =
 {
     colors,
@@ -79,6 +115,7 @@ const figures =
     up: "△",
     warning: "⚠",
     withColor,
+    /** @type {Readonly<Record<string, any>>} */
     blue:
     {
         info: withColor("ℹ", colors.blue),
@@ -86,6 +123,7 @@ const figures =
         warning: withColor("⚠", colors.blue),
         error: withColor("✘", colors.blue)
     },
+    /** @type {Readonly<Record<string, any>>} */
     color:
     {
         bullet: withColor("●", colors.white),
@@ -104,6 +142,7 @@ const figures =
 export {
     colors,
     figures,
+    tagColor,
     withColor,
     withColorLength,
     write,

@@ -2,26 +2,31 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // @ts-check
 
-import globalEnv from "./global";
+/**
+ * @module wpbuildutils.utils
+ */
+
 import { resolve } from "path";
+import { globalEnv } from "./global";
 import gradient from "gradient-string";
 import { WebpackError } from "webpack";
 import { readFileSync, existsSync } from "fs";
 import { write, writeInfo, withColor, figures, colors } from "./console";
 
-/** @typedef {import("../types").IWebpackApp} IWebpackApp */
+/** @typedef {import("../types").WpBuildApp} WpBuildApp */
 /** @typedef {import("../types").WebpackMode} WebpackMode */
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types").WebpackArgs} WebpackArgs */
+/** @typedef {import("../types").WpBuildWebpackArgs} WpBuildWebpackArgs */
 /** @typedef {import("../types").WebpackCompilation} WebpackCompilation */
-/** @typedef {import("../types").WebpackPackageJson} WebpackPackageJson */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WpBuildPackageJson} WpBuildPackageJson */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
+/** @typedef {import("../types").WebpackVsCodeBuild} WebpackVsCodeBuild */
 
 
 /**
  * @function apply
  * @param {Record<string, any>} object
- * @param {Record<string, any>} config
+ * @param {Record<string, any> | undefined} config
  * @param {Record<string, any>} [defaults]
  * @returns {Record<string, any>}
  */
@@ -32,7 +37,7 @@ const apply = (object, config, defaults) =>
         if (defaults) {
             apply(object, defaults);
         }
-        if (isObject(config)) {
+        if (config && isObject(config)) {
             Object.keys(config).forEach((i) => { object[i] = config[i]; });
         }
     }
@@ -47,16 +52,6 @@ const apply = (object, config, defaults) =>
  * @returns {any[]}
  */
 const asArray = (v, shallow, allowEmpStr) => (isArray(v) ? (shallow !== true ? v : v.slice()) : (!isEmpty(v, allowEmpStr) ? [ v ] : []));
-
-
-/**
- * Break property name into separate spaced words at each camel cased character
- *
- * @private
- * @param {string} prop
- * @returns {string}
- */
-const breakProp = (prop) => prop.replace(/[A-Z]/g, (v) => ` ${v.toLowerCase()}`);
 
 
 /**
@@ -97,26 +92,15 @@ const clone = (item) =>
  * @param {WebpackConfig} wpConfig Webpack config object
  * @param {boolean} [dbg]
  * @param {boolean} [ext]
+ * @param {boolean} [hash]
  */
-const getEntriesRegex = (wpConfig, dbg, ext) =>
+const getEntriesRegex = (wpConfig, dbg, ext, hash) =>
 {
-	return new RegExp(`(?:${Object.keys(wpConfig.entry)
-           .reduce((e, c) => `${!!e ? `${e}|` : e}${c}`, "")})${dbg ? "(?:\\.debug)?" : ""}${ext ? "\\.js" : ""}`);
-};
-
-
-/**
- * @function initGlobalEnvObject
- * @param {string} baseProp
- * @param {any} [initialValue]
- * @param {...any} props
- */
-const initGlobalEnvObject = (baseProp, initialValue, ...props) =>
-{
-    if (!globalEnv[baseProp]) {
-        globalEnv[baseProp] = {};
-    }
-    props.filter(p => !globalEnv[baseProp][p]).forEach((p) => { globalEnv[baseProp][p] = initialValue; });
+    return new RegExp(
+        `(?:${Object.keys(wpConfig.entry).reduce((e, c) => `${e ? e + "|" : ""}${c}`, "")})` +
+        `(?:\\.debug)${!dbg ? "?" : ""}(?:\\.[a-z0-9]{${wpConfig.output.hashDigestLength || 20}})` +
+        `${!hash ? "?" : ""}(?:\\.js|\\.js\\.map)${!ext ? "?" : ""}`
+    );
 };
 
 
@@ -238,12 +222,11 @@ const printLineSep = () =>
 
 /**
  * @function
- * @param {IWebpackApp} app
+ * @param {WpBuildApp} app
  * @param {WebpackMode} mode Webpack command line args
- * @param {Partial<WebpackEnvironment>} env Webpack build environment
- * @param {WebpackArgs} argv Webpack command line args
+ * @param {Partial<WpBuildEnvironment>} env Webpack build environment
  */
-const printBanner = (app, mode, env, argv) =>
+const printBanner = (app, mode, env) =>
 {
     printLineSep();
     // console.log(gradient.rainbow(spmBanner(version), {interpolation: "hsv"}));
@@ -252,7 +235,7 @@ const printBanner = (app, mode, env, argv) =>
     write(gradient("purple", "blue", "pink", "green", "purple", "blue").multiline(` Start ${app.bannerNameDetailed} Webpack Build`));
     printLineSep();
 	write(withColor("   Mode  : ", colors.white) + withColor(mode, colors.grey));
-	write(withColor("   Argv  : ", colors.white) + withColor(JSON.stringify(argv), colors.grey));
+	write(withColor("   Argv  : ", colors.white) + withColor(JSON.stringify(env.argv), colors.grey));
 	write(withColor("   Env   : ", colors.white) + withColor(JSON.stringify(env), colors.grey));
     printLineSep();
 };
@@ -261,15 +244,17 @@ const printBanner = (app, mode, env, argv) =>
 /**
  * @function
  * @throws {WebpackError}
- * @returns {IWebpackApp}
+ * @returns {WpBuildApp}
  */
 const readConfigFiles = () =>
 {
-    /** @type {IWebpackApp} */
+    /** @type {WpBuildApp} */
     const appRc = {},
           rcPath = resolve(__dirname, "..", ".wpbuildrc.json"),
           pkgJsonPath = resolve(__dirname, "..", "..", "package.json");
-
+    //
+    // Read .wpbuildrc
+    //
     try
     {   if (existsSync(rcPath))
         {
@@ -283,13 +268,16 @@ const readConfigFiles = () =>
         throw new WebpackError("Could not parse .wpbuildrc.json, check syntax");
     }
 
+    //
+    // Read package.json
+    //
     try
     {   if (existsSync(pkgJsonPath))
         {
-            const props = [ // needs to be in sync with the properties of `IWebpackPackageJson`
+            const props = [ // needs to be in sync with the properties of `WpBuildPackageJson`
                 "author", "displayName", "name", "description", "main", "module", "publisher", "version"
             ];
-            /** @type {WebpackPackageJson} */
+            /** @type {WpBuildPackageJson} */
             const pkgJso = JSON.parse(readFileSync(pkgJsonPath, "utf8")),
                   pkgJsoPartial = pickBy(pkgJso, p => props.includes(p));
             merge(appRc, {}, { pkgJson: pkgJsoPartial });
@@ -303,42 +291,54 @@ const readConfigFiles = () =>
         throw new WebpackError("Could not parse package.json, check syntax");
     }
 
+    if (!appRc.plugins) {
+        appRc.plugins = {};
+    }
+
+    if (!appRc.exports) {
+        appRc.exports = {};
+    }
+
+    //
+    // PRIMITIVE PROPERTIES
+    //
     if (!appRc.name) {
         appRc.name = appRc.pkgJson.name;
     }
-
     if (!appRc.displayName) {
         appRc.name = appRc.pkgJson.displayName;
     }
-
     if (!appRc.bannerName) {
         appRc.bannerName = appRc.displayName;
     }
-
     if (!appRc.bannerNameDetailed) {
         appRc.bannerNameDetailed = appRc.bannerName;
     }
-
     if (!appRc.version) {
         appRc.version = appRc.pkgJson.version;
     }
 
+    //
+    // VSCODE PROPERTIES
+    //
     if (!appRc.vscode) {
-        appRc.vscode = {};
+        appRc.vscode = /** @type {WebpackVsCodeBuild} */({});
     }
+    mergeIf(appRc.vscode, { webview: { apps: {}, baseDIr: "" }});
+    mergeIf(appRc.vscode.webview, { apps: {}, baseDir: "" });
 
-    if (!appRc.vscode.webview) {
-        appRc.vscode.webview = {};
-    }
-
+    //
+    // LOGPAD PROPERTIES
+    //
     if (!appRc.logPad) {
-        appRc.logPad = {};
+        appRc.logPad = { plugin: {}, externals: {} };
     }
-
+    if (!appRc.logPad.externals) {
+        appRc.logPad.externals = {};
+    }
     if (!appRc.logPad.plugin) {
         appRc.logPad.plugin = {};
     }
-
     mergeIf(appRc.logPad.plugin,
     {
         compilation: 20,
@@ -388,30 +388,7 @@ const spmBanner = (app, version) =>
 };
 
 
-/**
- * @function statsPrinter
- * @param {string} infoProp
- * @param {string} assetPluginName
- * @param {WebpackCompilation} compilation
- */
-const tapStatsPrinter = (infoProp, assetPluginName, compilation) =>
-{
-    if (compilation.hooks.statsPrinter)
-    {
-        compilation.hooks.statsPrinter.tap(assetPluginName, (stats) =>
-        {
-            stats.hooks.print.for(`asset.info.${infoProp}`).tap(
-                assetPluginName,
-                (istanbulTagged, { green, formatFlag }) => {
-                    return istanbulTagged ? /** @type {Function} */(green)(/** @type {Function} */(formatFlag)(breakProp(infoProp))) : "";
-                }
-            );
-        });
-    }
-};
-
-
 export {
-    apply, asArray, clone, isArray, isDate, isEmpty, isObject, isObjectEmpty, isString, printLineSep, getEntriesRegex,
-    initGlobalEnvObject, merge, mergeIf, pick, pickBy, pickNot, printBanner, readConfigFiles, spmBanner, tapStatsPrinter
+    apply, asArray, clone, isArray, isDate, isEmpty, isObject, isObjectEmpty, isString,
+    printLineSep, getEntriesRegex, merge, mergeIf, pick, pickBy, pickNot, printBanner, readConfigFiles
 };

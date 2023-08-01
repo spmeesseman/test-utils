@@ -3,7 +3,7 @@
 import context from "./context";
 import devtool from "./devtool";
 import entry from "./entry";
-import environment from "./environment";
+import experiments from "./experiments";
 import externals from "./externals";
 import ignorewarnings from "./ignorewarnings";
 import minification from "./minification";
@@ -22,7 +22,7 @@ export {
     context,
     devtool,
 	entry,
-    environment,
+    experiments,
     externals,
     getMode,
     ignorewarnings,

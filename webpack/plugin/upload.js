@@ -3,7 +3,7 @@
 // @ts-check
 
 /**
- * @module webpack.plugin.upload
+ * @module wpbuild.plugin.upload
  *
  * Uses 'plink' and 'pscp' from PuTTY package: https://www.putty.org
  *
@@ -14,105 +14,99 @@
  *
  */
 
+import { existsSync } from "fs";
 import { join, basename } from "path";
-import globalEnv from "../utils/global";
-import { spawnSync } from "child_process";
-import { initGlobalEnvObject } from "../utils/utils";
-import { writeInfo, figures, withColor, colors } from "../utils/console";
-import { renameSync, copyFileSync, mkdirSync, existsSync, rmSync, readdirSync } from "fs";
 import { WebpackError } from "webpack";
-import { info } from "console";
+import WpBuildBasePlugin from "./base";
+import { spawnSync } from "child_process";
+import { copyFile, rm, readdir, rename, mkdir } from "fs/promises";
+import { writeInfo, figures, withColor, colors } from "../utils/console";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types").WebpackHashState} WebpackHashState */
-/** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
+/** @typedef {import("../types").WebpackCompilation} WebpackCompilation */
+/** @typedef {import("../types").WpBuildPluginOptions} WpBuildPluginOptions */
 
 
-/**
- * @function upload
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns {WebpackPluginInstance | undefined} plugin instance
- */
-const upload = (env, wpConfig) =>
+class WpBuildUploadPlugin extends WpBuildBasePlugin
 {
-    /** @type {WebpackPluginInstance | undefined} */
-    let plugin;
-    if (env.app.plugins.upload && env.build === "extension")
+    /**
+     * @class WpBuildLicenseFilePlugin
+     * @param {WpBuildPluginOptions} options Plugin options to be applied
+     */
+	constructor(options)
     {
-        initGlobalEnvObject("upload", 0, "callCount", "readyCount");
-        plugin =
+        super(options);
+        this.initGlobalEnvObject("upload", 0, "callCount", "readyCount");
+    }
+
+    /**
+     * @function Called by webpack runtime to apply this plugin
+     * @param {WebpackCompiler} compiler the compiler instance
+     * @returns {void}
+     */
+    apply(compiler)
+    {
+        this.onApply(compiler,
         {
-            apply: (compiler) =>
+            debugFiles: {
+                async: true,
+                hook: "afterEmit",
+                callback: this.debugSupportFiles.bind(this)
+            }
+        });
+    }
+
+    /**
+     * @function
+     * @private
+     * @param {WebpackCompilation} compilation
+     * @throws {WebpackError}
+     */
+    async debugSupportFiles(compilation)
+    {   //
+        // `The lBasePath` variable is a temp directory that we will create in the in
+        // the OS/env temp dir.  We will move only files that have changed content there,
+        // and perform only one upload when all builds have completed.
+        //
+        const env = this.options.env,
+              toUploadPath = join(env.paths.temp, env.environment);
+
+        this.compilation = compilation;
+        if (!existsSync(toUploadPath)) {
+            await mkdir(toUploadPath);
+        }
+
+        for (const chunk of Array.from(compilation.chunks).filter(c => c.canBeInitial()))
+        {
+            for (const file of Array.from(chunk.files).filter(f => this.matchObject(f)))
             {
-                compiler.hooks.afterDone.tap("AfterDoneUploadPlugin", (statsData) =>
+                const asset = compilation.getAsset(file);;
+                if (asset && asset.info.related && chunk.name && env.state.hash.next[chunk.name] !== env.state.hash.current[chunk.name])
                 {
-                    if (statsData.hasErrors()) {
-                        return;
+                    await copyFile(join(env.paths.dist, file), join(toUploadPath, file));
+                    if (asset.info.related.sourceMap)
+                    {
+                        const sourceMapFile = asset.info.related.sourceMap.toString();
+                        if (env.environment === "prod") {
+                            await rename(join(env.paths.dist, sourceMapFile), join(toUploadPath, sourceMapFile));
+                        }
+                        else {
+                            await copyFile(join(env.paths.dist, sourceMapFile), join(toUploadPath, sourceMapFile));
+                        }
                     }
-                    const stats = statsData.toJson(),
-                          assets = stats.assets?.filter(a => a.type === "asset");
-                    ++globalEnv.upload.callCount;
-                    if (assets) {
-                        uploadAssets(assets, env);
-                    }
-                });
-            }
-        };
-    }
-    return plugin;
-};
-
-
-/**
- * @function uploadAssets
- * @param {WebpackStatsAsset[]} assets
- * @param {WebpackEnvironment} env
- * @throws {WebpackError}
- */
-const uploadAssets = (assets, env) =>
-{   //
-    // `The lBasePath` variable is a temp directory that we will create in the in
-    // the OS/env temp dir.  We will move only files that have changed content there,
-    // and perform only one upload when all builds have completed.
-    //
-    const toUploadPath = join(env.paths.temp, env.environment);
-
-    if (globalEnv.upload.callCount === 1)
-    {
-        if (!existsSync(toUploadPath)) { mkdirSync(toUploadPath); }
-        copyFileSync(join(env.paths.build, "node_modules", "source-map", "lib", "mappings.wasm"), join(toUploadPath, "mappings.wasm"));
-    }
-
-    assets.filter(a => !!a.chunkNames && a.chunkNames.length > 0).forEach((a) =>
-    {
-        const chunkName = /** @type {string}*/(/** @type {string[]}*/(a.chunkNames)[0]);
-        if (env.state.hash.next[chunkName] !== env.state.hash.current[chunkName] && a.info.related)
-        {
-            const distPath = env.buildMode === "release" ? env.paths.dist : env.paths.temp;
-            copyFileSync(join(distPath, a.name), join(toUploadPath, a.name));
-            if (a.info.related.sourceMap)
-            {
-                const fileNameSourceMap = a.info.related.sourceMap.toString();
-                if (env.environment === "prod") {
-                    renameSync(join(distPath, fileNameSourceMap), join(toUploadPath, fileNameSourceMap));
                 }
-                else {
-                    copyFileSync(join(distPath, fileNameSourceMap), join(toUploadPath, fileNameSourceMap));
+                else if (asset)
+                {
+                    writeInfo(
+                        `asset '${chunk.name}|${file}' ${withColor(`unchanged, skip upload [${asset.info.contenthash}]`, colors.grey)}`,
+                        withColor(figures.info, colors.yellow)
+                    );
                 }
             }
-            ++globalEnv.upload.readyCount;
         }
-        else {
-            const fileNameNoHash = a.name.replace(`.${a.info.contenthash}`, "");
-            writeInfo(`resource '${chunkName}|${fileNameNoHash}' unchanged, skip upload [${a.info.contenthash}]`, withColor(figures.info, colors.yellow));
-        }
-    });
 
-    if (globalEnv.upload.callCount === 2 && globalEnv.upload.readyCount > 0)
-    {
         const host = process.env.WPBUILD_APP1_SSH_UPLOAD_HOST,
               user = process.env.WPBUILD_APP1_SSH_UPLOAD_USER,
               rBasePath = process.env.WPBUILD_APP1_SSH_UPLOAD_PATH,
@@ -120,14 +114,19 @@ const uploadAssets = (assets, env) =>
               spawnSyncOpts = { cwd: env.paths.build, encoding: "utf8", shell: true },
               sshAuth = process.env.WPBUILD_APP1_SSH_UPLOAD_AUTH,
               sshAuthFlag = process.env.WPBUILD_APP1_SSH_UPLOAD_FLAG,
-              filesToUpload = readdirSync(toUploadPath);
+              filesToUpload = await readdir(toUploadPath);
 
-        if (!host || !user || !rBasePath ||  !sshAuth || !sshAuthFlag) {
-            throw new WebpackError("Required environment variables for upload are not set");
+        if (filesToUpload.length === 0) {
+            writeInfo("There were no updated assets found to upload");
+            return;
         }
 
-        if (filesToUpload.length !== globalEnv.upload.readyCount) {
-            writeInfo("stored resource count does not match upload directory file count", colors.warning);
+        await copyFile(join(env.paths.build, "node_modules", "source-map", "lib", "mappings.wasm"), join(toUploadPath, "mappings.wasm"));
+
+        if (!host || !user || !rBasePath ||  !sshAuth || !sshAuthFlag) {
+            // compilation.errors.push(new WebpackError("Required environment variables for upload are not set"));
+            // return;
+            throw new WebpackError("Required environment variables for upload are not set");
         }
 
         const plinkCmds = [
@@ -158,14 +157,15 @@ const uploadAssets = (assets, env) =>
 
         writeInfo(`${figures.color.star } ${withColor(`upload resource files to ${host}`, colors.grey)}`);
         try {
-            writeInfo(`   create / clear dir    : plink ${plinkArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`, null);
+            writeInfo(`   create / clear dir    : plink ${plinkArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`);
             spawnSync("plink", plinkArgs, spawnSyncOpts);
-            writeInfo(`   upload files  : pscp ${pscpArgs.map((v, i) => (i !== 1 ? v : "<PWD>")).join(" ")}`, null);
+            writeInfo(`   upload files  : pscp ${pscpArgs.map((v, i) => (i !== 1 ? v : "<PWD>")).join(" ")}`);
+            spawnSync("pscp", pscpArgs, spawnSyncOpts);
             spawnSync("pscp", pscpArgs, spawnSyncOpts);
             filesToUpload.forEach((f) =>
-                writeInfo(`   ${figures.color.up} ${withColor(basename(f).padEnd(env.app.logPad.plugin.upload.fileList), colors.grey)} ${figures.color.successTag}`, null)
+                writeInfo(`   ${figures.color.up} ${withColor(basename(f).padEnd(env.app.logPad.plugin.upload.fileList), colors.grey)} ${figures.color.successTag}`)
             );
-            writeInfo(`${figures.color.star} ${withColor("successfully uploaded resource files", colors.grey)}`, null);
+            writeInfo(`${figures.color.star} ${withColor("successfully uploaded resource files", colors.grey)}`);
         }
         catch (e) {
             writeInfo("error uploading resource files:", figures.color.error);
@@ -173,10 +173,21 @@ const uploadAssets = (assets, env) =>
             writeInfo(e.message.trim(), figures.color.error, "   ");
         }
         finally {
-            rmSync(toUploadPath, { recursive: true, force: true });
+            await rm(toUploadPath, { recursive: true, force: true });
         }
     }
-};
+
+}
+
+
+/**
+ * @function upload
+ * @param {WpBuildEnvironment} env
+ * @param {WebpackConfig} wpConfig Webpack config object
+ * @returns {WpBuildUploadPlugin | undefined} plugin instance
+ */
+const upload = (env, wpConfig) =>
+    (env.app.plugins.upload !== false && env.isExtension ? new WpBuildUploadPlugin({ env, wpConfig }) : undefined);
 
 
 export default upload;

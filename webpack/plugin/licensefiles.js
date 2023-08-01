@@ -3,72 +3,74 @@
 // @ts-check
 
 /**
- * @module webpack.plugin.finalize
+ * @module wpbuild.plugin.licensefiles
  */
 
 import { join } from "path";
-import { asArray } from "..//utils/utils";
+import { existsSync } from "fs";
+import WpBuildBasePlugin from "./base";
 import { rename, unlink, readdir } from "fs/promises";
-import { existsSync, copyFileSync, readdirSync } from "fs";
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
+/** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
+/** @typedef {import("../types").WpBuildPluginOptions} WpBuildPluginOptions */
 
 
 /**
- * @function finalize
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns {WebpackPluginInstance | undefined}
+ * @class WpBuildLicenseFilePlugin
  */
-const finalize = (env, wpConfig) =>
+class WpBuildLicenseFilePlugin extends WpBuildBasePlugin
 {
-    /** @type {WebpackPluginInstance | undefined} */
-    let plugin;
-    if (env.app.plugins.finalize && env.build === "extension")
+    /**
+     * @function Called by webpack runtime to apply this plugin
+     * @param {WebpackCompiler} compiler the compiler instance
+     * @returns {void}
+     */
+    apply(compiler)
     {
-        plugin =
+        this.onApply(compiler,
         {
-            apply: (compiler) =>
-            {
-                compiler.hooks.shutdown.tapPromise("FinalizeShutdownPlugin", async () =>
-                {
-                    if (env.environment === "prod")
-                    {
-                        await licenseFiles(env);
-                    }
-                });
+            checkin: {
+                async: true,
+                hook: "shutdown",
+                callback: this.licenseFiles.bind(this)
             }
-        };
+        });
     }
-    return plugin;
-};
 
+    /**
+     * @function licenseFiles
+     * @returns {Promise<void>}
+     */
+    async licenseFiles()
+    {
+        const distDir = this.compiler.options.output.path || this.compiler.outputPath,
+              items = existsSync(distDir) ? await readdir(distDir) : [];
+        for (const file of items.filter(i => i.includes("LICENSE")))
+        {
+            try {
+                if (!file.includes(".debug")) {
+                    await rename(join(distDir, file), join(distDir, file.replace("js.LICENSE.txt", "LICENSE")));
+                }
+                else {
+                    await unlink(join(distDir, file));
+                }
+            } catch {}
+        }
+    };
+}
 
 
 /**
- * @function licenseFiles
- * @param {WebpackEnvironment} env
- * @returns {Promise<void>}
+ * @function
+ * @param {WpBuildEnvironment} env
+ * @param {WebpackConfig} wpConfig Webpack config object
+ * @returns {WpBuildLicenseFilePlugin | undefined}
  */
-const licenseFiles = async (env) =>
-{
-    const distPath = env.paths.distBuild,
-          items = existsSync(distPath) ? await readdir(distPath) : [];
-    for (const file of items.filter(i => i.includes("LICENSE")))
-    {
-        try {
-            if (!file.includes(".debug")) {
-                await rename(join(distPath, file), join(distPath, file.replace("js.LICENSE.txt", "LICENSE")));
-            }
-            else {
-                await unlink(join(distPath, file));
-            }
-        } catch {}
-    }
-};
+const licensefiles = (env, wpConfig) =>
+    (env.app.plugins.licensefiles !== false && env.isExtensionProd ? new WpBuildLicenseFilePlugin({ env, wpConfig }) : undefined);
 
 
-export default finalize;
+export default licensefiles;

@@ -1,15 +1,15 @@
 // @ts-check
 
 /**
- * @module webpack.exports.stats
+ * @module wpbuild.exports.stats
  */
 
 /** @typedef {import("../types").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
 /**
  * @function stats
- * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WpBuildEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
 const stats = (env, wpConfig) =>

@@ -4,10 +4,13 @@ import analyze from "./analyze";
 import banner from "./banner";
 import build from "./build";
 import clean from "./clean";
-import compilation from "./compilation";
+import compile from "./compile";
 import copy from "./copy";
-import finalize from "./finalize";
-import { hash, prehash } from "./hash";
+import customize from "./customize";
+import runtimevars from "./runtimevars";
+import environment from "./environment";
+import licensefiles from "./licensefiles";
+import hash from "./hash";
 import ignore from "./ignore";
 import instrument from "./instrument";
 import optimization from "./optimization";
@@ -20,27 +23,7 @@ import upload from "./upload";
 import { cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps } from "./html";
 
 export {
-    analyze,
-    banner,
-    build,
-    clean,
-    compilation,
-    copy,
-    cssextract,
-    finalize,
-    hash,
-    htmlcsp,
-    htmlinlinechunks,
-	ignore,
-    imageminimizer,
-    instrument,
-    loghooks,
-    optimization,
-    prehash,
-    progress,
-    scm,
-    sourcemaps,
-    tscheck,
-    upload,
-    webviewapps
+    analyze, banner, build, clean, compile, copy, cssextract, customize, environment,
+    hash, htmlcsp, htmlinlinechunks,ignore, imageminimizer, instrument, licensefiles, loghooks,
+    optimization, progress, runtimevars, scm, sourcemaps, tscheck, upload, webviewapps
 };
