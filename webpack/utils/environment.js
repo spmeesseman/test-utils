@@ -6,9 +6,9 @@
  * @module wpbuild.utils.environment
  */
 
-import { mergeIf } from "./utils";
+import { mergeIf, apply, isString, merge, isObjectEmpty } from "./utils";
 import { globalEnv } from "./global";
-import { join, resolve } from "path";
+import { join, resolve, isAbsolute } from "path";
 import { WebpackError } from "webpack";
 import { existsSync, mkdirSync } from "fs";
 import WpBuildConsoleLogger from "./console";
@@ -55,7 +55,7 @@ const setBuildEnvironment = (env) =>
 		}
 		else {
 			const eMsg = "Could not detect build environment";
-			logger.writeInfo("Could not detect build environment", logger.figures.color.error);
+			logger.error("Could not detect build environment");
 			throw new WebpackError(eMsg);
 		}
 	}
@@ -71,6 +71,7 @@ const setBuildEnvironment = (env) =>
 		isExtensionProd: env.build === "extension" || env.build === "browser" && env.environment === "prod",
 		isExtensionTests: env.build === "extension" || env.build === "browser" && env.environment.startsWith("test"),
 		global: globalEnv,
+		logLevel: env.app.log.level || 0,
 		paths: getPaths(env),
 		preRelease: true,
 		state: { hash: { current: {}, next: {}, previous: {} } },
@@ -97,7 +98,7 @@ const setGlobalEnvironment = (env) =>
 
 
 /**
- * @function setPaths
+ * @function
  * @private
  * @param {WpBuildEnvironment} env Webpack build environment
  * @returns {WpBuildPaths}
@@ -110,17 +111,56 @@ const getPaths = (env) =>
 	if (!existsSync(temp)) {
 		mkdirSync(temp, { recursive: true });
 	}
-	return {
+	return merge(
+	{
 		build, temp,
 		base: env.build !== "webview" ? build : (wvBase ? resolve(build, wvBase) :
 													join(build, "src", "webview", "app")),
 		dist: join(build, "dist"), // = compiler.outputPath = compiler.options.output.path
+		distTests: join(build, "dist", "test"),
 		cache: globalEnv.cacheDir,
 		files: {
-			hash: join(globalEnv.cacheDir, `hash.${env.environment}.json`),
-			sourceMapWasm: "node_modules/source-map/lib/mappings.wasm"
+			hashStoreJson: join(globalEnv.cacheDir, `hash.${env.environment}.json`),
+			sourceMapWasm: join(build, "node_modules", "source-map", "lib", "mappings.wasm")
 		}
-	};
+	}, resolveRcPaths(build, env.app.paths || {}));
+};
+
+
+/**
+ * @function
+ * @private
+ * @param {string} dir
+ * @param {WpBuildPaths} paths
+ * @returns {WpBuildPaths}
+ */
+const resolveRcPaths = (dir, paths) =>
+{
+	Object.entries(paths).forEach((e) =>
+	{
+		if (isString(e[1], true))
+		{
+			if (!isAbsolute(e[1])) {
+				paths[e[0]] = resolve(dir, e[1]);
+			}
+		}
+		else {
+			delete paths[e[0]];
+		}
+	});
+	Object.entries(paths.files || {}).forEach((e) =>
+	{
+		if (isString(e[1], true))
+		{
+			if (!isAbsolute(e[1])) {
+				paths.files[e[0]] = resolve(dir, e[1]);
+			}
+		}
+		else {
+			delete paths.files[e[0]];
+		}
+	});
+	return apply({}, paths, { files: { ...paths.files }});
 };
 
 

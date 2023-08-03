@@ -2,6 +2,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // @ts-check
 
+import glob from "glob";
+
 /**
  * @module wpbuild.utils.utils
  */
@@ -83,6 +85,21 @@ const clone = (item) =>
 
 
 /**
+ * @function
+ * @param {string} pattern
+ * @param {import("glob").IOptions} options
+ * @returns {Promise<string[]>}
+ */
+const findFiles = (pattern, options) =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        glob(pattern, options, (err, files) => { if(!err) resolve(files); else reject(err); });
+    });
+};
+
+
+/**
  * @function getEntriesRegex
  * @param {WebpackConfig} wpConfig Webpack config object
  * @param {boolean} [dbg]
@@ -105,7 +122,7 @@ const getEntriesRegex = (wpConfig, dbg, ext, hash) =>
  * @param {boolean} [allowArray] If `true`, return true if v is an array
  * @returns {v is T}
  */
-const isObject = (v, allowArray) => !!v && (v instanceof Object || typeof v === "object") && (allowArray || !isArray(v));
+const isObject = (v, allowArray) => !!v && Object.prototype.toString.call(v) === "[object Object]" && (v instanceof Object || typeof v === "object") && (allowArray || !isArray(v));
 
 
 /**
@@ -116,7 +133,12 @@ const isObject = (v, allowArray) => !!v && (v instanceof Object || typeof v === 
 const isArray = (v, allowEmp) => !!v && Array.isArray(v) && (allowEmp !== false || v.length > 0);
 
 
+/**
+ * @param {any} v Variable to check to see if it's a Date instance
+ * @returns {v is Date}
+ */
 const isDate = (v) => !!v && Object.prototype.toString.call(v) === "[object Date]";
+
 
 /**
  * @param {any} v Variable to check to see if it's an array
@@ -126,6 +148,10 @@ const isDate = (v) => !!v && Object.prototype.toString.call(v) === "[object Date
 const isEmpty = (v, allowEmpStr) => v === null || v === undefined || (!allowEmpStr ? v === "" : false) || (isArray(v) && v.length === 0) || (isObject(v) && isObjectEmpty(v));
 
 
+/**
+ * @param {any} v Variable to check to see if it's and empty object
+ * @returns {boolean}
+ */
 const isObjectEmpty = (v) => { if (v) { return Object.keys(v).filter(k => ({}.hasOwnProperty.call(v, k))).length === 0; } return true; };
 
 
@@ -228,6 +254,6 @@ const pickNot = (obj, ...keys) =>
 
 
 export {
-    apply, asArray, clone, isArray, isDate, isEmpty, isObject, isObjectEmpty, isString,
+    apply, asArray, clone, findFiles, isArray, isDate, isEmpty, isObject, isObjectEmpty, isString,
     getEntriesRegex, merge, mergeIf, pick, pickBy, pickNot
 };

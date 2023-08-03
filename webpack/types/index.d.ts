@@ -8,6 +8,8 @@ declare type WebpackCache = import("webpack").Cache;
 declare type WebpackCacheFacade = Omit<import("webpack/lib/CacheFacade"), "_name" | "_cache" | "_hashFunction">;
 declare type WebpackChunk = import("webpack").Chunk;
 declare type WebpackCompilation = import("webpack").Compilation;
+declare type WebpackNormalModuleFactory = import("webpack").NormalModuleFactory;
+declare type WebpackContextModuleFactoryy = import("webpack").Compilation.ContextModuleFactory;
 declare type WebpackCompilationAssets = { [index: string]: WebpackSource; }
 declare type WebpackCompiler = import("webpack").Compiler;
 declare type WebpackConfig = Required<import("webpack").Configuration>;
@@ -18,10 +20,15 @@ declare type WebpackStats = import("webpack").Stats;
 declare type WebpackStatsAsset = import("webpack").StatsAsset;
 declare type WebpackSyncHook<T> = import("tapable").SyncHook<T>;
 declare type WebpackAsyncHook<T> = import("tapable").AsyncSeriesHook<T>;
-
+declare interface WebpackCompilationParams {
+	normalModuleFactory: WebpackNormalModuleFactory;
+	contextModuleFactory: WebpackContextModuleFactoryy;
+}
+//WebpackCompilationParams
 declare type WebpackTarget = "webworker" | "node" | "web";
 declare type WebpackMode = "none" | "development" | "production";
 declare type WebpackLogLevel = "none" | "error" | "warn" | "info" | "log" | "verbose" | undefined;
+declare type WpBuildLogLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
 declare type WpBuildConsoleLogger = import("../utils").WpBuildConsoleLogger;
 
@@ -59,6 +66,7 @@ declare interface IWpBuildEnvironment extends IWebpackEnvironmentInternal
     isWeb: boolean;
     global: WpBuildGlobalEnvironment;
     logger: WpBuildConsoleLogger;
+    logLevel: WpBuildLogLevel;
     paths: WpBuildPaths;
     preRelease: boolean;
     state: WebpackBuildState;
@@ -91,17 +99,18 @@ declare interface IWpBuildGlobalEnvironment
 }
 declare type WpBuildGlobalEnvironment = IWpBuildGlobalEnvironment & Record<string, any>;
 
-declare type WpBuildLogColor = "black" | "blue" | "green" | "grey" | "red" | "cyan" | "white" | "yellow";
+declare type WpBuildLogTrueColor = "black" | "blue" | "cyan" | "green" | "grey" | "magenta" | "red" | "white" | "yellow";
+declare type WpBuildLogColor = WpBuildLogTrueColor | "bold" | "inverse" | "italic" | "underline";
 declare interface IWpBuildLogColorMap
 {
-    default: WpBuildLogColor;
-    buildBracket: WpBuildLogColor,
-    buildText: WpBuildLogColor,
-    stageAsterisk: WpBuildLogColor;
-    stageText: WpBuildLogColor;
-    tagBracket: WpBuildLogColor;
-    tagText: WpBuildLogColor;
-    uploadSymbol: WpBuildLogColor;
+    default: WpBuildLogTrueColor;
+    buildBracket: WpBuildLogTrueColor,
+    buildText: WpBuildLogTrueColor,
+    stageAsterisk: WpBuildLogTrueColor;
+    stageText: WpBuildLogTrueColor;
+    tagBracket: WpBuildLogTrueColor;
+    tagText: WpBuildLogTrueColor;
+    uploadSymbol: WpBuildLogTrueColor;
 }
 declare type WpBuildLogColorMap = Required<IWpBuildLogColorMap>;
 declare interface IWpBuildLogPadMap
@@ -111,7 +120,13 @@ declare interface IWpBuildLogPadMap
     value: number;
     uploadFileName: number;
 }
-declare type WpBuildLogPadMap = Required<IWpBuildLogPadMap> & Record<string, number>;
+declare type WpBuildLogPadMap = Required<IWpBuildLogPadMap>;
+declare interface IWpBuildLogOptions
+{
+    level: WpBuildLogLevel;
+    pad: WpBuildLogPadMap;
+}
+declare type WpBuildLogOptions = Required<IWpBuildLogOptions>;
 declare type WpBuildModuleConfig = Record<WpBuildBuildEnvironment, Partial<WpBuildEnvironment>[]>;
 
 declare interface IWpBuildApp
@@ -129,7 +144,8 @@ declare interface IWpBuildAppRc
     displayName: string;                  // displayName (read from package.json)
     exports: Record<string, boolean>;
     publicInfoProject: boolean | string;  // Project w/ private repo that maintains a public `info` project
-    logPad: WpBuildLogPadMap;
+    logLevel: WpBuildLogLevel;
+    log: WpBuildLogOptions;
     name: string;                         // project name (read from package.json)
     pkgJson: WpBuildPackageJson;
     plugins: Record<string, boolean>;
@@ -140,7 +156,7 @@ declare type WpBuildAppRc = IWpBuildAppRc & Record<string, any>;
 
 declare interface IWebpackBuildFilePaths
 {
-    hash: string;
+    hashStoreJson: string;
     sourceMapWasm: string;
 }
 declare type WebpackBuildFilePaths = Required<IWebpackBuildFilePaths> & Record<string, any>;
@@ -160,6 +176,7 @@ declare interface IWpBuildPaths
     build: string;                        // base/root level dir path of project
     cache: string;
     dist: string;                         // output directory ~ wpConfig.output.path ~ compiler.options.output.path
+    distTests: string;                    // output directory ~ wpConfig.output.path ~ compiler.options.output.path
     files: WebpackBuildFilePaths;
     temp: string;                         // operating system temp directory
 }
@@ -216,7 +233,7 @@ interface IWpBuildPluginTapOptions
 {
     async?: boolean;
     hook: string | "compilation";
-    callback: ((assets: WebpackCompilationAssets) => void | Promise<void>) | ((compiler: WebpackCompiler) => void | Promise<void>);
+    callback: (arg: WebpackCompiler | WebpackCompilationAssets | WebpackCompilationParams) => void | Promise<void>;
     stage?: WpBuildPluginCompilationHookStage;
     statsProperty?: string;
 }
@@ -235,6 +252,7 @@ export {
     WebpackCache,
     WebpackCacheFacade,
     WebpackChunk,
+    WebpackCompilationParams,
     WebpackCompiler,
     WebpackCompilation,
     WebpackCompilationAssets,
@@ -256,6 +274,10 @@ export {
     WpBuildPaths,
     WpBuildGlobalEnvironment,
     WpBuildHashState,
+    WpBuildLogColor,
+    WpBuildLogLevel,
+    WpBuildLogOptions,
+    WpBuildLogTrueColor,
     WpBuildPackageJson,
     WpBuildPluginOptions,
     WpBuildPluginApplyOptions,

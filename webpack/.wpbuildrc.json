@@ -113,5 +113,25 @@
         "tagBracket": "blue",
         "tagText": "white",
         "uploadSymbol": "yellow"
+    },
+    "log": {
+        "level": 1,
+        "pad": {
+            "basePad": 0,
+            "envTag": 23,
+            "value": 30,
+            "uploadFileName": 50
+        }
+    },
+    "paths": {
+        "build": ".",
+        "cache": "node_modules/.cache/wpbuild",
+        "dist": "dist",
+        "distTests": "dist/test",
+        "temp": null,
+        "files": {
+            "hashStore": "",
+            "sourceMapWasm": ""
+        }
     }
 }
