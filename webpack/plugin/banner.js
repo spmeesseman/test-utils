@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable import/no-extraneous-dependencies */
 // @ts-check
 
@@ -6,37 +7,37 @@
  */
 
 import webpack from "webpack";
+import WpBuildBasePlugin from "./base";
 import { getEntriesRegex, isString } from "../utils/utils";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
 
 /**
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns {webpack.BannerPlugin | undefined}
+ * @returns {WpBuildBasePlugin | undefined}
  */
-const banner = (env, wpConfig) =>
+const banner = (env) =>
 {
-    let plugin;
-	if (env.app.plugins.banner !== false && wpConfig.mode === "production")
+	if (env.app.plugins.banner !== false && env.wpc.mode === "production")
 	{
-		const entriesRgx = getEntriesRegex(wpConfig, true, true),
-			  author = isString(env.app.pkgJson.author) ? env.app.pkgJson.author :
-			  		   /** @type {{ name: string; email?: string | undefined; }} */(env.app.pkgJson.author)?.name;
+		const author = isString(env.app.pkgJson.author) ? env.app.pkgJson.author : env.app.pkgJson.author?.name;
 		if (author)
 		{
-			plugin = new webpack.BannerPlugin(
-			{
-				banner: `Copyright ${(new Date()).getFullYear()} ${author}`,
-				entryOnly: true,
-				test: entriesRgx
-				// raw: true
+			return new WpBuildBasePlugin({
+				env,
+				plugins: [
+				{
+					ctor: webpack.BannerPlugin,
+					options: {
+						banner: `Copyright ${(new Date()).getFullYear()} ${author}`,
+						entryOnly: true,
+						test: getEntriesRegex(env.wpc, true, true)
+					}
+				}]
 			});
 		}
 	}
-	return plugin;
 };
 
 

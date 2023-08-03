@@ -11,7 +11,6 @@ import { existsSync } from "fs";
 import WpBuildBasePlugin from "./base";
 import { rename, unlink, readdir } from "fs/promises";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
@@ -66,11 +65,10 @@ class WpBuildLicenseFilePlugin extends WpBuildBasePlugin
 /**
  * @function
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
  * @returns {WpBuildLicenseFilePlugin | undefined}
  */
-const licensefiles = (env, wpConfig) =>
-    (env.app.plugins.licensefiles !== false && env.isExtensionProd ? new WpBuildLicenseFilePlugin({ env, wpConfig }) : undefined);
+const licensefiles = (env) =>
+    (env.app.plugins.licensefiles !== false && env.isExtensionProd ? new WpBuildLicenseFilePlugin({ env }) : undefined);
 
 
 export default licensefiles;

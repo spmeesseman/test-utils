@@ -10,7 +10,6 @@ import customize from "./customize";
 import runtimevars from "./runtimevars";
 import environment from "./environment";
 import licensefiles from "./licensefiles";
-import hash from "./hash";
 import ignore from "./ignore";
 import instrument from "./instrument";
 import optimization from "./optimization";
@@ -24,6 +23,6 @@ import { cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps } fr
 
 export {
     analyze, banner, build, clean, compile, copy, cssextract, customize, environment,
-    hash, htmlcsp, htmlinlinechunks,ignore, imageminimizer, instrument, licensefiles, loghooks,
+    htmlcsp, htmlinlinechunks,ignore, imageminimizer, instrument, licensefiles, loghooks,
     optimization, progress, runtimevars, scm, sourcemaps, tscheck, upload, webviewapps
 };

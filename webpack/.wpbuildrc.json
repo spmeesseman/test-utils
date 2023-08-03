@@ -67,5 +67,51 @@
             "welcome": "./welcome/welcome.ts"
         }
     },
-    "publicInfoProject": true
+    "publicInfoProject": true,
+    "builds": {
+        "dev": [
+            {
+                "build": "extension"
+            },
+            {
+                "build": "webview"
+            }
+        ],
+        "testprod": [
+            {
+                "build": "extension"
+            },
+            {
+                "build": "webview",
+                "environment": "prod "
+            }
+        ],
+        "prod": [
+            {
+                "build": "extension"
+            },
+            {
+                "build": "webview"
+            }
+        ],
+        "test": [
+            {
+                "build": "extension"
+            },
+            {
+                "build": "webview",
+                "environment": "dev "
+            }
+        ]
+    },
+    "colors": {
+        "default": "grey",
+        "buildBracket": "cyan",
+        "buildText": "white",
+        "stageAsterisk": "cyan",
+        "stageText": "white",
+        "tagBracket": "blue",
+        "tagText": "white",
+        "uploadSymbol": "yellow"
+    }
 }

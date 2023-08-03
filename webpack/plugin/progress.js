@@ -8,16 +8,14 @@
 
 import webpack from "webpack";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
 
 /**
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
  * @returns {webpack.ProgressPlugin | undefined}
  */
-const progress = (env, wpConfig) =>
+const progress = (env) =>
 {
 	if (env.app.plugins.progress !== false)
 	{

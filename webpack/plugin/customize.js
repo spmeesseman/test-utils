@@ -9,17 +9,15 @@
 import { basename, join } from "path";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 /** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
 
 
 /**
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
  * @returns {WebpackPluginInstance | undefined}
  */
-const customize = (env, wpConfig) =>
+const customize = (env) =>
 {
     /** @type {WebpackPluginInstance | undefined} */
 	let plugin;

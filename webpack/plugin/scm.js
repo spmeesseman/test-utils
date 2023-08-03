@@ -7,9 +7,8 @@
  */
 
 import WpBuildBasePlugin from "./base";
-import { colors, figures, globalEnv, writeInfo, withColor } from "../utils";
+import { globalEnv } from "../utils";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 /** @typedef {import("../types").WpBuildPluginOptions} WpBuildPluginOptions */
@@ -61,22 +60,22 @@ class WpBuildScmPlugin extends WpBuildBasePlugin
                 // sshAuth,  // auth key
                 // "-q",  // quiet, don't show statistics
                 "-r",     // copy directories recursively
-                `${user}@${host}:${this.options.env.app.name}/v${this.options.env.app.version}"`
+                `${user}@${host}:${this.env.app.name}/v${this.env.app.version}"`
             ];
-
-            writeInfo(`${figures.color.star } ${withColor(`check in resource files to ${host}`, colors.grey)}`);
+            const logger = this.env.logger;
+            logger.writeInfo(`${logger.figures.color.star } ${logger.withColor(`check in resource files to ${host}`, logger.colors.grey)}`);
             try {
-                writeInfo(`   full scm command      : ${provider} ${scmArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`);
+                logger.writeInfo(`   full scm command      : ${provider} ${scmArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`);
                 //
                 // TODO - check in any project-info files that were copied
                 //        -*-and-*- package.json if we add content hash to "main" file name???
                 //
                 // spawnSync(provider, scmArgs, spawnSyncOpts);
-                writeInfo(`${figures.color.star} ${withColor("successfully checked in resource files", colors.grey)}`);
+                logger.writeInfo(`${logger.figures.color.star} ${logger.withColor("successfully checked in resource files", logger.colors.grey)}`);
             }
             catch (e) {
-                writeInfo("error checking in resource files", figures.color.error);
-                writeInfo("   " + e.message.trim(), figures.color.error);
+                logger.writeInfo("error checking in resource files", this.env, false, logger.figures.color.error);
+                logger.writeInfo("   " + e.message.trim(), this.env, false, logger.figures.color.error);
             }
         }
     };
@@ -87,11 +86,10 @@ class WpBuildScmPlugin extends WpBuildBasePlugin
 /**
  * @function finalize
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
  * @returns {WpBuildScmPlugin | undefined}
  */
-const scm = (env, wpConfig) =>
-    (env.app.plugins.scm !== false && env.isExtensionProd ? new WpBuildScmPlugin({ env, wpConfig }) : undefined);
+const scm = (env) =>
+    (env.app.plugins.scm !== false && env.isExtensionProd ? new WpBuildScmPlugin({ env }) : undefined);
 
 
 export default scm;

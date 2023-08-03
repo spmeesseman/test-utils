@@ -7,9 +7,7 @@
  */
 
 import { globalEnv } from "../utils/global";
-import { writeInfo, write } from "../utils/console";
 
-/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WpBuildWebpackArgs} WpBuildWebpackArgs */
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 /** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
@@ -17,10 +15,9 @@ import { writeInfo, write } from "../utils/console";
 
 /**
  * @param {WpBuildEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
  * @returns {WebpackPluginInstance | undefined}
  */
-const environment = (env, wpConfig) =>
+const environment = (env) =>
 {
 	if (env.app.plugins.environment !== false)
 	{
@@ -57,25 +54,27 @@ const setVersion = (env) =>
  */
 const writeEnvironment = (env) =>
 {
-	write("Build Environment:");
+	const logger = env.logger,
+		  pad = env.app.logPad.value;
+		  logger.write("Build Environment:", env);
 	Object.keys(env).filter(k => typeof env[k] !== "object").forEach(
-		(k) => writeInfo(`   ${k.padEnd(15)}: ${env[k]}`)
+		(k) => logger.writeInfo(`   ${k.padEnd(pad - 3)}: ${env[k]}`, env)
 	);
-	write("Global Environment:");
+	logger.write("Global Environment:", env);
 	Object.keys(globalEnv).filter(k => typeof globalEnv[k] !== "object").forEach(
-		(k) => writeInfo(`   ${k.padEnd(15)}: ${globalEnv[k]}`)
+		(k) => logger.writeInfo(`   ${k.padEnd(pad - 3)}: ${globalEnv[k]}`, env)
 	);
 	if (env.argv)
 	{
-		write("Arguments:");
+		logger.write("Arguments:", env);
 		if (env.argv.mode) {
-			writeInfo(`   mode           : ${env.argv.mode}`);
+			logger.writeInfo(`   ${"mode".padEnd(pad - 3)}: ${env.argv.mode}`, env);
 		}
 		if (env.argv.watch) {
-			writeInfo(`   watch          : ${env.argv.watch}`);
+			logger.writeInfo(`   ${"watch".padEnd(pad - 3)}: ${env.argv.watch}`, env);
 		}
 		if (env.argv.config) {
-			writeInfo(`   config         : ${env.argv.config.join(", ")}`);
+			logger.writeInfo(`   ${"cfg".padEnd(pad - 3)}: ${env.argv.config.join(", ")}`, env);
 		}
 	}
 };

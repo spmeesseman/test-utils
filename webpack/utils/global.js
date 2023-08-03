@@ -4,7 +4,7 @@ import { resolve, join } from "path";
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from "fs";
 
 /**
- * @module wpbuildutils.global
+ * @module wpbuild.utils.global
  */
 
 /** @typedef {import("../types").WpBuildPackageJson} WpBuildPackageJson */
@@ -24,7 +24,7 @@ const globalEnv = {
     buildCount: 0,
     cache: JSON.parse(readFileSync(globalCacheFilePath, "utf8")),
     cacheDir,
-    valuePad: 45,
+    verbose: false,
     pkgJson: /** @type {WpBuildPackageJson} */({})
 };
 

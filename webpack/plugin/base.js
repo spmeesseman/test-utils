@@ -3,17 +3,21 @@
 // @ts-check
 
 /**
- * @module WpBuildBasePlugin
+ * @module wpbuild.plugin.WpBuildBasePlugin
  */
 
-import { globalEnv, merge } from "../utils";
+import { globalEnv, merge, asArray, mergeIf } from "../utils";
 import { ModuleFilenameHelpers } from "webpack";
 
+/** @typedef {import("../types").WebpackConfig} WebpackConfig */
 /** @typedef {import("../types").WebpackLogger} WebpackLogger */
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WebpackCacheFacade} WebpackCacheFacade */
 /** @typedef {import("../types").WebpackCompilation} WebpackCompilation */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 /** @typedef {import("../types").WpBuildPluginOptions} WpBuildPluginOptions */
+/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {new(...args: any[]) => WebpackPluginInstance} WbBuildPluginCtor */
 /** @typedef {import("../types").WpBuildPluginTapOptions} WpBuildPluginTapOptions */
 /** @typedef {import("../types").WebpackCompilationAssets} WebpackCompilationAssets */
 /** @typedef {import("../types").WpBuildPluginApplyOptions} WpBuildPluginApplyOptions */
@@ -28,66 +32,111 @@ import { ModuleFilenameHelpers } from "webpack";
 
 /**
  * @class WpBuildHashPlugin
+ * @abstract
  */
 class WpBuildBasePlugin
 {
     /**
+     * @member
      * @protected
      * @type {WebpackCacheFacade}
      */
     cache;
 
     /**
+     * @member
      * @protected
      * @type {WebpackCompilation}
      */
     compilation;
 
     /**
+     * @member
      * @protected
      * @type {WebpackCompiler}
      */
     compiler;
 
     /**
+     * @member
+     * @protected
+     * @type {WpBuildEnvironment}
+     */
+    env;
+
+    /**
+     * @member
      * @protected
      * @type {WebpackLogger}
      */
     logger;
 
     /**
+     * @member
      * @protected
      * @type {(str: string) => boolean}
      */
     matchObject;
 
     /**
+     * @member
      * @protected
      * @type {string}
      */
     name;
 
     /**
+     * @member
      * @protected
      * @type {WpBuildPluginOptions}
      */
     options;
 
+    /**
+     * @private
+     * @type {WebpackPluginInstance[]}
+     */
+    _plugins;
+
+    /**
+     * @member
+     * @protected
+     * @type {WebpackConfig}
+     */
+    wpConfig;
+
 
     /**
      * @class
-     * @param {Partial<WpBuildPluginOptions>} options Plugin options to be applied
+     * @param {WpBuildPluginOptions} options Plugin options to be applied
      * @param {string} [globalCache]
      */
 	constructor(options, globalCache)
     {
+        this.env = options.env;
+        this.wpConfig = options.env.wpc;
         this.name = this.constructor.name;
-        this.options = this.getOptions(options);
-		this.matchObject = ModuleFilenameHelpers.matchObject.bind(undefined, this.options);
+        this.options = mergeIf(options, { plugins: [] });
+		this.matchObject = ModuleFilenameHelpers.matchObject.bind(undefined, options);
         if (globalCache) {
             this.initGlobalEnvObject(globalCache);
         }
+        this._plugins = [ this, ...asArray(options.plugins).map(p => new p.ctor(p.options)) ];
     }
+
+
+    /**
+     * @function Called by webpack runtime to apply this plugin.  To be overridden by inheriting class.
+     * @param {WebpackCompiler} compiler the compiler instance
+     */
+    apply(compiler) { this.compiler = compiler; }
+
+
+    /**
+     * @function
+     * @returns {WebpackPluginInstance[]}
+     */
+    getPlugins() { return this._plugins; }
 
 
     /**
@@ -97,18 +146,6 @@ class WpBuildBasePlugin
      * @returns {string}
      */
     breakProp(prop) { return prop.replace(/[A-Z]/g, (v) => ` ${v.toLowerCase()}`); }
-
-
-    /**
-     * @function
-     * @private
-     * @param {Partial<WpBuildPluginOptions>} options
-     * @returns {WpBuildPluginOptions}
-     */
-    getOptions(options)
-    {
-        return /** @type {WpBuildPluginOptions} */(merge({ env: {}, wpConfig: {}, hookCompiler: {}, hookCompilation: {}}, options));
-    }
 
 
     /**
@@ -132,7 +169,6 @@ class WpBuildBasePlugin
      * @protected
      * @param {WebpackCompiler} compiler the compiler instance
      * @param {WpBuildPluginApplyOptionsHash} options
-     * @returns {void}
      */
     onApply(compiler, options)
     {
@@ -236,7 +272,7 @@ class WpBuildBasePlugin
                 stats.hooks.print.for(`asset.info.${property}`).tap(
                     name,
                     (istanbulTagged, { green, formatFlag }) => {
-                        return istanbulTagged ? /** @type {Function} */(green)(/** @type {Function} */(formatFlag)(this.breakProp(property))) : "";
+                        return istanbulTagged ? green?.(formatFlag?.(this.breakProp(property)) || "") || "" : "";
                     }
                 );
             });
