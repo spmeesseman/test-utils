@@ -8,7 +8,7 @@
 
 
 /**
- * @method
+ * @function
  * @param {WpBuildEnvironment} env Webpack build environment
  */
 const context = (env) =>

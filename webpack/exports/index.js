@@ -1,5 +1,6 @@
 // @ts-check
 
+import cache from "./cache";
 import context from "./context";
 import devtool from "./devtool";
 import entry from "./entry";
@@ -19,6 +20,7 @@ import target from "./target";
 import watch from "./watch";
 
 export {
+    cache,
     context,
     devtool,
 	entry,

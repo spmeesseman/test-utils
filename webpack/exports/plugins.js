@@ -6,9 +6,9 @@
  */
 
 import {
-	analyze, banner, build, clean, compile, copy, customize, environment, instrument,
-	loghooks, ignore,optimization, progress, runtimevars, sourcemaps, licensefiles, tscheck,
-	upload, cssextract, htmlcsp, imageminimizer, htmlinlinechunks, webviewapps, scm
+	analyze, banner, clean, copy, dispose, environment, instrument, istanbul, loghooks,
+	ignore, optimization, progress, runtimevars, sourcemaps, licensefiles, tscheck, upload,
+	cssextract, htmlcsp, imageminimizer, htmlinlinechunks, testsuite, vendormod, webviewapps, scm
 } from "../plugin";
 
 /** @typedef {import("../types").WpBuildWebpackArgs} WpBuildWebpackArgs */
@@ -27,11 +27,11 @@ const plugins = (env) =>
 	env.wpc.plugins.push(
 		loghooks(env),                 // logs all compiler.hooks.* when they run
 		environment(env),              // compiler.hooks.environment
-		customize(env),                // compiler.hooks.afterEnvironment - custom mods to installed plugins
+		vendormod(env),                // compiler.hooks.afterEnvironment - mods to vendor plugins and/or modules
 		progress(env),                 //
 		...clean(env),                 // compiler.hooks.emit, compiler.hooks.done
-		build(env),                    // compiler.hooks.beforeCompile
-		compile(env),                  // compiler.hooks.compilation - e.g. add istanbul ignores to node-requires
+		testsuite(env),                // compiler.hooks.beforeCompile - build tests / test suite
+		istanbul(env),                 // compiler.hooks.compilation - add istanbul ignores to node-requires
 		runtimevars(env),              // compiler.hooks.compilation
 		instrument(env),               // ? - TODO -?
 		ignore(env),                   // compiler.hooks.normalModuleFactory
@@ -67,7 +67,8 @@ const plugins = (env) =>
 		...optimization(env),          // ^compiler.hooks.shouldEmit, compiler.hooks.compilation -> compilation.hooks.shouldRecord
 		upload(env),                   // compiler.hooks.afterDone
 		licensefiles(env),             // compiler.hooks.shutdown
-		scm(env)                       // compiler.hooks.shutdown
+		scm(env),                      // compiler.hooks.shutdown
+		dispose(env)                   // perform cleanup, dispose registred disposables
 	);
 
 	env.wpc.plugins.slice().reverse().forEach((p, i, a) =>

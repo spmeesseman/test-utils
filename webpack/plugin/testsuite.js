@@ -3,193 +3,374 @@
 // @ts-check
 
 /**
- * @module webpack.plugin.build
+ * @module wpbuild.plugin.build
  */
 
-import { join } from "path";
-// import webpack from "webpack";
-// const { sources } = require("webpack");
-import { spawnSync } from "child_process";
-import { existsSync, unlinkSync } from "fs";
-// const ContextMapPlugin = require("context-map-webpack-plugin");
+import { existsSync } from "fs";
+import { promisify } from "util";
+import WpBuildBasePlugin from "./base";
+import { WebpackError } from "webpack";
+const exec = promisify(require("child_process").exec);
+// const spawn = promisify(require("child_process").spawn);
+import { findFiles, getTsConfig } from "../utils";
+const {readFile, unlink, access } from "fs/promises";
+import { join, basename, relative, dirname, isAbsolute, resolve } from "path";
 
-/** @typedef {import("../types/webpack").WebpackConfig} WebpackConfig */
-/** @typedef {import("../types/webpack").WebpackEnvironment} WebpackEnvironment */
-/** @typedef {import("../types/webpack").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
+/** @typedef {import("../types").WebpackSnapshot} WebpackSnapshot */
+/** @typedef {import("../types").WebpackCompilation} WebpackCompilation */
+/** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
+/** @typedef {import("../types").WpBuildPluginOptions} WpBuildPluginOptions */
+/** @typedef {import("../types").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("../types").WebpackCompilationAssets} WebpackCompilationAssets */
+/** @typedef {import("../types").WebpackCompilationParams} WebpackCompilationParams */
+
+
+class WpBuildPreCompilePlugin extends WpBuildBasePlugin
+{
+    /**
+     * @function Called by webpack runtime to initialize this plugin
+     * @param {WebpackCompiler} compiler the compiler instance
+     */
+    apply(compiler)
+    {
+        this.onApply(compiler,
+        {
+			typesAndTests: {
+				async: true,
+                hook: "afterCompile",
+                // hook: "compilation",
+				// stage: "ADDITIONAL",
+				statsProperty: "tests",
+                callback: this.testsuite.bind(this)
+            }
+        });
+    }
+
+
+	/**
+	 * @function
+	 * @private
+	 * @param {WebpackCompilation} compilation
+	 */
+	async testsuite(compilation)
+	{
+		this.env.logger.write("build test suite", 1);
+		this.onCompilation(compilation);
+
+		const testsDir = join(this.env.paths.dist, "test");
+		const globOptions = {
+			cwd: this.env.paths.build,
+			absolute: true,
+			allowWindowsEscape: true,
+			ignore: [ "**/node_modules/**", "**/.vscode*/**", "**/build/**", "**/dist/**", "**/res*/**", "**/doc*/**" ]
+		};
+
+		let tsConfigFile,
+			files = await findFiles("**/src/**/test{,s}/tsconfig.*", globOptions);
+		if (files.length === 0)
+		{
+			files = await findFiles("**/src/**tsconfig.test{,s}.*", globOptions);
+		}
+		if (files.length >= 1)
+		{
+			tsConfigFile = files[0];
+		}
+
+		if (!tsConfigFile)
+		{
+			const eMsg = "Could not locate tsconfig file for tests suite - must be **/tests?/tsconfig.* or **/tsconfig.tests?.json";
+			this.handleError(new WebpackError(eMsg));
+			this.logger.warning("consider possible solutions:");
+			this.logger.warning("   (1) rename test suite config file according to convention");
+			this.logger.warning("   (2) disable testsuite plugin in italic(.wsbuildrc.plugins.testsuite)");
+			return;
+		}
+
+		this.env.logger.value("   found test suite tsconfig file", tsConfigFile, 2);
+
+		if (!existsSync(testsDir))
+		{
+			this.env.logger.write("   checking for tsbuildinfo file path", 3);
+			const tsConfig = getTsConfig(this.env, tsConfigFile);
+			let buildInfoFile = tsConfig.compilerOptions.tsBuildInfoFile || join(dirname(tsConfigFile), "tsconfig.tsbuildinfo");
+			if (!isAbsolute(buildInfoFile)) {
+				buildInfoFile = resolve(dirname(tsConfigFile), buildInfoFile);
+			}
+			this.env.logger.value("   delete tsbuildinfo file", buildInfoFile, 3);
+			try {
+				await unlink(buildInfoFile);
+			} catch {}
+		}
+
+		await this.execTsBuild(relative(this.env.paths.build, tsConfigFile), 2, testsDir, true);
+	}
+
+
+	// /**
+	//  * @function
+	//  * @private
+	//  * @param {WebpackCompilationAssets} _assets
+	//  */
+	// async types(_assets)
+	// {
+	// 	const bldDir = this.env.paths.build,
+	// 		  typesDir = join(bldDir, "types", "dist");
+	// 	this.env.logger.write("build types");
+	// 	if (!existsSync(typesDir))
+	// 	{
+	// 		try { await unlink(join(bldDir, "node_modules", ".cache", "tsconfig.types.tsbuildinfo")); } catch {}
+	// 	}
+	// 	await this.execTsBuild("./types", 1, typesDir);
+	// }
+
+
+	/**
+	 * @function Executes a command via a promisified node exec()
+	 * @private
+	 * @param {string} command
+	 * @param {string} dsc
+	 * @returns {Promise<number | null>}
+	 */
+	exec = async (command, dsc) =>
+	{
+		let exitCode = null,
+			stdout = "", stderr = "";
+		const logger = this.env.logger,
+			  procPromise = exec(command, { cwd: this.env.paths.build, encoding: "utf8" }),
+			  child = procPromise.child;
+		child.stdout?.on("data", (data) => { stdout += data; });
+		child.stderr?.on("data", (data) => { stderr += data; });
+		child.on("close", (code) => { exitCode = code; logger.write(`   ${dsc} completed with exit code bold(${code})`); });
+		await procPromise;
+		if (stdout || stderr)
+		{
+			const match = (stdout || stderr).match(/error TS([0-9]{4})\:/);
+			if (match) {
+				const [ _, err ] = match;
+				logger.error(`   tsc failed with error: ${err}`);
+			}
+			if (stdout) {
+				logger.write(`   tsc stderr: ${stdout}`, 5, "", logger.icons.color.star, logger.colors.yellow);
+			}
+			if (stderr) {
+				logger.write(`   tsc stderr: ${stderr}`, 5, "", logger.icons.color.star, logger.colors.yellow);
+			}
+		}
+		return exitCode;
+	};
+
+
+	/**
+	 * @function Executes a typescript build using the specified tsconfig
+	 * @private
+	 * @param {string} tsConfigFile Path to tsconfig file or dir, relative to `env.paths.build`
+	 * @param {number} identifier Unique group identifier to associate with the file path
+	 * @param {string} outputDir Output directory of build
+	 * @param {boolean} [alias] Write alias paths with ``
+	 */
+	execTsBuild = async (tsConfigFile, identifier, outputDir, alias) =>
+	{
+		// const babel = [
+		// 	"npx", "babel", tsConfig, "--out-dir", outputDir, "--extensions", ".ts",
+		// 	"--presets=@babel/preset-env,@babel/preset-typescript",
+		// ];
+		const logger = this.env.logger;
+		let command = `npx tsc -p ${tsConfigFile}`; // babel.join(" ");
+		logger.write(`   execute typescript build @ italic(${tsConfigFile})`, 1);
+
+		try
+		{
+			let code = await this.exec(command, "typescript build");
+			if (code !== 0)
+			{
+				this.compilation.errors.push(new WebpackError("typescript build failed for " + tsConfigFile));
+				return;
+			}
+			//
+			// Ensure target directory exists
+			//
+			await access(outputDir);
+			//
+			// Run `tsc-alias` for path aliasing if specified.
+			//
+			if (alias)
+			{   //
+				// Note that `tsc-alias` requires a filename e.g. tsconfig.json in it's path argument
+				//
+				if (!(/tsconfig\.(?:[\w\-_\.]+\.)?json$/).test(tsConfigFile))
+				{
+					tsConfigFile = join(tsConfigFile, "tsconfig.json");
+				}
+				if (!existsSync(tsConfigFile))
+				{
+					const files = await findFiles("tsconfig.*", { cwd: dirname(tsConfigFile), absolute: true,  });
+					if (files.length === 1)
+					{
+						tsConfigFile = files[0];
+					}
+					else {
+						this.handleError(new WebpackError("Invalid path to tsconfig file"));
+						return;
+					}
+				}
+				command = `tsc-alias -p ${tsConfigFile}`;
+				code = await this.exec(command, "typescript path aliasing");
+				if (code !== 0)
+				{
+					this.compilation.errors.push(new WebpackError("typescript path aliasing failed for " + tsConfigFile));
+					return;
+				}
+			}
+			//
+			// Process output files
+			//
+			const files = await findFiles("**/*.js", { cwd: outputDir, absolute: true });
+			for (const filePath of files)
+			{
+				let data, source, hash, compilationCacheEntry, persistedCache;
+				const filePathRel = relative(outputDir, filePath),
+					  file = basename(filePathRel);
+
+				this.compilation.buildDependencies.add(file);
+
+				logger.value("   check cache", filePathRel, 4);
+				try {
+					persistedCache = this.cache.get();
+					compilationCacheEntry = await this.wpCacheCompilation.getPromise(`${filePath}|${identifier}`, null);
+				}
+				catch (e) {
+					this.handleError(e, "failed while checking cache");
+					return;
+				}
+
+				if (persistedCache)
+				{
+					data = data || await readFile(filePath);
+					const newHash = this.getContentHash(data);
+					if (newHash === persistedCache[filePathRel])
+					{
+						logger.value("   asset unchanged", filePathRel, 4);
+						this.compilation.comparedForEmitAssets.add(file);
+						continue;
+					}
+					persistedCache[filePathRel] = newHash;
+					this.cache.set(persistedCache);
+				}
+
+				if (compilationCacheEntry)
+				{
+					let isValidSnapshot;
+					logger.value("   check snapshot valid", filePathRel, 3);
+					try {
+						isValidSnapshot = await this.checkSnapshotValid(compilationCacheEntry.snapshot);
+					}
+					catch (e) {
+						this.handleError(e, "failed while checking snapshot");
+						return;
+					}
+					if (isValidSnapshot)
+					{
+						logger.value("   snapshot valid", filePathRel, 4);
+						({ hash, source } = compilationCacheEntry);
+						data = data || await readFile(filePath);
+						const newHash = this.getContentHash(data);
+						if (newHash === hash)
+						{
+							logger.value("   asset unchanged", filePathRel, 4);
+							this.compilation.comparedForEmitAssets.add(file);
+							return;
+						}
+					}
+					else {
+						logger.write(`   snapshot for '${filePathRel}' is invalid`, 4);
+					}
+				}
+
+				if (!source)
+				{
+					let snapshot;
+					const startTime = Date.now();
+					data = data || await readFile(filePath);
+					source = new this.compiler.webpack.sources.RawSource(data);
+					logger.value("   create snapshot", filePathRel, 4);
+					try {
+						snapshot = await this.createSnapshot(startTime, filePath);
+					}
+					catch (e) {
+						this.handleError(e, "failed while creating snapshot");
+						return;
+					}
+					if (snapshot)
+					{
+						// console.log("########: ");
+						// console.log("hasContextHashes: " + snapshot.hasContextHashes());
+						// console.log("hasFileHashes: " + snapshot.hasFileHashes());
+						// console.log("hasFileTimestamps: " + snapshot.hasFileTimestamps());
+						// console.log("hasStartTime: " + snapshot.hasStartTime());
+
+						logger.value("   cache snapshot", filePathRel, 4);
+						try {
+							const hash = this.getContentHash(source.buffer());
+							snapshot.setFileHashes(hash);
+							await this.wpCacheCompilation.storePromise(`${filePath}|${identifier}`, null, { source, snapshot, hash });
+
+							compilationCacheEntry = await this.wpCacheCompilation.getPromise(`${filePath}|${identifier}`, null);
+							// if (cacheEntry)
+							// {
+							// 	console.log("!!!!!!!!!!: " + cacheEntry.hash);
+							// 	console.log("hasContextHashes: " + snapshot.hasContextHashes());
+							// 	console.log("hasFileHashes: " + snapshot.hasFileHashes());
+							// 	console.log("hasFileTimestamps: " + snapshot.hasFileTimestamps());
+							// 	console.log("hasStartTime: " + snapshot.hasStartTime());
+							// }
+						}
+						catch (e) {
+							this.handleError(e, "failed while caching snapshot");
+							return;
+						}
+					}
+				}
+
+				const info = {
+					absoluteFilename: filePath,
+					sourceFilename: filePathRel,
+					filename: file,
+					precompile: true,
+					development: true,
+					immutable: true
+				};
+
+				const existingAsset = this.compilation.getAsset(filePathRel);
+				if (!existingAsset)
+				{
+					logger.value("   add asset", filePathRel, 2);
+					this.compilation.additionalChunkAssets.push(filePathRel);
+					// logger.value("   emit asset", filePathRel, 2);
+					// this.compilation.emitAsset(file, source, info);
+				}
+				// else if (this.options.force) {
+				// 	logger.value("   update asset", filePathRel, 2);
+				// 	this.compilation.updateAsset(file, source, info);
+				// }
+
+				this.compilation.comparedForEmitAssets.add(filePathRel);
+			}
+		}
+		catch (e) {
+			this.handleError(e, "typescript build failed");
+		}
+	};
+
+}
 
 
 /**
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns {WebpackPluginInstance[]}
+ * @param {WpBuildEnvironment} env
+ * @returns {WpBuildPreCompilePlugin | undefined}
  */
-const build = (env, wpConfig) =>
-{
-	const _env = { ...env };
-
-	const plugins = [
-	{   /** @param {import("webpack").Compiler} compiler Compiler */
-		apply: (compiler) =>
-		{
-			compiler.hooks.beforeCompile.tap("BeforeCompilePlugin", () =>
-			{
-				const isTestsBuild = (_env.build === "tests" || _env.environment.startsWith("test"));
-				try {
-					tsc.buildTypes(_env);
-					if (isTestsBuild) {
-						tsc.buildTests(_env);
-					}
-				} catch {}
-			});
-		}
-	}];
-
-	// plugins.push(
-	// 	new webpack.DefinePlugin({
-    //         __REQUIRE_MODULE__: env.environment === "dev" ? "" : "require",
-    //     })
-	// );
-
-	// plugins.push(
-	// 	new ContextMapPlugin("node_modules/nyc/lib", [
-	// 		"../lib/register-env.js",
-	// 		"../lib/wrap.js",
-	// 		"../bin/wrap.js"
-	// 	])
-	// );
-	// lugins.push(
-	// 	new webpack.ContextReplacementPlugin(
-	// 		/(.*)/,
-	// 		(resource) =>
-	// 		{
-	// 			console.log("--------------------------------------------------");
-	// 			console.log("ctx: " + resource.context);
-	// 			console.log("req: " + resource.request);
-	// 			console.log(resource.recursive);
-	// 			console.log(resource.resolveOptions);
-	// 			console.log(resource.contextInfo);
-	// 			console.log("mode: " + resource.mode);
-	// 			console.log(resource.resource);
-	// 			console.log(resource.request);
-	// 			resource.request = resource.request.replace(
-	// 				/\./,
-	// 				"../.."
-	// 			);
-	// 			// resource.context = resource.context.replace(
-	// 			// 	/src[\/\\]runner/,
-	// 			// 	"node_modules\\nyc\\lib"
-	// 			// );
-	// 			// resource.recursive = false;
-	// 		}
-	// 	)
-	// ;
-		// {
-		// 	test: /clean\-webpack\-plugin\.js$/,
-		// 	include: path.join(env.buildPath, "node_modules", "clean-webpack-plugin", "dist"),
-		// 	loader: "string-replace-loader",
-		// 	options: {
-		// 		multiple: [
-		// 		{
-		// 			search: "hooks.emit.tap('clean-webpack-plugin', compilation => {",
-		// 			replace: "hooks.beforeCompile.tap('clean-webpack-plugin', compilation => {"
-		// 		},
-		// 		{
-		// 			search: "const stats = compilation.getStats();",
-		// 			replace: "this.removeFiles(this.cleanOnceBeforeBuildPatterns); return;"
-		// 		}]
-		// 	}
-		// },
-/*
-	plugins.push(
-		new webpack.ContextReplacementPlugin(/(.*)/, (context) =>
-		{
-			console.log(context.context);
-			Object.keys(context).forEach(k => console.log(k));
-			if (!/[\/\\]runner/.test(context.context)) {
-				return;
-			}
-			Object.assign(context,
-			{
-				regExp: /^\w+/,
-				request: "../../node_modules/nyc/lib", // resolved relatively
-			});
-		})
-	);
-*/
-	// plugins.push(
-	// {
-	// 	/** @param {import("webpack").Compiler} compiler Compiler */
-	// 	apply: (compiler) =>
-	// 	{
-	// 		compiler.hooks.compilation.tap("CompilationPlugin", (compilation) =>
-	// 		{
-	// 			compilation.hooks.afterProcessAssets.tap(
-	// 			{
-	// 				name: "CompilationPlugin",
-	// 				stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL
-	// 			},
-	// 			 (assets) =>
-	// 			{
-	// 				Object.keys(assets).forEach(k => console.log("" + k));
-	// 				const oldSource = assets["testutils.cjs"];
-	// 				const { ReplaceSource } = compiler.webpack.sources;
-	// 				const newSource = new ReplaceSource(oldSource, "CompilationPlugin");
-	// 				const codeToReplace = "require(",
-	// 					  newCode = "__non_webpack_require__(",
-	// 					  start = oldSource.source().indexOf(codeToReplace),
-	// 					  end = start + codeToReplace.length;
-	// 				newSource.replace(start, end, newCode, "CompilationPlugin");
-	// 				compilation.updateAsset("testutils.cjs", newSource);
-	// 			});
-	// 			// try {
-	// 			// 	const outFile = path.join(env.buildPath, "dist", "testutils.cjs");
-	// 			// 	if (fs.existsSync(outFile))
-	// 			// 	{
-	// 			// 		console.log("HHHHHHHHH");
-	// 			// 		const regex = /^require\(/mg,
-	// 			// 			  content = fs.readFileSync(outFile, "utf8").replace(regex, (v) => { console.log("here"); return "__non_webpack_require__("; });
-	// 			// 		fs.writeFileSync(outFile, content);
-	// 			// 	}
-	// 			// } catch {}
-	// 		});
-	// 	}
-	// });
-	return plugins;
-};
+const testsuite = (env) =>
+	(env.isTests && env.app.plugins.build !== false && env.build !== "webview" ? new WpBuildPreCompilePlugin({ env }) : undefined);
 
 
-const tsc =
-{
-	/**
-	 * @param {WebpackEnvironment} env
-	 * @returns {void}
-	 */
-	buildTests: (env) =>
-	{
-		// const tscArgs = [ "tsc", "-p", "./src/test/tsconfig.json" ];
-		// spawnSync("npx", tscArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
-		const npmArgs = [ "npm", "run", "build-tests" ];
-		spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
-	},
-
-	/**
-	 * @param {WebpackEnvironment} env
-	 * @returns {void}
-	 */
-	buildTypes: (env) =>
-	{
-		const npmArgs = [ "npm", "run", "build-types" ];
-		if (!existsSync(join(env.buildPath, "dist", "types"))) {
-			try { unlinkSync(join(env.buildPath, "node_modules", ".cache", "tsconfig.tsbuildinfo")); } catch {}
-		}
-		// const result =
-			spawnSync("npx", npmArgs, { cwd: env.buildPath, encoding: "utf8", shell: true });
-		// if (result.status !== 0) {
-		// 	compilation.warnings.push(/** @type {*}*/(new webpack.WebpackError(paths.join(" -> "))));
-		// }
-	}
-
-};
-
-
-export default build;
+export default testsuite;

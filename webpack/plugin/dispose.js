@@ -6,10 +6,10 @@
  * @module wpbuild.plugin.licensefiles
  */
 
-const { join } = require("path");
-const { existsSync } = require("fs");
-const WpBuildBasePlugin = require("./base");
-const { rename, unlink, readdir } = require("fs/promises");
+import { join } from "path";
+import { existsSync } from "fs";
+import WpBuildBasePlugin from "./base";
+import { rename, unlink, readdir } from "fs/promises";
 
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
@@ -39,9 +39,12 @@ class WpBuildDisposePlugin extends WpBuildBasePlugin
         });
     }
 
-    dispose()
+    async dispose()
     {
-        this.env.disposables.forEach(async d => d.dispose());
+        this.logger.write("cleanup: call all registered disposables", 2);
+        for (const d of this.env.disposables.splice(0)) {
+            await d.dispose();
+        }
     }
 }
 
@@ -54,4 +57,4 @@ class WpBuildDisposePlugin extends WpBuildBasePlugin
 const dispose = (env) => new WpBuildDisposePlugin({ env });
 
 
-module.exports = dispose;
+export default dispose;

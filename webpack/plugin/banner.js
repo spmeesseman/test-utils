@@ -8,7 +8,7 @@
 
 import webpack from "webpack";
 import WpBuildBasePlugin from "./base";
-import { getEntriesRegex, isString } from "../utils/utils";
+import { isString } from "../utils/utils";
 
 /** @typedef {import("../types").WpBuildEnvironment} WpBuildEnvironment */
 
@@ -32,7 +32,7 @@ const banner = (env) =>
 					options: {
 						banner: `Copyright ${(new Date()).getFullYear()} ${author}`,
 						entryOnly: true,
-						test: getEntriesRegex(env.wpc, true, true)
+						test: WpBuildBasePlugin.getEntriesRegex(env.wpc, true, true)
 					}
 				}]
 			});

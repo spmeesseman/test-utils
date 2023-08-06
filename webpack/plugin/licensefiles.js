@@ -23,7 +23,7 @@ import { rename, unlink, readdir } from "fs/promises";
 class WpBuildLicenseFilePlugin extends WpBuildBasePlugin
 {
     /**
-     * @function Called by webpack runtime to apply this plugin
+     * @function Called by webpack runtime to initialize this plugin
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */

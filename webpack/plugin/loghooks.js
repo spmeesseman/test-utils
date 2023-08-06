@@ -24,7 +24,7 @@ class WpBuildLogHookStagesPlugin extends WpBuildBasePlugin
 	constructor(options) { super(options, "hooksLog"); }
 
     /**
-     * @function Called by webpack runtime to apply this plugin
+     * @function Called by webpack runtime to initialize this plugin
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */
@@ -132,14 +132,11 @@ class WpBuildLogHookStagesPlugin extends WpBuildBasePlugin
 	 */
 	writeBuildTag(hook)
 	{
-		const logger = this.env.logger,
-			  key = hook +this.env.wpc.name;
+		const key = hook +this.env.wpc.name;
 		if (!globalEnv.hooksLog[key])
 		{
 			globalEnv.hooksLog[key] = true;
-			const star = logger.withColor(logger.icons.star, logger.colors.cyan),
-				  hookName = `${star} ${hook} ${star}`;
-			logger.value("build stage hook", hookName);
+			this.logHook("build stage hook", hook);
 		}
 	};
 

@@ -21,4 +21,4 @@ const cache = (env) =>
 };
 
 
-module.exports = cache;
+export default cache;
