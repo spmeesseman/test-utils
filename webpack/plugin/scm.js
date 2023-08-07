@@ -3,7 +3,8 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.banner
+ * @file plugin/scm.js
+ * @author Scott Meesseman
  */
 
 import { globalEnv } from "../utils";
@@ -25,26 +26,30 @@ class WpBuildScmPlugin extends WpBuildBasePlugin
 
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
+     * @member apply
      * @param {WebpackCompiler} compiler the compiler instance
-     * @returns {void}
      */
     apply(compiler)
     {
         this.onApply(compiler,
         {
-            checkin: {
+            commitSourceCodeChanges: {
                 async: true,
                 hook: "shutdown",
-                callback: this.checkin.bind(this)
+                callback: this.commit.bind(this)
             }
         });
     }
 
 
     /**
-     * @function uploadAssets
+     * @function
+     * @private
+     * @async
+     * @member commit
      */
-    async checkin()
+    async commit()
     {
         if (globalEnv.scm.callCount === 2 && globalEnv.scm.readyCount > 0)
         {
@@ -83,12 +88,11 @@ class WpBuildScmPlugin extends WpBuildBasePlugin
 
 
 /**
- * @function finalize
+ * @function
  * @param {WpBuildEnvironment} env
  * @returns {WpBuildScmPlugin | undefined}
  */
-const scm = (env) =>
-    (env.app.plugins.scm !== false && env.isExtensionProd ? new WpBuildScmPlugin({ env }) : undefined);
+const scm = (env) => env.app.plugins.scm && env.isExtensionProd ? new WpBuildScmPlugin({ env }) : undefined;
 
 
 export default scm;

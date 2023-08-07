@@ -133,5 +133,6 @@
             "hashStore": "",
             "sourceMapWasm": ""
         }
-    }
+    },
+    "moduleName": "taskexplorer"
 }

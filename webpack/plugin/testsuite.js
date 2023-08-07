@@ -3,7 +3,8 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.build
+ * @file plugin/testsuite.js
+ * @author Scott Meesseman
  */
 
 import { existsSync } from "fs";
@@ -11,7 +12,6 @@ import { promisify } from "util";
 import WpBuildBasePlugin from "./base";
 import { WebpackError } from "webpack";
 const exec = promisify(require("child_process").exec);
-// const spawn = promisify(require("child_process").spawn);
 import { findFiles, getTsConfig } from "../utils";
 const {readFile, unlink, access } from "fs/promises";
 import { join, basename, relative, dirname, isAbsolute, resolve } from "path";
@@ -26,17 +26,18 @@ import { join, basename, relative, dirname, isAbsolute, resolve } from "path";
 /** @typedef {import("../types").WebpackCompilationParams} WebpackCompilationParams */
 
 
-class WpBuildPreCompilePlugin extends WpBuildBasePlugin
+class WpBuildTestSuitePlugin extends WpBuildBasePlugin
 {
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
      * @param {WebpackCompiler} compiler the compiler instance
      */
     apply(compiler)
     {
         this.onApply(compiler,
         {
-			typesAndTests: {
+			buildTestsSuite: {
 				async: true,
                 hook: "afterCompile",
                 // hook: "compilation",
@@ -232,7 +233,7 @@ class WpBuildPreCompilePlugin extends WpBuildBasePlugin
 				const filePathRel = relative(outputDir, filePath),
 					  file = basename(filePathRel);
 
-				this.compilation.buildDependencies.add(file);
+				// this.compilation.buildDependencies.add(file);
 
 				logger.value("   check cache", filePathRel, 4);
 				try {
@@ -367,10 +368,10 @@ class WpBuildPreCompilePlugin extends WpBuildBasePlugin
 
 /**
  * @param {WpBuildEnvironment} env
- * @returns {WpBuildPreCompilePlugin | undefined}
+ * @returns {WpBuildTestSuitePlugin | undefined}
  */
 const testsuite = (env) =>
-	(env.isTests && env.app.plugins.build !== false && env.build !== "webview" ? new WpBuildPreCompilePlugin({ env }) : undefined);
+	env.isTests && env.app.plugins.build && env.build !== "webview" ? new WpBuildTestSuitePlugin({ env }) : undefined;
 
 
 export default testsuite;

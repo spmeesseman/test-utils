@@ -3,7 +3,8 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.licensefiles
+ * @file plugin/licensefiles.js
+ * @author Scott Meesseman
  */
 
 import { join } from "path";
@@ -24,6 +25,7 @@ class WpBuildLicenseFilePlugin extends WpBuildBasePlugin
 {
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */
@@ -31,7 +33,7 @@ class WpBuildLicenseFilePlugin extends WpBuildBasePlugin
     {
         this.onApply(compiler,
         {
-            checkin: {
+            processLicenseFiles: {
                 async: true,
                 hook: "shutdown",
                 callback: this.licenseFiles.bind(this)

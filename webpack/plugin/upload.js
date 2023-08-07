@@ -3,12 +3,13 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.upload
+ * @file plugin/upload.js
  * !!! This module uses 'plink' and 'pscp' from the PuTTY package: https://www.putty.org
  * !!! For first time build on fresh os install:
  * !!!   - create the environment variables WPBUILD_APP1_SSH_AUTH_*
  * !!!   - run a plink command manually to generate and trust the fingerprints:
  * !!!       plink -ssh -batch -pw <PWD> smeesseman@app1.spmeesseman.com "echo hello"
+ * @author Scott Meesseman
  */
 
 import { existsSync } from "fs";
@@ -38,6 +39,7 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
 
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */
@@ -45,7 +47,7 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
     {
         this.onApply(compiler,
         {
-            debugFiles: {
+            uploadDebugSupportFiles: {
                 async: true,
                 hook: "afterEmit",
                 callback: this.debugSupportFiles.bind(this)
@@ -67,8 +69,10 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
         //
         const env = this.env,
               logger = env.logger,
-              toUploadPath = join(env.paths.temp, env.environment);
+              toUploadPath = join(env.paths.temp, env.environment), // /temp/<env>/<env>
+              logIcon = logger.withColor(logger.icons.info, logger.colors.yellow);
 
+        logger.write("upload debug support files", 1, "", logIcon);
         this.compilation = compilation;
         if (!existsSync(toUploadPath)) {
             await mkdir(toUploadPath);
@@ -81,11 +85,15 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
                 const asset = compilation.getAsset(file);
                 if (asset && chunk.name && (env.state.hash.next[chunk.name] !== env.state.hash.current[chunk.name] || !env.state.hash.previous[chunk.name]))
                 {
+                    logger.value("   queue asset for upload", logger.tag(file), 2, "", logIcon);
+                    logger.value("      asset info", JSON.stringify(asset.info), 4);
                     await copyFile(join(env.paths.dist, file), join(toUploadPath, file));
                     if (asset.info.related?.sourceMap)
                     {
                         const sourceMapFile = asset.info.related.sourceMap.toString();
+                        logger.value("   queue sourcemap for upload", logger.tag(sourceMapFile), 2, "", logIcon);
                         if (env.environment === "prod") {
+                            logger.value("   remove production sourcemap from distribution", sourceMapFile, 3);
                             await rename(join(env.paths.dist, sourceMapFile), join(toUploadPath, sourceMapFile));
                         }
                         else {
@@ -95,10 +103,9 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
                 }
                 else if (asset)
                 {
-                    const msg = "unchanged, skip upload ".padEnd(env.app.log.pad.value),
-                          hash = asset.info.contenthash?.toString() || "",
-                          icon = logger.withColor(logger.icons.info, logger.colors.yellow);
-                    logger.write(`${msg}${logger.tagColor(hash)} ${logger.tagColor(file, null, logger.colors.grey)}`, 1, "", icon, logger.colors.grey);
+                    const msg = "   unchanged, skip upload",
+                          hash = asset.info.contenthash?.toString() || "";
+                    logger.value(msg, logger.tag(hash) + " " + logger.tag(file), 2, "", logIcon);
                 }
             }
         }
@@ -113,7 +120,7 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
               filesToUpload = await readdir(toUploadPath);
 
         if (filesToUpload.length === 0) {
-            logger.write("There were no updated assets found to upload");
+            logger.write("no assets to upload", 1, "", logIcon);
             return;
         }
 
@@ -127,9 +134,11 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
             `mkdir ${rBasePath}/${env.app.name}`,
             `mkdir ${rBasePath}/${env.app.name}/v${env.app.version}`,
             `mkdir ${rBasePath}/${env.app.name}/v${env.app.version}/${env.environment}`,
-            `rm -f ${rBasePath}/${env.app.name}/v${env.app.version}/${env.environment}/*.*`
+            // `mkdir ${rBasePath}/${env.app.name}/v${env.app.version}/${env.environment}/${compilation.hash}`,
+            `rm -f ${rBasePath}/${env.app.name}/v${env.app.version}/${env.environment}/*.*`,
+            // `rm -f ${rBasePath}/${env.app.name}/v${env.app.version}/${env.environment}/${compilation.hash}/*.*`
         ];
-        if (env.environment === "prod") { plinkCmds.pop(); }
+        if (env.environment !== "prod") { plinkCmds.pop(); }
 
         const plinkArgs = [
             "-ssh",       // force use of ssh protocol
@@ -151,21 +160,26 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
 
         await copyFile(join(env.paths.build, "node_modules", "source-map", "lib", "mappings.wasm"), join(toUploadPath, "mappings.wasm"));
 
-        logger.write(`upload resource files to ${host}`, 1, "", logger.icons.color.star);
-        try {
-            logger.write(`   create / clear dir    : plink ${plinkArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`);
+        logger.write(`   upload resource files to ${host}`, 1, "", logIcon);
+        try
+        {
+            logger.write("   plink: create / clear remmote directory", 1, "", logIcon);
+            // logger.write("  plink ${plinkArgs.map((v, i) => (i !== 3 ? v : "<PWD>")).join(" ")}`, 5, "", logIcon);
             spawnSync("plink", plinkArgs, spawnSyncOpts);
-            logger.write(`   upload files  : pscp ${pscpArgs.map((v, i) => (i !== 1 ? v : "<PWD>")).join(" ")}`);
-            spawnSync("pscp", pscpArgs, spawnSyncOpts);
+            logger.write("   pscp:  upload files", 1, "", logIcon);
+            // logger.write("  pscp ${pscpArgs.map((v, i) => (i !== 1 ? v : "<PWD>")).join(" ")}`, 5, "", logIcon);
             spawnSync("pscp", pscpArgs, spawnSyncOpts);
             filesToUpload.forEach((f) =>
-                logger.write(`   ${logger.icons.color.successTag} ${logger.withColor(`uploaded ${basename(f)}`, logger.colors.grey)}`, 1, "", logger.icons.color.up)
+                logger.write(`   ${logger.icons.color.successTag} ${logger.withColor(`uploaded ${basename(f)}`, logger.colors.grey)}`, 1, "", logIcon)
             );
-            logger.write("successfully uploaded resource files", 1, "", logger.icons.color.star);
+            logger.write("successfully uploaded resource files", 1, "", logIcon);
         }
-        catch (e) {
+        catch (e)
+        {
             logger.error("error uploading resource files:");
-            filesToUpload.forEach(f => logger.write(`   ${logger.withColor(logger.icons.up, logger.colors.red)} ${logger.withColor(basename(f), logger.colors.grey)}`, undefined, "", logger.icons.color.error));
+            filesToUpload.forEach((f) =>
+                logger.write(`   ${logger.icons.color.errorTag} ${logger.withColor(`upload ${basename(f)} failed`, logger.colors.grey)}`, 1, "", logIcon)
+            );
             logger.error(e);
         }
         finally {
@@ -177,12 +191,12 @@ class WpBuildUploadPlugin extends WpBuildBasePlugin
 
 
 /**
+ * @module wpbuild.plugin.upload
  * @function upload
  * @param {WpBuildEnvironment} env
  * @returns {WpBuildUploadPlugin | undefined} plugin instance
  */
-const upload = (env) =>
-    (env.app.plugins.upload !== false && env.isExtension ? new WpBuildUploadPlugin({ env }) : undefined);
+const upload = (env) => env.app.plugins.upload && env.isMain ? new WpBuildUploadPlugin({ env }) : undefined;
 
 
 export default upload;

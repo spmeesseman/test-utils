@@ -2,7 +2,8 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.ignore
+ * @file plugin/ignore.js
+ * @author Scott Meesseman
  */
 
 import webpack from "webpack";

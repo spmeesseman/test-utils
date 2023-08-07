@@ -3,7 +3,8 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.banner
+ * @file plugin/banner.js
+ * @author Scott Meesseman
  */
 
 import webpack from "webpack";
@@ -19,7 +20,7 @@ import { isString } from "../utils/utils";
  */
 const banner = (env) =>
 {
-	if (env.app.plugins.banner !== false && env.wpc.mode === "production")
+	if (env.app.plugins.banner !== false && env.build !== "tests" && env.wpc.mode === "production")
 	{
 		const author = isString(env.app.pkgJson.author) ? env.app.pkgJson.author : env.app.pkgJson.author?.name;
 		if (author)

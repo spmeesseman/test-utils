@@ -2,6 +2,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 // @ts-check
 
+/**
+ * @file plugin/loghooks.js
+ * @author Scott Meesseman
+ */
+
 import { globalEnv } from "../utils";
 import WpBuildBasePlugin from "./base";
 
@@ -25,6 +30,7 @@ class WpBuildLogHookStagesPlugin extends WpBuildBasePlugin
 
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */
@@ -136,7 +142,7 @@ class WpBuildLogHookStagesPlugin extends WpBuildBasePlugin
 		if (!globalEnv.hooksLog[key])
 		{
 			globalEnv.hooksLog[key] = true;
-			this.logHook("build stage hook", hook);
+			this.logger.valuestar("build stage hook", hook);
 		}
 	};
 

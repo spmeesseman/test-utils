@@ -3,13 +3,12 @@
 // @ts-check
 
 /**
- * @module wpbuild.plugin.licensefiles
+ * @file plugin/dispose.js
+ * @author Scott Meesseman
  */
 
-import { join } from "path";
-import { existsSync } from "fs";
+import { isPromise } from "../utils";
 import WpBuildBasePlugin from "./base";
-import { rename, unlink, readdir } from "fs/promises";
 
 /** @typedef {import("../types").WebpackCompiler} WebpackCompiler */
 /** @typedef {import("../types").WebpackStatsAsset} WebpackStatsAsset */
@@ -18,12 +17,13 @@ import { rename, unlink, readdir } from "fs/promises";
 
 
 /**
- * @class WpBuildLicenseFilePlugin
+ * @class WpBuildDisposePlugin
  */
 class WpBuildDisposePlugin extends WpBuildBasePlugin
 {
     /**
      * @function Called by webpack runtime to initialize this plugin
+     * @override
      * @param {WebpackCompiler} compiler the compiler instance
      * @returns {void}
      */
@@ -31,7 +31,7 @@ class WpBuildDisposePlugin extends WpBuildBasePlugin
     {
         this.onApply(compiler,
         {
-            checkin: {
+            cleanupRegisteredDisposables: {
                 async: true,
                 hook: "shutdown",
                 callback: this.dispose.bind(this)
@@ -42,8 +42,12 @@ class WpBuildDisposePlugin extends WpBuildBasePlugin
     async dispose()
     {
         this.logger.write("cleanup: call all registered disposables", 2);
-        for (const d of this.env.disposables.splice(0)) {
-            await d.dispose();
+        for (const d of this.env.disposables.splice(0))
+        {
+            const result = d.dispose();
+            if (isPromise(result)) {
+                await result;
+            }
         }
     }
 }
