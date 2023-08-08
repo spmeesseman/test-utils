@@ -11,6 +11,7 @@ import { ITestTrackerOptions, ITestResults } from "../interface/index.js";
 export class TestUtilsUtilities
 {
     private _testTimer = 0;
+    private _isSingleSuiteTest = false;
     private readonly _inst: TestTracker;
     private readonly _results: ITestResults;
     private readonly _options: ITestTrackerOptions;
@@ -24,6 +25,7 @@ export class TestUtilsUtilities
     }
 
 
+    get isSingleSuiteTest() { return this._isSingleSuiteTest; }
     get writeConsole() { return writeInfo; }
 
 
@@ -71,9 +73,7 @@ export class TestUtilsUtilities
                 timeFinished: 0,
                 numTestsFailed: 0
             };
-            if (suite.parent) {
-                this._options.isSingleSuiteTest = suite.parent.suites.length <= 2;
-            }
+            this._isSingleSuiteTest = !!suite.parent && suite.parent.suites.length <= 2;
         }
 
         const suiteResults = this._results.suiteResults[suiteKey],

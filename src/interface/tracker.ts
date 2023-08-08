@@ -39,7 +39,6 @@ export interface ITestTrackerOptions
     isLogEnabled: boolean;
     isMultiRootWorkspace: boolean;
     isOutputWindowLogEnabled: boolean;
-    isSingleSuiteTest: boolean;
     framework: TestsFramework;
     printSuiteRuntimes: boolean;
     store: ITestUtilsStore;

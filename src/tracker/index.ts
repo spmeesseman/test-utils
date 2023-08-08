@@ -46,7 +46,6 @@ export class TestTracker
             isLogEnabled: false,
             isMultiRootWorkspace: false,
             isOutputWindowLogEnabled: false,
-            isSingleSuiteTest: false,
             printSuiteRuntimes: false,
             store: {
                 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -66,13 +65,10 @@ export class TestTracker
 
 
     get isRollingCountError() { return !!this._hasRollingCountError; }
-
+    get isSingleSuiteTest() { return this._utils.isSingleSuiteTest; }
     get options(): ITestTrackerOptions { return this._options; }
-
     set options(options: Partial<ITestTrackerOptions>) { this._timeStarted = Date.now(); Object.assign(this._options, options); }
-
     get results(): ITestResults { return this._results; }
-
     get utils(): TestUtilsUtilities { return this._utils; }
 
 
